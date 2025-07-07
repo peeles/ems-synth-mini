@@ -1,23 +1,27 @@
 <template>
-    <SynthPanel title="Oscillator Module">
+    <SynthPanel title="Oscillator">
         <div class="mb-3">
-            <label class="block font-semibold">Frequency Range</label>
+            <label class="block text-xs font-semibold mb-1">
+                Frequency Range
+            </label>
             <input
                 type="range"
                 min="0.1"
                 max="15"
                 step="0.1"
-                v-model.number="oscFrequency"
+                v-model.number="oscFreq"
                 @input="updateFreq"
-                class="w-full accent-amber-500"
+                class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
-            <div class="text-center text-[10px] mt-1 text-gray-700">
-                {{ oscFrequency.toFixed(1) }} Hz
+            <div class="text-center text-xs mt-1 text-gray-700">
+                {{ oscFreq.toFixed(1) }} Hz
             </div>
         </div>
 
         <div>
-            <label class="block font-semibold">Level</label>
+            <label class="block text-xs font-semibold mb-1">
+                Level
+            </label>
             <input
                 type="range"
                 min="0"
@@ -25,7 +29,7 @@
                 step="0.01"
                 v-model.number="oscGain"
                 @input="updateGain"
-                class="w-full accent-amber-500"
+                class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
         </div>
     </SynthPanel>
@@ -52,7 +56,11 @@ onMounted(async () => {
         gain: oscGain.value,
         type: 'sine'
     })
-    node.gain.connect(context.destination) // or hold for patch routing
+    node.gain.connect(context.destination)
+
+    // Explicit initial sync
+    updateFreq()
+    updateGain()
 })
 
 const updateFreq = () => {

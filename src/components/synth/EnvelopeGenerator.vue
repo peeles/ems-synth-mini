@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel :title="'Envelope (Trapezoid)'">
+    <SynthPanel :title="'Trapezoid Generator'">
         <div class="mb-3">
             <label class="block text-xs font-semibold mb-1">
                 Attack (Rise): {{ envelopeAttack.toFixed(2) }}s

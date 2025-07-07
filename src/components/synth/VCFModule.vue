@@ -1,23 +1,8 @@
 <template>
-    <SynthPanel :title="'VCF (Filter)'">
+    <SynthPanel :title="'VCF'">
         <div class="mb-3">
             <label class="block text-xs font-semibold mb-1">
-                Type
-            </label>
-            <select
-                v-model="filterType"
-                @change="() => synth.setFilterType(filterType)"
-                class="w-full text-xs px-2 py-1 rounded border"
-            >
-                <option value="lowpass">Low-Pass</option>
-                <option value="highpass">High-Pass</option>
-                <option value="bandpass">Band-Pass</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="block text-xs font-semibold mb-1">
-                Cutoff: {{ filterCutoff }} Hz
+                Frequency (Cut-Off)
             </label>
             <input
                 type="range"
@@ -28,11 +13,29 @@
                 @input="() => synth.setFilterCutoff(filterCutoff)"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
+            <p class="text-center text-xs mt-1 text-gray-700">
+                {{ filterCutoff }} Hz
+            </p>
+        </div>
+
+        <div class="block mb-3">
+            <label class="block text-xs font-semibold mb-1">
+                Type
+            </label>
+            <select
+                v-model="filterType"
+                @change="() => synth.setFilterType(filterType)"
+                class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"
+            >
+                <option value="lowpass">Low-Pass</option>
+                <option value="highpass">High-Pass</option>
+                <option value="bandpass">Band-Pass</option>
+            </select>
         </div>
 
         <div>
             <label class="block text-xs font-semibold mb-1">
-                Resonance (Q): {{ filterResonance.toFixed(1) }}
+                Resonance (Q) {{ filterResonance.toFixed(1) }}
             </label>
             <input
                 type="range"

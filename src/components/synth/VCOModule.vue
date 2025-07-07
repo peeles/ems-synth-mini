@@ -1,6 +1,6 @@
 <template>
     <SynthPanel :title="'VCO'">
-        <div class="mb-1">
+        <div class="mb-3">
             <label class="block text-xs font-semibold mb-1">
                 Frequency
             </label>
@@ -13,9 +13,9 @@
                 @input="() => synth.setVcoFrequency(vcoFrequency)"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
-            <div class="text-center mt-1">
+            <p class="text-center text-xs mt-1 text-gray-700">
                 {{ vcoFrequency }} Hz
-            </div>
+            </p>
         </div>
 
         <div>

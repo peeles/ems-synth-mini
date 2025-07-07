@@ -1,60 +1,60 @@
 <template>
-    <SynthPanel :title="'Mixer Module'">
-        <div class="mb-3">
-            <label class="block text-xs font-semibold mb-1">
-                VCO Level: {{ vcoLevel.toFixed(2) }}
-            </label>
-            <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                v-model.number="vcoLevel"
-                @input="updateLevels"
-                class="w-full h-[6px] accent-black bg-black/10 rounded-full"
-            />
-        </div>
+    <SynthPanel title="Mixer">
+        <div class="flex justify-around items-end h-[140px]">
 
-        <div class="mb-3">
-            <label class="block text-xs font-semibold mb-1">
-                Noise Level: {{ noiseLevel.toFixed(2) }}
-            </label>
-            <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                v-model.number="noiseLevel"
-                @input="updateLevels"
-                class="w-full h-[6px] accent-black bg-black/10 rounded-full"
-            />
-        </div>
+            <!-- VCO -->
+            <div class="flex flex-col items-center">
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    v-model.number="vcoLevel"
+                    @input="updateLevels"
+                    class="w-4 h-24 accent-black bg-gray-200 rounded"
+                />
+                <span class="mt-1 text-[10px]">VCO</span>
+            </div>
 
-        <div>
-            <label class="block text-xs font-semibold mb-1">
-                Tone: {{ toneLabel }}
-            </label>
-            <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                v-model.number="tone"
-                @input="updateTone"
-                class="w-full h-[6px] accent-orange-500 bg-orange/10 rounded-full"
-            />
+            <!-- Noise -->
+            <div class="flex flex-col items-center">
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    v-model.number="noiseLevel"
+                    @input="updateLevels"
+                    class="w-4 h-24 accent-black bg-gray-200 rounded"
+                />
+                <span class="mt-1 text-[10px]">Noise</span>
+            </div>
+
+            <!-- Tone -->
+            <div class="flex flex-col items-center w-20">
+                <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    v-model.number="tone"
+                    @input="updateTone"
+                    class="w-full accent-orange-600"
+                />
+                <span class="mt-1 text-[10px]">{{ toneLabel }}</span>
+            </div>
+
         </div>
     </SynthPanel>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import SynthPanel from '../SynthPanel.vue'
+import { computed, ref } from 'vue'
 import { useSynthStore } from '../../storage/synthStore'
-import SynthPanel from "../SynthPanel.vue";
 
 const synth = useSynthStore()
 
-// VCO & Noise levels
 const vcoLevel = computed({
     get: () => synth.vcoLevel,
     set: (val) => synth.setMixerLevels(val, synth.noiseLevel)
@@ -65,22 +65,21 @@ const noiseLevel = computed({
     set: (val) => synth.setMixerLevels(synth.vcoLevel, val)
 })
 
+const tone = ref(0.5)
+
+const toneLabel = computed(() => {
+    if (tone.value < 0.3) return 'Dark'
+    if (tone.value > 0.7) return 'Bright'
+    return 'Neutral'
+})
+
 const updateLevels = () => {
     synth.setMixerLevels(vcoLevel.value, noiseLevel.value)
 }
 
-// Tone control (mapped to filter cutoff offset)
-const tone = ref(0.5)
-const toneLabel = computed(() => {
-    if (tone.value <= 0.2) return 'Dark'
-    if (tone.value >= 0.8) return 'Bright'
-    return 'Neutral'
-})
-
 const updateTone = () => {
-    const base = 800 // base filter cutoff
-    const spread = 7000
-    const adjusted = base + tone.value * spread
-    synth.setFilterCutoff(adjusted)
+    const base = 500
+    const spread = 8000
+    synth.setFilterCutoff(base + tone.value * spread)
 }
 </script>

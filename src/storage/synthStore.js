@@ -31,6 +31,10 @@ export const useSynthStore = defineStore('synth', () => {
 
     // === Modular Initializers ===
 
+    const getVCAOutputNode = () => {
+        return vcaGainNode
+    }
+
     const initVCF = () => {
         filterNode = engine.createFilterNode({
             type: filterType.value,
@@ -186,7 +190,7 @@ export const useSynthStore = defineStore('synth', () => {
         setLfoFrequency, setLfoWaveform,
         setFilterCutoff, setFilterResonance, setFilterType,
         setMixerLevels, setVcaMode,
-        triggerEnvelope: triggerVCAEnvelope,
+        triggerEnvelope: triggerVCAEnvelope, getVCAOutputNode,
 
         // Lifecycle
         resume: engine.resume,

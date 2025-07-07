@@ -1,7 +1,10 @@
 <template>
     <SynthPanel title="Noise Generator">
         <div>
-            <label class="block font-semibold mb-1">Level</label>
+            <label class="flex flex-row items-center justify-between text-xs font-semibold mb-1">
+                Level
+                <span class="text-gray-500">White</span>
+            </label>
             <input
                 type="range"
                 min="0"
@@ -13,8 +16,8 @@
             />
         </div>
 
-        <div class="mt-1 text-center italic text-gray-600">
-            Type: White
+        <div class="mt-1 text-center text-xs italic text-gray-600">
+            {{ noiseLevel.toFixed(1) }}
         </div>
     </SynthPanel>
 </template>
