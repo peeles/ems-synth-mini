@@ -1,36 +1,46 @@
 <template>
-    <div class="absolute flex flex-col items-center"
-         :style="{ left: '100px', bottom: '20px', width: '600px' }">
-        <h3 class="text-md font-bold mb-2">Slider Keyboard</h3>
-        <!-- Horizontal slider to choose pitch -->
-        <input type="range" min="0" max="100" step="1" class="w-full accent-red-600"
-               v-model.number="position"
-               @change="playNote" />
-        <!-- Optionally, display the frequency or note name -->
-        <div class="mt-1 text-sm">Frequency: {{ currentFrequency.toFixed(1) }} Hz</div>
+    <div class="bg-[#f5c44e] border border-black rounded-sm shadow-md p-2 font-mono text-[10px] text-black uppercase tracking-wide">
+        <h3 class="text-xs font-bold uppercase text-center">Slider Keyboard</h3>
+
+        <div class="space-y-2">
+            <div class="bg-gradient-to-t from-black to-gray-800 h-[40px] rounded-sm">
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    v-model.number="position"
+                    @change="playNote"
+                    class="w-full h-[8px] accent-black bg-black/10 rounded-full"
+                />
+            </div>
+
+            <div class="mt-2 text-center text-xs">
+                Frequency: <strong>{{ currentFrequency.toFixed(1) }} Hz</strong>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { useSynthStore } from '../../storage/synthStore';
-const synth = useSynthStore();
+import { ref, computed } from 'vue'
+import { useSynthStore } from '../../storage/synthStore'
 
-// 'position' represents the keyboard slider value (0-100)
-const position = ref(50);
+const synth = useSynthStore()
+
+// 0–100 slider position (normalized "touch strip")
+const position = ref(50)
+
+// Map position to frequency (e.g. 200–1000 Hz)
 const currentFrequency = computed(() => {
-    // Map the slider position to a frequency range for the VCO.
-    // For example, 0 -> 200 Hz, 100 -> 800 Hz (just as a demo scale).
-    const minFreq = 200;
-    const maxFreq = 800;
-    return minFreq + (maxFreq - minFreq) * (position.value / 100);
-});
+    const min = 200
+    const max = 1000
+    return min + ((max - min) * (position.value / 100))
+})
 
-// When the slider is released (change event), set the VCO frequency and trigger envelope
+// On slider release, set frequency and trigger envelope
 const playNote = () => {
-    // Update oscillator frequency based on slider position
-    synth.setVcoFrequency(currentFrequency.value);
-    // Trigger the envelope for a new note
-    synth.triggerEnvelope();
-};
+    synth.setVcoFrequency(currentFrequency.value)
+    synth.triggerEnvelope()
+}
 </script>

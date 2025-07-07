@@ -1,54 +1,69 @@
 <template>
-    <div class="absolute" :style="{ top: '20px', left: '220px' }">
-        <!-- VCO Panel UI -->
-        <h3 class="text-md font-bold mb-2">VCO (Oscillator)</h3>
-        <div class="mb-2">
-            <label class="block text-sm">Frequency: {{ vcoFrequency }} Hz</label>
-            <input type="range" min="50" max="5000" step="1"
-                   v-model.number="vcoFrequency"
-                   @input="onFrequencyInput"
-                   class="w-full accent-red-500" />
+    <SynthPanel :title="'VCO'">
+        <div class="mb-1">
+            <label class="block text-xs font-semibold mb-1">
+                Frequency
+            </label>
+            <input
+                type="range"
+                min="50"
+                max="2000"
+                step="1"
+                v-model.number="vcoFrequency"
+                @input="() => synth.setVcoFrequency(vcoFrequency)"
+                class="w-full h-[8px] accent-black bg-black/10 rounded-full"
+            />
+            <div class="text-center mt-1">
+                {{ vcoFrequency }} Hz
+            </div>
         </div>
-        <div class="mb-2">
-            <label class="block text-sm">Waveform</label>
-            <select v-model="vcoWaveform" @change="onWaveformChange" class="w-full px-2 py-1 rounded">
+
+        <div>
+            <label class="block text-xs font-semibold mb-1">Waveform</label>
+            <select
+                v-model="vcoWaveform"
+                @change="() => synth.setVcoWaveform(vcoWaveform)"
+                class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"
+            >
                 <option value="sine">Sine</option>
-                <option value="triangle">Triangle</option>
-                <option value="sawtooth">Sawtooth</option>
                 <option value="square">Square</option>
+                <option value="sawtooth">Saw</option>
+                <option value="triangle">Triangle</option>
             </select>
         </div>
-    </div>
+    </SynthPanel>
 </template>
 
 <script setup>
-import {computed, onUnmounted} from 'vue';
-import { useSynthStore } from '../../storage/synthStore';
+import { computed, onMounted } from 'vue'
+import { useSynthStore } from "../../storage/synthStore";
+import { useSynthEngine } from '../../composables/useSynthEngine'
+import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
+import SynthPanel from '../SynthPanel.vue'
 
+const engine = useSynthEngine()
 const synth = useSynthStore();
+let node = null;
 
-// Local refs from Pinia store (v-model can bind directly to store state)
 const vcoFrequency = computed({
     get: () => synth.vcoFrequency,
-    set: (val) => synth.setVcoFrequency(val)
-});
+    set: (val) => synth.setVcoFrequency(val),
+})
+
 const vcoWaveform = computed({
     get: () => synth.vcoWaveform,
-    set: (val) => synth.setVcoWaveform(val)
-});
+    set: (val) => synth.setVcoWaveform(val),
+})
 
-// Event handlers (not strictly required if using computed setters above, but added for clarity)
-const onFrequencyInput = () => {
-    synth.setVcoFrequency(vcoFrequency.value);
-};
-const onWaveformChange = () => {
-    synth.setVcoWaveform(vcoWaveform.value);
-};
+onMounted(async () => {
+    await engine.resume()
+    node = engine.createOscillatorNode({
+        frequency: vcoFrequency.value,
+        type: vcoWaveform.value,
+        gain: 0.5
+    })
+    node.gain.connect(engine.context.destination) // or to filter
+})
 
-// If this component were to mount/unmount dynamically, we could handle oscillator lifecycle:
-onUnmounted(() => {
-    // Stop and disconnect the oscillator if needed to prevent leaks
-    // (In static design, oscillator lives for app lifetime via store, so this is precaution)
-    // synth.stopOscillator()  // if we had such an action to stop and cleanup
-});
+useModuleLifecycle(node)
 </script>

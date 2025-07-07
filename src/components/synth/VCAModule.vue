@@ -1,31 +1,41 @@
 <template>
-    <div class="absolute" :style="{ top: '150px', left: '720px' }">
-        <h3 class="text-md font-bold mb-2">VCA</h3>
-        <div class="mb-2">
-            <label class="block text-sm">Mode:
-                <span v-if="vcaMode === 0">Envelope</span>
-                <span v-else-if="vcaMode === 1">Ring Mod</span>
-                <span v-else>{{ (vcaMode * 100).toFixed(0) + '%' }}</span>
+    <SynthPanel :title="'VCA'">
+        <div class="mb-3">
+            <label class="block text-xs font-semibold mb-1">
+                Mode Mix: {{ modeLabel }}
             </label>
-            <input type="range" min="0" max="1" step="0.01"
-                   v-model.number="vcaMode"
-                   @input="onModeChange"
-                   class="w-full accent-purple-500" />
+            <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                v-model.number="vcaMode"
+                @input="() => synth.setVcaMode(vcaMode)"
+                class="w-full h-[8px] accent-black bg-black/10 rounded-full"
+            />
         </div>
-        <!-- (Optional: could include an output level knob if needed) -->
-    </div>
+
+        <div class="text-center text-xs italic">
+            0 = Envelope / 1 = Ring Mod (LFO)
+        </div>
+    </SynthPanel>
 </template>
 
 <script setup>
-import {computed} from "vue";
-import { useSynthStore } from '../../storage/synthStore';
+import { computed } from 'vue'
+import { useSynthStore } from '../../storage/synthStore'
+import SynthPanel from "../SynthPanel.vue";
 
-const synth = useSynthStore();
+const synth = useSynthStore()
 
 const vcaMode = computed({
     get: () => synth.vcaMode,
     set: (val) => synth.setVcaMode(val)
-});
+})
 
-const onModeChange = () => synth.setVcaMode(vcaMode.value);
+const modeLabel = computed(() => {
+    if (vcaMode.value <= 0.1) return 'Envelope'
+    if (vcaMode.value >= 0.9) return 'Ring Mod'
+    return `${Math.round(vcaMode.value * 100)}% Blend`
+})
 </script>

@@ -1,37 +1,52 @@
 <template>
-    <div class="absolute" :style="{ top: '150px', left: '420px' }">
-        <h3 class="text-md font-bold mb-2">Noise Generator</h3>
-        <div class="mb-2">
-            <label class="block text-sm">Noise Level: {{ noiseLevel }}</label>
-            <input type="range" min="0" max="1" step="0.01"
-                   v-model.number="noiseLevel"
-                   @input="onLevelChange"
-                   class="w-full accent-gray-500" />
+    <SynthPanel title="Noise Generator">
+        <div>
+            <label class="block font-semibold mb-1">Level</label>
+            <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                v-model.number="noiseLevel"
+                @input="updateNoise"
+                class="w-full h-[8px] accent-black bg-black/10 rounded-full"
+            />
         </div>
-        <!-- Optionally, choose noise type -->
-        <div class="mb-2">
-            <label class="block text-sm">Type</label>
-            <select v-model="noiseType" class="w-full px-2 py-1 rounded" disabled>
-                <option>White</option>
-                <!-- <option>Pink</option> could be added if pink noise implemented -->
-            </select>
+
+        <div class="mt-1 text-center italic text-gray-600">
+            Type: White
         </div>
-    </div>
+    </SynthPanel>
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
-import { useSynthStore } from '../../storage/synthStore';
+import SynthPanel from '../SynthPanel.vue'
+import { computed, onMounted } from 'vue'
+import { useSynthStore } from '../../storage/synthStore'
+import { useSynthEngine } from '../../composables/useSynthEngine'
+import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
 
-const synth = useSynthStore();
+const synthStore = useSynthStore()
+const engine = useSynthEngine()
+const context = engine.context
 
 const noiseLevel = computed({
-    get: () => synth.noiseLevel,
-    set: (val) => synth.setMixerLevels(synth.vcoLevel, val)  // update noise part of mixer
-});
+    get: () => synthStore.noiseLevel,
+    set: (val) => synthStore.setMixerLevels(synthStore.vcoLevel, val)
+})
 
-const noiseType = ref('White');  // Only white noise implemented
-const onLevelChange = () => {
-    synth.setMixerLevels(synth.vcoLevel, noiseLevel.value);
-};
+const updateNoise = () => {
+    synthStore.setMixerLevels(synthStore.vcoLevel, noiseLevel.value)
+}
+
+let node = null
+
+onMounted(async () => {
+    await engine.resume()
+    node = engine.createNoiseNode()
+    node.gain.gain.setValueAtTime(noiseLevel.value, context.currentTime)
+    node.gain.connect(context.destination) // or to filter
+})
+
+useModuleLifecycle(node)
 </script>

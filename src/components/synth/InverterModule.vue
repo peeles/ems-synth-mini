@@ -1,11 +1,18 @@
 <template>
-    <div class="absolute" :style="{ top: '150px', left: '480px' }">
-        <h3 class="text-md font-bold mb-2">Inverter</h3>
-        <p class="text-sm">Inverts any connected signal (180° phase shift).</p>
-        <!-- This module has no user control in the UI; it operates internally when used -->
-    </div>
+    <SynthPanel :title="'Inverter'">
+        <div class="text-xs text-center text-gray-700">
+            This utility inverts any signal connected to phase shift.
+        </div>
+
+        <div class="mt-3 text-center">
+          <span class="inline-block px-2 py-1 bg-gray-200 text-[10px] font-mono rounded">
+            Gain = –1
+          </span>
+        </div>
+    </SynthPanel>
 </template>
 
 <script setup>
-// No interactive logic required; inversion is handled by audio wiring
+// No interactive logic — this is a routing utility
+import SynthPanel from "../SynthPanel.vue";
 </script>
