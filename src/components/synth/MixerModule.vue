@@ -46,14 +46,13 @@ const noiseLevel = computed({
     set: (val) => synth.setMixerLevels(synth.vcoLevel, val)
 });
 // A simple tone control implemented by slightly adjusting filter cutoff around a base value
-const tone = ref(0.5);  // 0 = mellow (low cutoff), 1 = bright (high cutoff)
-const baseCutoff = synth.filterCutoff; // base cutoff from store
+const tone = ref(0.5);
+const baseCutoff = computed(() => synth.filterCutoff);
 
 const updateLevels = () => {
     synth.setMixerLevels(vcoLevel.value, noiseLevel.value);
 };
 const updateTone = () => {
-    // Map tone 0-1 to a cutoff factor (e.g., 0 -> -1 octave, 1 -> +1 octave relative base)
     const factor = tone.value;
     const newCutoff = baseCutoff * (0.5 + factor);  // just an example scaling
     synth.setFilterCutoff(newCutoff);

@@ -47,7 +47,7 @@ const onWaveformChange = () => {
 
 // If this component were to mount/unmount dynamically, we could handle oscillator lifecycle:
 onUnmounted(() => {
-    // Stop and disconnect the oscillator if needed to prevent leaks:contentReference[oaicite:6]{index=6}
+    // Stop and disconnect the oscillator if needed to prevent leaks
     // (In static design, oscillator lives for app lifetime via store, so this is precaution)
     // synth.stopOscillator()  // if we had such an action to stop and cleanup
 });

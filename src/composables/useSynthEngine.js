@@ -1,8 +1,8 @@
-
+peeles
 let audioContext = null;
 
 export const useSynthEngine = () => {
-    // Lazily get or create a singleton AudioContext:contentReference[oaicite:2]{index=2}
+    // Lazily get or create a singleton AudioContext
     const getContext = () => {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -18,7 +18,7 @@ export const useSynthEngine = () => {
         }
     };
 
-    // Create an oscillator with an attached gain (amplitude control):contentReference[oaicite:3]{index=3}
+    // Create an oscillator with an attached gain (amplitude control)
     const createOscillatorNode = ({ frequency = 440, type = 'sine', gain = 0.5 }) => {
         const ctx = getContext();
         const osc = ctx.createOscillator();
@@ -27,7 +27,7 @@ export const useSynthEngine = () => {
         osc.frequency.setValueAtTime(frequency, ctx.currentTime);
         gainNode.gain.setValueAtTime(gain, ctx.currentTime);
         osc.connect(gainNode);
-        osc.start();  // start oscillator immediately:contentReference[oaicite:4]{index=4}
+        osc.start();  // start oscillator immediately
         return { osc, gain: gainNode };
     };
 
