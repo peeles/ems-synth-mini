@@ -24,14 +24,10 @@
 
 <script setup>
 import SynthPanel from '../SynthPanel.vue'
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useSynthStore } from '../../storage/synthStore'
-import { useSynthEngine } from '../../composables/useSynthEngine'
-import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
 
 const synthStore = useSynthStore()
-const engine = useSynthEngine()
-const context = engine.context
 
 const noiseLevel = computed({
     get: () => synthStore.noiseLevel,
@@ -41,15 +37,4 @@ const noiseLevel = computed({
 const updateNoise = () => {
     synthStore.setMixerLevels(synthStore.vcoLevel, noiseLevel.value)
 }
-
-let node = null
-
-onMounted(async () => {
-    await engine.resume()
-    node = engine.createNoiseNode()
-    node.gain.gain.setValueAtTime(noiseLevel.value, context.currentTime)
-    node.gain.connect(context.destination) // or to filter
-})
-
-useModuleLifecycle(node)
 </script>

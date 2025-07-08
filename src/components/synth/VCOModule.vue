@@ -35,15 +35,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useSynthStore } from "../../storage/synthStore";
-import { useSynthEngine } from '../../composables/useSynthEngine'
-import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
 import SynthPanel from '../SynthPanel.vue'
 
-const engine = useSynthEngine()
 const synth = useSynthStore();
-let node = null;
 
 const vcoFrequency = computed({
     get: () => synth.vcoFrequency,
@@ -55,15 +51,4 @@ const vcoWaveform = computed({
     set: (val) => synth.setVcoWaveform(val),
 })
 
-onMounted(async () => {
-    await engine.resume()
-    node = engine.createOscillatorNode({
-        frequency: vcoFrequency.value,
-        type: vcoWaveform.value,
-        gain: 0.5
-    })
-    node.gain.connect(engine.context.destination) // or to filter
-})
-
-useModuleLifecycle(node)
 </script>
