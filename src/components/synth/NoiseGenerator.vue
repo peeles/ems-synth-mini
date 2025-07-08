@@ -49,7 +49,6 @@ onMounted(async () => {
     node = engine.createNoiseNode()
     node.gain.gain.setValueAtTime(noiseLevel.value, context.currentTime)
     node.gain.connect(context.destination) // or to filter
+    useModuleLifecycle(node)
 })
-
-useModuleLifecycle(node)
 </script>

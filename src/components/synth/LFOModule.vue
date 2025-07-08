@@ -66,7 +66,6 @@ onMounted(async () => {
         gain: 1.0
     })
     node.gain.connect(context.destination) // or modulate something
+    useModuleLifecycle(node)
 })
-
-useModuleLifecycle(node)
 </script>

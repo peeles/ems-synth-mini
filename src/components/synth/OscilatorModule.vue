@@ -61,6 +61,7 @@ onMounted(async () => {
     // Explicit initial sync
     updateFreq()
     updateGain()
+    useModuleLifecycle(node)
 })
 
 const updateFreq = () => {
@@ -71,5 +72,4 @@ const updateGain = () => {
     node?.gain.gain.setValueAtTime(oscGain.value, context.currentTime)
 }
 
-useModuleLifecycle(node)
 </script>

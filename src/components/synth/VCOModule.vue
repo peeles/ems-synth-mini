@@ -63,7 +63,6 @@ onMounted(async () => {
         gain: 0.5
     })
     node.gain.connect(engine.context.destination) // or to filter
+    useModuleLifecycle(node)
 })
-
-useModuleLifecycle(node)
 </script>
