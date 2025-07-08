@@ -73,7 +73,7 @@ onMounted(() => {
 
     vcaOut.connect(splitter)
     splitter.connect(analyserL, 0)
-    splitter.connect(analyserR, 0)
+    splitter.connect(analyserR, 1)
     analyserL.connect(context.destination)
     analyserR.connect(context.destination)
 
