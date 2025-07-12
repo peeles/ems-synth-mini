@@ -1,13 +1,17 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-4 uppercase"
+            >
                 Noise Generator
             </h3>
         </template>
 
         <div>
-            <label class="flex flex-row items-center justify-between text-xs font-semibold mb-1">
+            <label
+                class="flex flex-row items-center justify-between text-xs font-semibold mb-1"
+            >
                 Level
                 <span class="text-gray-500">White</span>
             </label>
@@ -30,31 +34,21 @@
 
 <script setup>
 import SynthPanel from '../SynthPanel.vue'
-import { computed, onMounted } from 'vue'
-import { useSynthStore } from '../../storage/synthStore'
-import { useSynthEngine } from '../../composables/useSynthEngine'
-import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
+import {computed, onMounted} from 'vue'
+import {useSynthStore} from '../../storage/synthStore'
 
 const synthStore = useSynthStore()
-const engine = useSynthEngine()
-const context = engine.context
 
 const noiseLevel = computed({
     get: () => synthStore.noiseLevel,
-    set: (val) => synthStore.setMixerLevels(synthStore.vcoLevel, val)
+    set: val => synthStore.setMixerLevels(synthStore.vcoLevel, val),
 })
 
 const updateNoise = () => {
     synthStore.setMixerLevels(synthStore.vcoLevel, noiseLevel.value)
 }
 
-let node = null
-
 onMounted(async () => {
-    await engine.resume()
-    node = engine.createNoiseNode()
-    node.gain.gain.setValueAtTime(noiseLevel.value, context.currentTime)
-    node.gain.connect(context.destination) // or to filter
-    useModuleLifecycle(node)
+    await synthStore.resume()
 })
 </script>
