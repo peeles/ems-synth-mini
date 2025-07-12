@@ -1,5 +1,11 @@
 <template>
     <SynthPanel :title="'LFO Modulator'">
+        <template #heading>
+            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
+                Low Frequency Oscillator
+            </h3>
+        </template>
+
         <div class="mb-1">
             <label class="block text-xs font-semibold mb-1">
                 Frequency

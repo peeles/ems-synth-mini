@@ -1,22 +1,34 @@
 <template>
-    <SynthPanel :title="'VCA'">
-        <div class="mb-3">
-            <label class="block text-xs font-semibold mb-1">
-                Mode Mix: {{ modeLabel }}
+    <SynthPanel>
+        <template #heading>
+            <section class="flex flex-row items-center justify-between px-8 mb-8">
+                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
+                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
+                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
+            </section>
+            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
+                VCA
+            </h3>
+        </template>
+
+        <div class="flex flex-col justify-center text-center">
+            <label class="block text-xs font-semibold mb-2">
+                Mix Mode
             </label>
-            <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
+
+            <VerticalSlider
+                :min="0"
+                :max="1"
+                :step="0.01"
+                :show-labels="false"
                 v-model.number="vcaMode"
                 @input="() => synth.setVcaMode(vcaMode)"
-                class="w-full h-[8px] accent-black bg-black/10 rounded-full"
+                class="mx-auto"
             />
-        </div>
 
-        <div class="text-center text-xs italic">
-            0 = Envelope / 1 = Ring Mod (LFO)
+            <label class="block text-xs font-medium mb-1 mt-3">
+                {{ modeLabel }}
+            </label>
         </div>
     </SynthPanel>
 </template>
@@ -25,6 +37,8 @@
 import { computed } from 'vue'
 import { useSynthStore } from '../../storage/synthStore'
 import SynthPanel from "../SynthPanel.vue";
+import VerticalSlider from "../VerticalSlider.vue";
+import JackPanel from "../JackPanel.vue";
 
 const synth = useSynthStore()
 

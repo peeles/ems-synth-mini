@@ -1,25 +1,26 @@
 <template>
-    <div class="w-full mx-auto p-2">
-        <div class="grid grid-cols-12 grid-rows-[auto] gap-[4px]">
-
-            <div class="col-span-3"><OscilatorModule /></div>
-            <div class="col-span-3"><VCOModule /></div>
-            <div class="col-span-3"><VCFModule /></div>
-            <div class="col-span-3"></div>
-
-            <!-- Row 2 -->
-            <div class="col-span-2"><InputModule /></div>
-            <div class="col-span-3"><EnvelopeGenerator /></div>
-            <div class="col-span-2">
-                <NoiseGenerator />
-                <InverterModule />
+    <div class="w-full max-w-full h-screen flex flex-col mx-auto p-4">
+        <div class="flex flex-1 flex-col gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mx-16 grid-flow-dense">
+                <div class=""><LFOModule /></div>
+                <div class=""><VCOModule /></div>
+                <div class=""><VCFModule /></div>
+                <div class=""><SynthPanel :title="''"/></div>
             </div>
-            <div class="col-span-2"><VCAModule /></div>
-            <div class="col-span-3"><MasterVolume /></div>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mx-4">
+                <div class=""><InputModule /></div>
+                <div class=""><EnvelopeGenerator /></div>
+                <div class="flex flex-col gap-4">
+                    <NoiseGenerator />
+                    <InverterModule />
+                </div>
+                <div class=""><VCAModule /></div>
+                <div class=""><MasterVolume /></div>
+            </div>
+        </div>
 
-
-            <!-- Row 4 -->
-            <div class="col-span-12"><SliderKeyboard /></div>
+        <div class="flex flex-col gap-6 py-6">
+            <div class=""><SliderKeyboard /></div>
         </div>
     </div>
 </template>
@@ -37,11 +38,10 @@ import LFOModule from "./synth/LFOModule.vue";
 import VCOModule from "./synth/VCOModule.vue";
 import VCFModule from "./synth/VCFModule.vue";
 import InverterModule from "./synth/InverterModule.vue";
-import MixerModule from "./synth/MixerModule.vue";
 import VCAModule from "./synth/VCAModule.vue";
 import InputModule from "./synth/InputModule.vue";
-import OscilatorModule from "./synth/OscilatorModule.vue";
 import MasterVolume from "./synth/MasterVolume.vue";
+import SynthPanel from "./SynthPanel.vue";
 
 const ready = ref(false);
 

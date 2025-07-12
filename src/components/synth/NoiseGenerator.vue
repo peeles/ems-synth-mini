@@ -1,5 +1,11 @@
 <template>
-    <SynthPanel title="Noise Generator">
+    <SynthPanel>
+        <template #heading>
+            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+                Noise Generator
+            </h3>
+        </template>
+
         <div>
             <label class="flex flex-row items-center justify-between text-xs font-semibold mb-1">
                 Level

@@ -1,5 +1,11 @@
 <template>
-    <SynthPanel :title="'VCF'">
+    <SynthPanel>
+        <template #heading>
+            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
+                VCF
+            </h3>
+        </template>
+
         <div class="mb-3">
             <label class="block text-xs font-semibold mb-1">
                 Frequency (Cut-Off)
