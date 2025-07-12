@@ -16,7 +16,6 @@
                 max="10000"
                 step="1"
                 v-model.number="filterCutoff"
-                @input="() => synth.setFilterCutoff(filterCutoff)"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
             <p class="text-center text-xs mt-1 text-gray-700">
@@ -30,7 +29,6 @@
             </label>
             <select
                 v-model="filterType"
-                @change="() => synth.setFilterType(filterType)"
                 class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"
             >
                 <option value="lowpass">Low-Pass</option>
@@ -49,7 +47,6 @@
                 max="20"
                 step="0.1"
                 v-model.number="filterResonance"
-                @input="() => synth.setFilterResonance(filterResonance)"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
         </div>

@@ -55,6 +55,40 @@ const GAIN_SCALE = 4
 
 let splitter, analyserL, analyserR, bufferL, bufferR, rafId
 
+const update = () => {
+    if (document.hidden) {
+        rafId = null
+        return
+    }
+
+    analyserL.getByteTimeDomainData(bufferL)
+    analyserR.getByteTimeDomainData(bufferR)
+
+    const rms = data => {
+        let sum = 0
+        for (let i = 0; i < data.length; i++) {
+            const norm = (data[i] - 128) / 128
+            sum += norm * norm
+        }
+        const raw = Math.sqrt(sum / data.length)
+        return normalize.value ? Math.min(raw * GAIN_SCALE, 1) : raw
+    }
+
+    leftLevel.value = rms(bufferL)
+    rightLevel.value = rms(bufferR)
+
+    rafId = requestAnimationFrame(update)
+}
+
+const handleVisibility = () => {
+    if (!document.hidden && rafId == null) {
+        update()
+    } else if (document.hidden && rafId != null) {
+        cancelAnimationFrame(rafId)
+        rafId = null
+    }
+}
+
 onMounted(() => {
     const vcaOut = synth.getVCAOutputNode()
     if (!vcaOut) {
@@ -76,31 +110,14 @@ onMounted(() => {
     splitter.connect(analyserL, 0)
     splitter.connect(analyserR, 1)
 
-    const update = () => {
-        analyserL.getByteTimeDomainData(bufferL)
-        analyserR.getByteTimeDomainData(bufferR)
-
-        const rms = (data) => {
-            let sum = 0
-            for (let i = 0; i < data.length; i++) {
-                const norm = (data[i] - 128) / 128
-                sum += norm * norm
-            }
-            const raw = Math.sqrt(sum / data.length)
-            return normalize.value ? Math.min(raw * GAIN_SCALE, 1) : raw
-        }
-
-        leftLevel.value = rms(bufferL)
-        rightLevel.value = rms(bufferR)
-
-        rafId = requestAnimationFrame(update)
-    }
+    document.addEventListener('visibilitychange', handleVisibility)
 
     update()
 })
 
 onUnmounted(() => {
     cancelAnimationFrame(rafId)
+    document.removeEventListener('visibilitychange', handleVisibility)
     analyserL?.disconnect()
     analyserR?.disconnect()
     splitter?.disconnect()
