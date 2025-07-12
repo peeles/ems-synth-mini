@@ -1,15 +1,15 @@
 <template>
     <SynthPanel :title="'VCO'">
         <template #heading>
-            <h3 class="text-center text-wrap text-2xl font-medium mb-8 uppercase">
+            <h3
+                class="text-center text-wrap text-2xl font-medium mb-8 uppercase"
+            >
                 VCO
             </h3>
         </template>
 
         <div class="mb-3">
-            <label class="block text-xs font-semibold mb-1">
-                Frequency
-            </label>
+            <label class="block text-xs font-semibold mb-1"> Frequency </label>
             <input
                 type="range"
                 min="50"
@@ -41,34 +41,23 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useSynthStore } from "../../storage/synthStore";
-import { useSynthEngine } from '../../composables/useSynthEngine'
-import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
+import {computed, onMounted} from 'vue'
+import {useSynthStore} from '../../storage/synthStore'
 import SynthPanel from '../SynthPanel.vue'
 
-const engine = useSynthEngine()
-const synth = useSynthStore();
-let node = null;
+const synth = useSynthStore()
 
 const vcoFrequency = computed({
     get: () => synth.vcoFrequency,
-    set: (val) => synth.setVcoFrequency(val),
+    set: val => synth.setVcoFrequency(val),
 })
 
 const vcoWaveform = computed({
     get: () => synth.vcoWaveform,
-    set: (val) => synth.setVcoWaveform(val),
+    set: val => synth.setVcoWaveform(val),
 })
 
 onMounted(async () => {
-    await engine.resume()
-    node = engine.createOscillatorNode({
-        frequency: vcoFrequency.value,
-        type: vcoWaveform.value,
-        gain: 0.5
-    })
-    node.gain.connect(engine.context.destination) // or to filter
-    useModuleLifecycle(node)
+    await synth.resume()
 })
 </script>
