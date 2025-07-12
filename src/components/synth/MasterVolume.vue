@@ -71,11 +71,10 @@ onMounted(() => {
     bufferL = new Uint8Array(analyserL.frequencyBinCount)
     bufferR = new Uint8Array(analyserR.frequencyBinCount)
 
+    // tap the VCA output for metering
     vcaOut.connect(splitter)
     splitter.connect(analyserL, 0)
     splitter.connect(analyserR, 1)
-    analyserL.connect(context.destination)
-    analyserR.connect(context.destination)
 
     const update = () => {
         analyserL.getByteTimeDomainData(bufferL)
