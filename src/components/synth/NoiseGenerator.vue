@@ -21,7 +21,6 @@
                 max="1"
                 step="0.01"
                 v-model.number="noiseLevel"
-                @input="updateNoise"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
         </div>
@@ -43,10 +42,6 @@ const noiseLevel = computed({
     get: () => synthStore.noiseLevel,
     set: val => synthStore.setMixerLevels(synthStore.vcoLevel, val),
 })
-
-const updateNoise = () => {
-    synthStore.setMixerLevels(synthStore.vcoLevel, noiseLevel.value)
-}
 
 onMounted(async () => {
     await synthStore.resume()

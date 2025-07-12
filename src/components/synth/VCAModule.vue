@@ -22,7 +22,6 @@
                 :step="0.01"
                 :show-labels="false"
                 v-model.number="vcaMode"
-                @input="() => synth.setVcaMode(vcaMode)"
                 class="mx-auto"
             />
 

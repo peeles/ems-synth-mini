@@ -10,7 +10,6 @@
                     max="1"
                     step="0.01"
                     v-model.number="vcoLevel"
-                    @input="updateLevels"
                     class="w-4 h-24 accent-black bg-gray-200 rounded"
                 />
                 <span class="mt-1 text-[10px]">VCO</span>
@@ -24,7 +23,6 @@
                     max="1"
                     step="0.01"
                     v-model.number="noiseLevel"
-                    @input="updateLevels"
                     class="w-4 h-24 accent-black bg-gray-200 rounded"
                 />
                 <span class="mt-1 text-[10px]">Noise</span>
@@ -72,10 +70,6 @@ const toneLabel = computed(() => {
     if (tone.value > 0.7) return 'Bright'
     return 'Neutral'
 })
-
-const updateLevels = () => {
-    synth.setMixerLevels(vcoLevel.value, noiseLevel.value)
-}
 
 const updateTone = () => {
     const base = 500

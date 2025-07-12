@@ -16,7 +16,6 @@
                 max="15"
                 step="0.1"
                 v-model.number="lfoFrequency"
-                @input="() => synth.setLfoFrequency(lfoFrequency)"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
             <div class="text-center mt-1">{{ lfoFrequency.toFixed(1) }} Hz</div>
@@ -26,7 +25,6 @@
             <label class="block text-xs font-semibold mb-1"> Waveform </label>
             <select
                 v-model="lfoWaveform"
-                @change="() => synth.setLfoWaveform(lfoWaveform)"
                 class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"
             >
                 <option value="sine">Sine</option>
