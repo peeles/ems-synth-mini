@@ -1,19 +1,8 @@
 <template>
-    <SynthPanel :title="'LFO Modulator'">
+    <SynthPanel :id="id">
         <template #heading>
-            <section class="flex flex-row items-center justify-end px-8 mb-8">
-                <JackPanel
-                    :count="1"
-                    type="output"
-                    :module-id="id"
-                    :connected="connectedOutputs"
-                    @patch="handlePatch"
-                />
-            </section>
-            <h3
-                class="text-center text-wrap text-xl font-medium mb-8 uppercase"
-            >
-                Low Frequency Oscillator
+            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+                LFO Modulator
             </h3>
         </template>
 
@@ -27,7 +16,9 @@
                 v-model.number="lfoFrequency"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
-            <div class="text-center mt-1">{{ lfoFrequency.toFixed(1) }} Hz</div>
+            <p class="text-center text-xs mt-1 text-gray-700">
+                {{ lfoFrequency.toFixed(1) }} Hz
+            </p>
         </div>
 
         <div>
@@ -42,6 +33,23 @@
                 <option value="sawtooth">Sawtooth</option>
             </select>
         </div>
+
+        <section class="flex flex-row items-center justify-between mt-8">
+            <JackPanel
+                :count="1"
+                type="input"
+                :module-id="id"
+                :connected="connectedInputs"
+                @patch="handlePatch"
+            />
+            <JackPanel
+                :count="1"
+                :type="'output'"
+                :module-id="id"
+                :connected="connectedOutputs"
+                @patch="handlePatch"
+            />
+        </section>
     </SynthPanel>
 </template>
 
@@ -68,11 +76,17 @@ onUnmounted(() => {
     registry.unregister(id)
 })
 
+const connectedInputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, false)
+        .map(p => p.to.index)
+);
+
 const connectedOutputs = computed(() =>
     patchStore
         .getConnectionsFor(id, true)
         .map(p => p.from.index)
-)
+);
 
 const lfoFrequency = computed({
     get: () => synth.lfoFrequency,

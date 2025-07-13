@@ -1,28 +1,12 @@
 <template>
-    <SynthPanel>
+    <SynthPanel :id="id">
         <template #heading>
-            <section class="flex flex-row items-center justify-between px-8 mb-8">
-                <JackPanel
-                    :count="1"
-                    type="input"
-                    :module-id="id"
-                    :connected="connectedInputs"
-                    @patch="handlePatch"
-                />
-                <JackPanel
-                    :count="1"
-                    type="output"
-                    :module-id="id"
-                    :connected="connectedOutputs"
-                    @patch="handlePatch"
-                />
-            </section>
-            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
-                VCF
+            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+                Voltage Filter
             </h3>
         </template>
 
-        <div class="mb-3">
+        <div class="mb-1">
             <label class="block text-xs font-semibold mb-1">
                 Frequency (Cut-Off)
             </label>
@@ -66,6 +50,23 @@
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
         </div>
+
+        <section class="flex flex-row items-center justify-between mt-8">
+            <JackPanel
+                :count="1"
+                type="input"
+                :module-id="id"
+                :connected="connectedInputs"
+                @patch="handlePatch"
+            />
+            <JackPanel
+                :count="1"
+                type="output"
+                :module-id="id"
+                :connected="connectedOutputs"
+                @patch="handlePatch"
+            />
+        </section>
     </SynthPanel>
 </template>
 

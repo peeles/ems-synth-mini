@@ -1,7 +1,7 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <section class="flex flex-row items-center justify-end px-8 mb-4">
+            <section class="flex flex-row items-center justify-end mb-4">
                 <JackPanel
                     :count="1"
                     type="output"

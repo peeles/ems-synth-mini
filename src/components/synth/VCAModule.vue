@@ -1,17 +1,17 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <section class="flex flex-row items-center justify-between px-3 mb-8">
+            <section class="flex flex-row items-center justify-between mb-8">
                 <JackPanel
                     :count="1"
-                    type="input"
+                    :type="'input'"
                     :module-id="id"
                     :connected="connectedInputs"
                     @patch="handlePatch"
                 />
                 <JackPanel
                     :count="1"
-                    type="output"
+                    :type="'output'"
                     :module-id="id"
                     :connected="connectedOutputs"
                     @patch="handlePatch"

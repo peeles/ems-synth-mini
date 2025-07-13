@@ -1,24 +1,12 @@
 <template>
-    <SynthPanel :title="'VCO'">
+    <SynthPanel :id="id">
         <template #heading>
-            <section class="flex flex-row items-center justify-between px-8 mb-8">
-                <div></div>
-                <JackPanel
-                    :count="1"
-                    type="output"
-                    :module-id="id"
-                    :connected="connectedOutputs"
-                    @patch="handlePatch"
-                />
-            </section>
-            <h3
-                class="text-center text-wrap text-2xl font-medium mb-8 uppercase"
-            >
-                VCO
+            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+                Voltage Oscillator
             </h3>
         </template>
 
-        <div class="mb-3">
+        <div class="mb-1">
             <label class="block text-xs font-semibold mb-1"> Frequency </label>
             <input
                 type="range"
@@ -45,6 +33,23 @@
                 <option value="triangle">Triangle</option>
             </select>
         </div>
+
+        <section class="flex flex-row items-center justify-between mt-8">
+            <JackPanel
+                :count="1"
+                type="input"
+                :module-id="id"
+                :connected="connectedInputs"
+                @patch="handlePatch"
+            />
+            <JackPanel
+                :count="1"
+                type="output"
+                :module-id="id"
+                :connected="connectedOutputs"
+                @patch="handlePatch"
+            />
+        </section>
     </SynthPanel>
 </template>
 
@@ -73,16 +78,22 @@ onUnmounted(() => {
     registry.unregister(id)
 })
 
+const connectedInputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, false)
+        .map(p => p.to.index)
+);
+
 const connectedOutputs = computed(() =>
     patchStore
         .getConnectionsFor(id, true)
         .map(p => p.from.index)
-)
+);
 
 const vcoFrequency = computed({
     get: () => synth.vcoFrequency,
     set: val => synth.setVcoFrequency(val),
-})
+});
 
 const vcoWaveform = computed({
     get: () => synth.vcoWaveform,
