@@ -54,10 +54,10 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted} from 'vue'
-import {useSynthStore} from '../../storage/synthStore'
-import {useModuleRegistry} from '../../composables/useModuleRegistry'
-import {usePatchStore} from '../../storage/patchStore'
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useSynthStore } from '../../storage/synthStore'
+import { useModuleRegistry } from '../../composables/useModuleRegistry'
+import { usePatchStore } from '../../storage/patchStore'
 import SynthPanel from '../SynthPanel.vue'
 import JackPanel from '../JackPanel.vue'
 
@@ -70,8 +70,12 @@ const getOutputNode = (index) => {
     return synth.getVCOOutputNode?.(index)
 }
 
+const getInputNode = (index) => {
+    return synth.getVCOInputNode?.(index)
+}
+
 onMounted(() => {
-    registry.register(id, { id, getOutputNode })
+    registry.register(id, { id, getInputNode, getOutputNode })
 })
 
 onUnmounted(() => {
