@@ -1,16 +1,21 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <section class="flex flex-row items-center justify-between px-8 mb-8">
+            <section class="flex flex-row items-center justify-between px-3 mb-8">
                 <JackPanel
-                    :count="2"
+                    :count="1"
                     type="input"
                     :module-id="id"
                     :connected="connectedInputs"
                     @patch="handlePatch"
                 />
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
+                <JackPanel
+                    :count="1"
+                    type="output"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
             </section>
             <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
                 VCA
@@ -103,6 +108,12 @@ const connectedInputs = computed(() =>
         .getConnectionsFor(id, false)
         .map(p => p.to.index)
 );
+
+const connectedOutputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, true)
+        .map(p => p.from.index)
+)
 
 const handlePatch = (jack) => {
     patchStore.selectJack(jack)

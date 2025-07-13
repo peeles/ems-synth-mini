@@ -59,10 +59,9 @@
             </div>
 
             <div class="flex flex-col flex-1 items-end gap-y-2.5">
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
+                <div class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2" />
+                <div class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2" />
+                <div class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2" />
             </div>
         </div>
 
@@ -80,7 +79,6 @@ import { computed } from 'vue'
 import { useSynthStore } from '../../storage/synthStore'
 import SynthPanel from "../SynthPanel.vue";
 import VerticalSlider from "../VerticalSlider.vue";
-import JackPanel from "../JackPanel.vue";
 
 const synth = useSynthStore()
 
