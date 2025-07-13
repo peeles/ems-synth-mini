@@ -70,6 +70,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+    patchStore.removeConnectionsForModule(id)
     registry.unregister(id);
 });
 

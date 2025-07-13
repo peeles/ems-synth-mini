@@ -44,6 +44,30 @@ export const usePatchStore = defineStore('patch', () => {
         }
     };
 
+    const removeConnectionsForModule = (moduleId) => {
+        const toRemove = patches.value.filter(
+            (p) => p.from.id === moduleId || p.to.id === moduleId
+        );
+
+        toRemove.forEach((p) => {
+            const fromModule = registry.get(p.from.id);
+            const toModule = registry.get(p.to.id);
+            if (fromModule && toModule) {
+                try {
+                    const out = fromModule.getOutputNode(p.from.index);
+                    const inp = toModule.getInputNode(p.to.index);
+                    out?.disconnect?.(inp);
+                } catch (e) {
+                    console.error('Patch cleanup failed:', e);
+                }
+            }
+        });
+
+        patches.value = patches.value.filter(
+            (p) => p.from.id !== moduleId && p.to.id !== moduleId
+        );
+    };
+
     const togglePatch = (fromModule, fromIndex, toModule, toIndex) => {
         const exists = patches.value.find(
             p =>
@@ -107,6 +131,7 @@ export const usePatchStore = defineStore('patch', () => {
         disconnectNodes,
         togglePatch,
         getConnectionsFor,
-        selectJack
+        selectJack,
+        removeConnectionsForModule
     };
 });
