@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import {onMounted, watch, ref} from 'vue'
+import { onMounted, onUnmounted, watch, ref } from 'vue'
 import { usePatchStore } from '../storage/patchStore'
 
 const patchStore = usePatchStore();
@@ -56,5 +56,9 @@ watch(
 onMounted(() => {
     updateLines()
     window.addEventListener('resize', updateLines)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', updateLines)
 })
 </script>
