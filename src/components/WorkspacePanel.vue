@@ -37,7 +37,7 @@
 
 <script setup>
 import { useSynthStore } from '../storage/synthStore';
-import {onMounted, ref} from 'vue';
+import {onMounted, onUnmounted, ref} from 'vue';
 import EnvelopeGenerator from "./synth/EnvelopeGenerator.vue";
 import NoiseGenerator from "./synth/NoiseGenerator.vue";
 import SliderKeyboard from "./synth/SliderKeyboard.vue";
@@ -71,6 +71,10 @@ const unlock = async () => {
         console.warn('Failed to resume AudioContext:', e);
     }
 };
+
+onUnmounted(() => {
+    synth.destroySynth()
+})
 </script>
 
 <style>
