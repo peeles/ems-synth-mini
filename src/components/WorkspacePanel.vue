@@ -1,11 +1,21 @@
 <template>
-    <div class="w-full max-w-full h-screen flex flex-col mx-auto p-4">
+    <div
+        v-if="!audioReady"
+        class="transition-opacity duration-700 opacity-100 absolute inset-0 z-50 bg-black bg-opacity-80 flex flex-col items-center justify-center text-center p-6"
+    >
+        <div class="text-3xl font-bold mb-4">Click to Start Audio</div>
+        <p class="text-sm opacity-80">Tap anywhere to unlock sound</p>
+    </div>
+    <div
+        v-else
+        class="relative w-full max-w-full h-screen flex flex-col mx-auto p-4"
+    >
         <div class="flex flex-1 flex-col gap-4">
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mx-16 grid-flow-dense">
                 <div class=""><LFOModule /></div>
                 <div class=""><VCOModule /></div>
                 <div class=""><VCFModule /></div>
-                <div class=""><SynthPanel :title="''"/></div>
+                <div class=""><SynthPanel /></div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mx-4">
                 <div class=""><InputModule /></div>
@@ -27,9 +37,6 @@
 
 <script setup>
 import { useSynthStore } from '../storage/synthStore';
-// Ensure the store (and audio graph) is initialized
-const synth = useSynthStore();
-// (Optional: resume AudioContext on first user interaction)
 import {onMounted, ref} from 'vue';
 import EnvelopeGenerator from "./synth/EnvelopeGenerator.vue";
 import NoiseGenerator from "./synth/NoiseGenerator.vue";
@@ -43,14 +50,27 @@ import InputModule from "./synth/InputModule.vue";
 import MasterVolume from "./synth/MasterVolume.vue";
 import SynthPanel from "./SynthPanel.vue";
 
-const ready = ref(false);
+const audioReady = ref(false);
+const synth = useSynthStore();
 
 onMounted(() => {
-    window.addEventListener('pointerdown', async () => {
-        await synth.resume()
-        ready.value = true
-    }, { once: true })
-})
+    window.addEventListener('pointerdown', unlock, { once: true });
+});
+
+const unlock = async () => {
+    try {
+        await synth.resume();
+        if (synth.audioReady !== undefined) {
+            audioReady.value = synth.audioReady;
+        } else {
+            // fallback if using local ref
+            audioReady.value = true;
+        }
+        window.removeEventListener('pointerdown', unlock);
+    } catch (e) {
+        console.warn('Failed to resume AudioContext:', e);
+    }
+};
 </script>
 
 <style>

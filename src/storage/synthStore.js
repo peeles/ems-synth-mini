@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useSynthEngine } from '../composables/useSynthEngine'
 
 export const useSynthStore = defineStore('synth', () => {
+    const audioReady = ref(false);
     const engine = useSynthEngine()
     const ctx = engine.context
 
@@ -28,6 +29,13 @@ export const useSynthStore = defineStore('synth', () => {
     let vcaGainNode
     let inverterGain
     let triggerEnvelope // now from engine.createEnvelopeGain()
+
+    async function resume() {
+        await ctx.resume();
+        if (ctx.state === 'running') {
+            audioReady.value = true;
+        }
+    }
 
     // === Modular Initializers ===
 
@@ -187,12 +195,14 @@ export const useSynthStore = defineStore('synth', () => {
         })
     }
 
-    // === Lifecycle Cleanup (Optional) ===
     const destroySynth = () => {
         try {
-            vcoOsc?.stop(); vcoOsc?.disconnect()
-            lfoOsc?.stop(); lfoOsc?.disconnect()
-            noiseSrc?.stop(); noiseSrc?.disconnect()
+            vcoOsc?.stop();
+            vcoOsc?.disconnect();
+            lfoOsc?.stop();
+            lfoOsc?.disconnect();
+            noiseSrc?.stop();
+            noiseSrc?.disconnect();
         } catch {}
 
         ;[vcoOutGain, lfoOutGain, noiseOutGain, filterNode, vcaGainNode].forEach((n) => {
@@ -203,10 +213,11 @@ export const useSynthStore = defineStore('synth', () => {
         vcoOutGain = lfoOutGain = noiseOutGain = null
         filterNode = vcaGainNode = inverterGain = triggerEnvelope = null
     }
+
     // Nodes will be lazily initialized by the setter functions above
     return {
         // State
-        vcoFrequency, vcoWaveform, lfoFrequency, lfoWaveform,
+        audioReady, vcoFrequency, vcoWaveform, lfoFrequency, lfoWaveform,
         filterCutoff, filterResonance, filterType,
         envelopeAttack, envelopeDecay,
         vcoLevel, noiseLevel, vcaMode,
@@ -219,7 +230,7 @@ export const useSynthStore = defineStore('synth', () => {
         triggerEnvelope: triggerVCAEnvelope, getVCAOutputNode,
 
         // Lifecycle
-        resume: engine.resume,
+        resume,
         destroySynth
     }
 })
