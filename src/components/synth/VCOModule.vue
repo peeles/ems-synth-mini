@@ -1,6 +1,16 @@
 <template>
     <SynthPanel :title="'VCO'">
         <template #heading>
+            <section class="flex flex-row items-center justify-between px-8 mb-8">
+                <div></div>
+                <JackPanel
+                    :count="1"
+                    type="output"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
+            </section>
             <h3
                 class="text-center text-wrap text-2xl font-medium mb-8 uppercase"
             >
@@ -39,11 +49,35 @@
 </template>
 
 <script setup>
-import {computed, onMounted} from 'vue'
+import {computed, onMounted, onUnmounted} from 'vue'
 import {useSynthStore} from '../../storage/synthStore'
+import {useModuleRegistry} from '../../composables/useModuleRegistry'
+import {usePatchStore} from '../../storage/patchStore'
 import SynthPanel from '../SynthPanel.vue'
+import JackPanel from '../JackPanel.vue'
 
 const synth = useSynthStore()
+const registry = useModuleRegistry()
+const patchStore = usePatchStore()
+const id = 'vco-module'
+
+const getOutputNode = (index) => {
+    return synth.getVCOOutputNode?.(index)
+}
+
+onMounted(() => {
+    registry.register(id, { id, getOutputNode })
+})
+
+onUnmounted(() => {
+    registry.unregister(id)
+})
+
+const connectedOutputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, true)
+        .map(p => p.from.index)
+)
 
 const vcoFrequency = computed({
     get: () => synth.vcoFrequency,
@@ -58,4 +92,8 @@ const vcoWaveform = computed({
 onMounted(async () => {
     await synth.resume()
 })
+
+const handlePatch = (jack) => {
+    patchStore.selectJack(jack)
+}
 </script>

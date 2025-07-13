@@ -1,6 +1,15 @@
 <template>
     <SynthPanel>
         <template #heading>
+            <section class="flex flex-row items-center justify-end px-8 mb-4">
+                <JackPanel
+                    :count="1"
+                    type="output"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
+            </section>
             <h3
                 class="text-center text-wrap text-xl font-medium mb-4 uppercase"
             >
@@ -33,10 +42,32 @@
 
 <script setup>
 import SynthPanel from '../SynthPanel.vue'
-import {computed, onMounted} from 'vue'
+import JackPanel from '../JackPanel.vue'
+import {computed, onMounted, onUnmounted} from 'vue'
 import {useSynthStore} from '../../storage/synthStore'
+import {useModuleRegistry} from '../../composables/useModuleRegistry'
+import {usePatchStore} from '../../storage/patchStore'
 
 const synthStore = useSynthStore()
+const registry = useModuleRegistry()
+const patchStore = usePatchStore()
+const id = 'noise-module'
+
+const getOutputNode = () => synthStore.getNoiseOutputNode?.()
+
+onMounted(() => {
+    registry.register(id, { id, getOutputNode })
+})
+
+onUnmounted(() => {
+    registry.unregister(id)
+})
+
+const connectedOutputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, true)
+        .map(p => p.from.index)
+)
 
 const noiseLevel = computed({
     get: () => synthStore.noiseLevel,
@@ -46,4 +77,8 @@ const noiseLevel = computed({
 onMounted(async () => {
     await synthStore.resume()
 })
+
+const handlePatch = ({ type, index }) => {
+    patchStore.selectJack({ type, moduleId: id, index })
+}
 </script>

@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { useModuleRegistry } from '../composables/useModuleRegistry';
 
 export const usePatchStore = defineStore('patch', () => {
     const patches = ref([]);
+    const selectedJack = ref(null);
+    const registry = useModuleRegistry();
 
     const connectNodes = (fromModule, fromIndex, toModule, toIndex) => {
         const output = fromModule.getOutputNode(fromIndex);
@@ -63,11 +66,47 @@ export const usePatchStore = defineStore('patch', () => {
         );
     };
 
+    const selectJack = (jack) => {
+        if (!selectedJack.value) {
+            selectedJack.value = jack;
+            return;
+        }
+
+        const first = selectedJack.value;
+        const second = jack;
+
+        // ignore if same type or same jack
+        if (first.moduleId === second.moduleId && first.index === second.index && first.type === second.type) {
+            selectedJack.value = null;
+            return;
+        }
+
+        if (first.type === second.type) {
+            // start new selection
+            selectedJack.value = second;
+            return;
+        }
+
+        const from = first.type === 'output' ? first : second;
+        const to = first.type === 'input' ? first : second;
+
+        const fromModule = registry.get(from.moduleId);
+        const toModule = registry.get(to.moduleId);
+
+        if (fromModule && toModule) {
+            togglePatch(fromModule, from.index, toModule, to.index);
+        }
+
+        selectedJack.value = null;
+    };
+
     return {
         patches,
+        selectedJack,
         connectNodes,
         disconnectNodes,
         togglePatch,
-        getConnectionsFor
+        getConnectionsFor,
+        selectJack
     };
 });

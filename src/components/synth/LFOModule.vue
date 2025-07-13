@@ -1,6 +1,15 @@
 <template>
     <SynthPanel :title="'LFO Modulator'">
         <template #heading>
+            <section class="flex flex-row items-center justify-end px-8 mb-8">
+                <JackPanel
+                    :count="1"
+                    type="output"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
+            </section>
             <h3
                 class="text-center text-wrap text-xl font-medium mb-8 uppercase"
             >
@@ -38,10 +47,32 @@
 
 <script setup>
 import SynthPanel from '../SynthPanel.vue'
-import {computed, onMounted} from 'vue'
+import JackPanel from '../JackPanel.vue'
+import {computed, onMounted, onUnmounted} from 'vue'
 import {useSynthStore} from '../../storage/synthStore'
+import {useModuleRegistry} from '../../composables/useModuleRegistry'
+import {usePatchStore} from '../../storage/patchStore'
 
 const synth = useSynthStore()
+const registry = useModuleRegistry()
+const patchStore = usePatchStore()
+const id = 'lfo-module'
+
+const getOutputNode = () => synth.getLFOOutputNode?.()
+
+onMounted(() => {
+    registry.register(id, { id, getOutputNode })
+})
+
+onUnmounted(() => {
+    registry.unregister(id)
+})
+
+const connectedOutputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, true)
+        .map(p => p.from.index)
+)
 
 const lfoFrequency = computed({
     get: () => synth.lfoFrequency,
@@ -55,4 +86,8 @@ const lfoWaveform = computed({
 onMounted(async () => {
     await synth.resume()
 })
+
+const handlePatch = ({ type, index }) => {
+    patchStore.selectJack({ type, moduleId: id, index })
+}
 </script>

@@ -1,6 +1,22 @@
 <template>
     <SynthPanel>
         <template #heading>
+            <section class="flex flex-row items-center justify-between px-8 mb-8">
+                <JackPanel
+                    :count="1"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
+                />
+                <JackPanel
+                    :count="1"
+                    type="output"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
+            </section>
             <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
                 VCF
             </h3>
@@ -54,11 +70,40 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useSynthStore } from '../../storage/synthStore'
+import { useModuleRegistry } from '../../composables/useModuleRegistry'
+import { usePatchStore } from '../../storage/patchStore'
 import SynthPanel from "../SynthPanel.vue";
+import JackPanel from '../JackPanel.vue'
 
 const synth = useSynthStore()
+const registry = useModuleRegistry()
+const patchStore = usePatchStore()
+const id = 'vcf-module'
+
+const getInputNode = () => synth.getVCFInputNode?.()
+const getOutputNode = () => synth.getVCFOutputNode?.()
+
+onMounted(() => {
+    registry.register(id, { id, getInputNode, getOutputNode })
+})
+
+onUnmounted(() => {
+    registry.unregister(id)
+})
+
+const connectedInputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, false)
+        .map(p => p.to.index)
+)
+
+const connectedOutputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, true)
+        .map(p => p.from.index)
+)
 
 const filterCutoff = computed({
     get: () => synth.filterCutoff,
@@ -78,4 +123,8 @@ const filterType = computed({
 onMounted(() => {
     // Optional: synth.initVCF() if not globally initialized
 })
+
+const handlePatch = (jack) => {
+    patchStore.selectJack(jack)
+}
 </script>
