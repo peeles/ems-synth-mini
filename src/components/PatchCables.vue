@@ -17,18 +17,18 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, watch, ref } from 'vue'
+import { onMounted, onUnmounted, computed, ref } from 'vue'
 import { usePatchStore } from '../storage/patchStore'
 
 const patchStore = usePatchStore();
-const lines = ref([]);
 const svg = ref(null);
+const resizeTrigger = ref(0);
 
 const getPosition = (moduleId, type, index) => {
     const el = document.getElementById(`${moduleId}-${type}-${index}`)
-    const svgEl = svg.value;
+    const svgEl = svg.value
     if (!el || !svgEl) {
-        return {x: 0, y: 0}
+        return { x: 0, y: 0 }
     }
 
     const rect = el.getBoundingClientRect()
@@ -39,26 +39,25 @@ const getPosition = (moduleId, type, index) => {
     }
 }
 
-const updateLines = () => {
-    lines.value = patchStore.patches.map(p => {
+const lines = computed(() => {
+    resizeTrigger.value
+    return patchStore.patches.map(p => {
         const from = getPosition(p.from.id, 'output', p.from.index)
         const to = getPosition(p.to.id, 'input', p.to.index)
         return { x1: from.x, y1: from.y, x2: to.x, y2: to.y }
     })
+})
+
+const triggerResize = () => {
+    resizeTrigger.value++
 }
 
-watch(
-    () => patchStore.patches,
-    () => updateLines(),
-    { deep: true }
-)
-
 onMounted(() => {
-    updateLines()
-    window.addEventListener('resize', updateLines)
+    triggerResize()
+    window.addEventListener('resize', triggerResize)
 })
 
 onUnmounted(() => {
-    window.removeEventListener('resize', updateLines)
+    window.removeEventListener('resize', triggerResize)
 })
 </script>
