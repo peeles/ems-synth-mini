@@ -18,7 +18,7 @@
                 <div class=""><SynthPanel /></div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mx-4">
-                <div class=""><InputModule /></div>
+                <div class=""><MixerModule /></div>
                 <div class=""><EnvelopeGenerator /></div>
                 <div class="flex flex-col gap-4">
                     <NoiseGenerator />
@@ -47,7 +47,7 @@ import VCOModule from "./synth/VCOModule.vue";
 import VCFModule from "./synth/VCFModule.vue";
 import InverterModule from "./synth/InverterModule.vue";
 import VCAModule from "./synth/VCAModule.vue";
-import InputModule from "./synth/InputModule.vue";
+import MixerModule from "./synth/MixerModule.vue";
 import MasterVolume from "./synth/MasterVolume.vue";
 import SynthPanel from "./SynthPanel.vue";
 import PatchCables from "./PatchCables.vue";

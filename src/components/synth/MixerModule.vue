@@ -1,6 +1,6 @@
 <template>
     <SynthPanel title="Mixer">
-        <div class="flex justify-around items-end h-[140px]">
+        <div class="flex flex-col justify-around h-[140px]">
 
             <!-- VCO -->
             <div class="flex flex-col items-center">
