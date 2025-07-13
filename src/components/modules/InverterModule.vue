@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel :title="'Inverter'">
+    <SynthPanel>
         <div class="text-xs text-center text-gray-700">
             This utility inverts any signal connected to phase shift.
         </div>

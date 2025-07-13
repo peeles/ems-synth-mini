@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel :id="id">
+    <SynthPanel>
         <template #heading>
             <h3
                 class="text-center text-wrap text-xl font-medium mb-4 uppercase"
@@ -52,6 +52,7 @@
                     value="lowpass"
                     name="filterType"
                     id="low_pass"
+                    v-model="filterType"
                 />
                 <label
                     class="flex py-1.5 px-2 bg-transparent border border-gray-¶00 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
@@ -68,6 +69,7 @@
                     value="highpass"
                     name="filterType"
                     id="high_pass"
+                    v-model="filterType"
                 />
                 <label
                     class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
@@ -84,6 +86,7 @@
                     value="bandpass"
                     name="filterType"
                     id="band_pass"
+                    v-model="filterType"
                 />
                 <label
                     class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
@@ -93,20 +96,6 @@
                 </label>
             </li>
         </ul>
-
-        <!--        <div class="block mb-3">-->
-        <!--            <label class="block text-xs font-semibold mb-1">-->
-        <!--                Type-->
-        <!--            </label>-->
-        <!--            <select-->
-        <!--                v-model="filterType"-->
-        <!--                class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"-->
-        <!--            >-->
-        <!--                <option value="lowpass">Low-Pass</option>-->
-        <!--                <option value="highpass">High-Pass</option>-->
-        <!--                <option value="bandpass">Band-Pass</option>-->
-        <!--            </select>-->
-        <!--        </div>-->
 
         <section class="flex flex-row items-center justify-between mt-8">
             <JackPanel
@@ -176,7 +165,7 @@ const filterType = computed({
 });
 
 onMounted(() => {
-    // Optional: synth.initVCF() if not globally initialized
+    // Optional: modules.initVCF() if not globally initialized
 });
 
 const handlePatch = jack => {

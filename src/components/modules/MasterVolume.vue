@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel title="Stereo Output">
+    <SynthPanel>
         <div class="flex justify-around items-end h-[140px]">
             <!-- Left Meter -->
             <div

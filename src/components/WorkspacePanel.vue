@@ -41,16 +41,16 @@
 <script setup>
 import {useSynthStore} from '../storage/synthStore';
 import {onMounted, onUnmounted, ref} from 'vue';
-import EnvelopeGenerator from './synth/EnvelopeGenerator.vue';
-import NoiseGenerator from './synth/NoiseGenerator.vue';
-import SliderKeyboard from './synth/SliderKeyboard.vue';
-import LFOModule from './synth/LFOModule.vue';
-import VCOModule from './synth/VCOModule.vue';
-import VCFModule from './synth/VCFModule.vue';
-import InverterModule from './synth/InverterModule.vue';
-import VCAModule from './synth/VCAModule.vue';
-import MixerModule from './synth/MixerModule.vue';
-import MasterVolume from './synth/MasterVolume.vue';
+import EnvelopeGenerator from './modules/EnvelopeGenerator.vue';
+import NoiseGenerator from './modules/NoiseGenerator.vue';
+import SliderKeyboard from './modules/SliderKeyboard.vue';
+import LFOModule from './modules/LFOModule.vue';
+import VCOModule from './modules/VCOModule.vue';
+import VCFModule from './modules/VCFModule.vue';
+import InverterModule from './modules/InverterModule.vue';
+import VCAModule from './modules/VCAModule.vue';
+import MixerModule from './modules/MixerModule.vue';
+import MasterVolume from './modules/MasterVolume.vue';
 import SynthPanel from './SynthPanel.vue';
 import PatchCables from './PatchCables.vue';
 

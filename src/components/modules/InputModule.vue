@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel :title="'Input Module'">
+    <SynthPanel>
         <div>
             <label class="block text-xs font-semibold mb-1">
                 External Signal Level

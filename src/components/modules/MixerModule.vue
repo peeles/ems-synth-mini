@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel :id="id" title="Mixer">
+    <SynthPanel>
         <div class="flex flex-col justify-around h-[140px]">
             <!-- VCO -->
             <div class="flex flex-col items-center">

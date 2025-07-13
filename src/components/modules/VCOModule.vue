@@ -1,5 +1,5 @@
 <template>
-    <SynthPanel :id="id">
+    <SynthPanel>
         <template #heading>
             <h3
                 class="text-center text-wrap text-xl font-medium mb-4 uppercase"
