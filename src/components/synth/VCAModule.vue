@@ -2,7 +2,13 @@
     <SynthPanel>
         <template #heading>
             <section class="flex flex-row items-center justify-between px-8 mb-8">
-                <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
+                <JackPanel
+                    :count="2"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
+                />
                 <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
                 <JackPanel :count="2" @toggle="(index) => console.log('Patch port', index)" />
             </section>
@@ -33,13 +39,28 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import {computed, onMounted, onUnmounted} from 'vue'
 import { useSynthStore } from '../../storage/synthStore'
+import { usePatchStore } from "../../storage/patchStore";
 import SynthPanel from "../SynthPanel.vue";
 import VerticalSlider from "../VerticalSlider.vue";
 import JackPanel from "../JackPanel.vue";
+import {useModuleRegistry} from "../../composables/useModuleRegistry";
 
-const synth = useSynthStore()
+const synth = useSynthStore();
+const registry = useModuleRegistry();
+
+const getOutputNode = (index) => {
+    return synth.getVcoOutputNode?.(index); // or use direct reference
+};
+
+onMounted(() => {
+    registry.register(id, { id, getOutputNode });
+});
+
+onUnmounted(() => {
+    registry.unregister(id);
+});
 
 const vcaMode = computed({
     get: () => synth.vcaMode,
@@ -47,8 +68,46 @@ const vcaMode = computed({
 })
 
 const modeLabel = computed(() => {
-    if (vcaMode.value <= 0.1) return 'Envelope'
-    if (vcaMode.value >= 0.9) return 'Ring Mod'
+    if (vcaMode.value <= 0.1) {
+        return 'Envelope'
+    }
+
+    if (vcaMode.value <= 0.2) {
+        return 'Sine Wave'
+    }
+
+    if (vcaMode.value <= 0.3) {
+        return 'Linear'
+    }
+
+    if (vcaMode.value <= 0.4) {
+        return 'Exponential'
+    }
+
+    if (vcaMode.value >= 0.9) {
+        return 'Ring Mod'
+    }
+
     return `${Math.round(vcaMode.value * 100)}% Blend`
 })
+
+const patchStore = usePatchStore();
+const id = 'vca-module';
+
+const connectedInputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, false)
+        .map(p => p.to.index)
+);
+
+const handlePatch = ({ type, index }) => {
+    if (type === 'input') {
+        const fromModule = registry.get('vca-module');
+        const toModule = registry.get('vco-module');
+
+        if (fromModule && toModule) {
+            patchStore.togglePatch(fromModule, 0, toModule, index);
+        }
+    }
+};
 </script>
