@@ -4,7 +4,7 @@
         tracking-wide space-y-2"
     >
         <slot name="heading" />
-        <div class="flex- 1 space-y-3">
+        <div class="flex-1 space-y-3">
             <slot />
         </div>
     </div>
