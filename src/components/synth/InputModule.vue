@@ -55,16 +55,62 @@
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full"
             />
         </div>
+        <section class="flex flex-row justify-center mt-4">
+            <JackPanel
+                :count="1"
+                type="output"
+                :module-id="id"
+                :connected="connectedOutputs"
+                @patch="handlePatch"
+            />
+        </section>
     </SynthPanel>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import SynthPanel from "../SynthPanel.vue";
+import JackPanel from "../JackPanel.vue";
+import { usePatchStore } from "../../storage/patchStore";
+import { useModuleRegistry } from "../../composables/useModuleRegistry";
+import { useSynthStore } from "../../storage/synthStore";
+
+const patchStore = usePatchStore();
+const registry = useModuleRegistry();
+const synth = useSynthStore();
+const id = 'input-module';
+
+let outputGain = null;
+const getOutputNode = () => {
+    if (!outputGain) {
+        outputGain = synth.context.createGain();
+    }
+    return outputGain;
+};
+
+onMounted(() => {
+    registry.register(id, { id, getOutputNode });
+});
+
+onUnmounted(() => {
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+    try { outputGain?.disconnect(); } catch {}
+});
+
+const connectedOutputs = computed(() =>
+    patchStore
+        .getConnectionsFor(id, true)
+        .map(p => p.from.index)
+);
 
 // Placeholder state — can wire into synthStore or audio input later
 const extSignal = ref(0.5)
 const extEnvelope = ref(0.5)
 const highLevel = ref(0.5)
 const lowLevel = ref(0.5)
+
+const handlePatch = (jack) => {
+    patchStore.selectJack(jack);
+};
 </script>

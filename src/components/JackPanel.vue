@@ -8,6 +8,7 @@
                     'bg-yellow-400': connected.includes(i - 1),
                     'bg-gray-800': !connected.includes(i - 1)
                 }"
+                :id="`${moduleId}-${type}-${i - 1}`"
                 class="w-3 h-3 rounded-full cursor-pointer border border-gray-600"
                 @click="handleClick(i - 1)"
             />

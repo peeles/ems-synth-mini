@@ -32,6 +32,7 @@
         <div class="flex flex-col gap-6 py-6">
             <div class=""><SliderKeyboard /></div>
         </div>
+        <PatchCables />
     </div>
 </template>
 
@@ -49,6 +50,7 @@ import VCAModule from "./synth/VCAModule.vue";
 import InputModule from "./synth/InputModule.vue";
 import MasterVolume from "./synth/MasterVolume.vue";
 import SynthPanel from "./SynthPanel.vue";
+import PatchCables from "./PatchCables.vue";
 
 const audioReady = ref(false);
 const synth = useSynthStore();
