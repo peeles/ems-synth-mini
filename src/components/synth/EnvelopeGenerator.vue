@@ -84,12 +84,12 @@ const synth = useSynthStore()
 
 const envelopeAttack = computed({
     get: () => synth.envelopeAttack,
-    set: (val) => synth.envelopeAttack = val
+    set: (val) => synth.setEnvelopeAttack(val)
 })
 
 const envelopeDecay = computed({
     get: () => synth.envelopeDecay,
-    set: (val) => synth.envelopeDecay = val
+    set: (val) => synth.setEnvelopeDecay(val)
 })
 
 const triggerEnvelope = () => {
