@@ -79,6 +79,6 @@ onMounted(async () => {
 })
 
 const handlePatch = ({ type, index }) => {
-    patchStore.selectJack({ type, moduleId: id, index })
+  patchStore.selectJack({ type, moduleId: id, index })
 }
 </script>
