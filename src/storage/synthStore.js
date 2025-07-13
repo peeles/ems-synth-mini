@@ -90,6 +90,16 @@ export const useSynthStore = defineStore('synth', () => {
         return lfoOsc?.frequency || null;
     };
 
+    const getInverterInputNode = () => {
+        ensureInverter();
+        return inverterGain;
+    };
+
+    const getInverterOutputNode = () => {
+        ensureInverter();
+        return inverterGain;
+    };
+
     const initMixer = () => {
         mixerNode = ctx.createGain();
         mixerNode.connect(filterNode);
@@ -113,8 +123,10 @@ export const useSynthStore = defineStore('synth', () => {
         // Route filter → VCA → output
         filterNode?.connect(vcaGainNode);
         vcaGainNode.connect(ctx.destination);
+    };
 
-        // Create inverter (unused for now)
+    // Create inverter (unused for now)
+    const initInverter = () => {
         inverterGain = ctx.createGain();
         inverterGain.gain.value = -1;
     };
@@ -183,6 +195,10 @@ export const useSynthStore = defineStore('synth', () => {
 
     const ensureMixer = () => {
         if (!mixerNode) initMixer();
+    };
+
+    const ensureInverter = () => {
+        if (!inverterGain) initInverter();
     };
 
     // === Parameter Actions ===
@@ -299,6 +315,7 @@ export const useSynthStore = defineStore('synth', () => {
             mixerNode,
             filterNode,
             vcaGainNode,
+            inverterGain,
         ].forEach(n => {
             try {
                 n?.disconnect();
@@ -355,6 +372,8 @@ export const useSynthStore = defineStore('synth', () => {
         getMixerOutputNode,
         getLFOInputNode,
         getLFOOutputNode,
+        getInverterInputNode,
+        getInverterOutputNode,
 
         // Lifecycle
         resume,

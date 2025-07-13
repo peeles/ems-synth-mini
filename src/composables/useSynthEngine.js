@@ -124,8 +124,13 @@ export const useSynthEngine = () => {
             peak = 1,
         } = {}) => {
             const now = ctx.currentTime;
-            gainNode.gain.cancelScheduledValues(now);
-            gainNode.gain.setValueAtTime(0, now);
+            if (typeof gainNode.gain.cancelAndHoldAtTime === 'function') {
+                gainNode.gain.cancelAndHoldAtTime(now);
+            } else {
+                const current = gainNode.gain.value;
+                gainNode.gain.cancelScheduledValues(now);
+                gainNode.gain.setValueAtTime(current, now);
+            }
 
             if (attack > 0) {
                 gainNode.gain.linearRampToValueAtTime(peak, now + attack);
