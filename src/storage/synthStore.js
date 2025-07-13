@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useSynthEngine } from '../composables/useSynthEngine'
+import {defineStore} from 'pinia'
+import {ref} from 'vue'
+import {useSynthEngine} from '../composables/useSynthEngine'
 
 export const useSynthStore = defineStore('synth', () => {
-    const audioReady = ref(false);
+    const audioReady = ref(false)
     const engine = useSynthEngine()
     const ctx = engine.context
 
@@ -26,14 +26,15 @@ export const useSynthStore = defineStore('synth', () => {
     let lfoOsc, lfoOutGain
     let noiseSrc, noiseOutGain
     let filterNode
+    let mixerNode
     let vcaGainNode
     let inverterGain
     let triggerEnvelope // now from engine.createEnvelopeGain()
 
     async function resume() {
-        await ctx.resume();
+        await ctx.resume()
         if (ctx.state === 'running') {
-            audioReady.value = true;
+            audioReady.value = true
         }
     }
 
@@ -74,6 +75,11 @@ export const useSynthStore = defineStore('synth', () => {
         return noiseOutGain
     }
 
+    const getMixerOutputNode = () => {
+        ensureMixer()
+        return mixerNode
+    }
+
     const getLFOOutputNode = () => {
         ensureLFO()
         return lfoOutGain
@@ -84,12 +90,19 @@ export const useSynthStore = defineStore('synth', () => {
         return lfoOsc?.frequency || null
     }
 
+    const initMixer = () => {
+        mixerNode = ctx.createGain()
+        mixerNode.connect(filterNode)
+    }
+
     const initVCF = () => {
         filterNode = engine.createFilterNode({
             type: filterType.value,
             frequency: filterCutoff.value,
-            q: filterResonance.value
+            q: filterResonance.value,
         })
+        mixerNode?.disconnect()
+        mixerNode?.connect(filterNode)
     }
 
     const initVCA = () => {
@@ -110,19 +123,21 @@ export const useSynthStore = defineStore('synth', () => {
         const result = engine.createOscillatorNode({
             frequency: vcoFrequency.value,
             type: vcoWaveform.value,
-            gain: 1.0
+            gain: 1.0,
         })
         if (!result) return
         vcoOsc = result.osc
         vcoOutGain = result.gain
-        vcoOutGain.connect(filterNode)
+        ensureVCF()
+        ensureMixer()
+        vcoOutGain.connect(mixerNode)
     }
 
     const initLFO = () => {
         const result = engine.createOscillatorNode({
             frequency: lfoFrequency.value,
             type: lfoWaveform.value,
-            gain: 1.0
+            gain: 1.0,
         })
         if (!result) return
         lfoOsc = result.osc
@@ -135,12 +150,15 @@ export const useSynthStore = defineStore('synth', () => {
         if (!result) return
         noiseSrc = result.source
         noiseOutGain = result.gain
-        noiseOutGain.connect(filterNode)
+        ensureVCF()
+        ensureMixer()
+        noiseOutGain.connect(mixerNode)
     }
 
     // Lazy initializer helpers
     const ensureVCF = () => {
         if (!filterNode) initVCF()
+        ensureMixer()
     }
 
     const ensureVCA = () => {
@@ -163,27 +181,31 @@ export const useSynthStore = defineStore('synth', () => {
         if (!noiseSrc) initNoise()
     }
 
+    const ensureMixer = () => {
+        if (!mixerNode) initMixer()
+    }
+
     // === Parameter Actions ===
 
-    const setVcoFrequency = (val) => {
+    const setVcoFrequency = val => {
         vcoFrequency.value = val
         ensureVCO()
         vcoOsc?.frequency.setValueAtTime(val, ctx.currentTime)
     }
 
-    const setVcoWaveform = (val) => {
+    const setVcoWaveform = val => {
         vcoWaveform.value = val
         ensureVCO()
         if (vcoOsc) vcoOsc.type = val
     }
 
-    const setLfoFrequency = (val) => {
+    const setLfoFrequency = val => {
         lfoFrequency.value = val
         ensureLFO()
         lfoOsc?.frequency.setValueAtTime(val, ctx.currentTime)
     }
 
-    const setLfoWaveform = (val) => {
+    const setLfoWaveform = val => {
         lfoWaveform.value = val
         ensureLFO()
         if (lfoOsc) lfoOsc.type = val
@@ -194,7 +216,7 @@ export const useSynthStore = defineStore('synth', () => {
     const FILTER_MAX_Q = 20
     const FILTER_SMOOTH_TIME = 0.02
 
-    const setFilterCutoff = (val) => {
+    const setFilterCutoff = val => {
         filterCutoff.value = val
         const clamped = Math.max(FILTER_MIN_FREQ, val)
         filterCutoff.value = clamped
@@ -206,12 +228,9 @@ export const useSynthStore = defineStore('synth', () => {
         filterNode.frequency.setTargetAtTime(clamped, now, FILTER_SMOOTH_TIME)
     }
 
-    const setFilterResonance = (val) => {
+    const setFilterResonance = val => {
         filterResonance.value = val
-        const clamped = Math.min(
-            FILTER_MAX_Q,
-            Math.max(FILTER_MIN_Q, val)
-        )
+        const clamped = Math.min(FILTER_MAX_Q, Math.max(FILTER_MIN_Q, val))
         filterResonance.value = clamped
         ensureVCF()
         filterNode?.Q.setValueAtTime(val, ctx.currentTime)
@@ -221,7 +240,7 @@ export const useSynthStore = defineStore('synth', () => {
         filterNode.Q.setTargetAtTime(clamped, now, FILTER_SMOOTH_TIME)
     }
 
-    const setFilterType = (val) => {
+    const setFilterType = val => {
         filterType.value = val
         ensureVCF()
         if (filterNode) filterNode.type = val
@@ -236,17 +255,17 @@ export const useSynthStore = defineStore('synth', () => {
         noiseOutGain?.gain.setValueAtTime(noiseLvl, ctx.currentTime)
     }
 
-    const setVcaMode = (mode) => {
+    const setVcaMode = mode => {
         vcaMode.value = mode
         ensureLFO()
         lfoOutGain?.gain.setValueAtTime(mode, ctx.currentTime)
     }
 
-    const setEnvelopeAttack = (val) => {
+    const setEnvelopeAttack = val => {
         envelopeAttack.value = val
     }
 
-    const setEnvelopeDecay = (val) => {
+    const setEnvelopeDecay = val => {
         envelopeDecay.value = val
     }
 
@@ -259,43 +278,72 @@ export const useSynthStore = defineStore('synth', () => {
         triggerEnvelope({
             attack: envelopeAttack.value,
             decay: envelopeDecay.value,
-            peak
+            peak,
         })
     }
 
     const destroySynth = () => {
         try {
-            vcoOsc?.stop();
-            vcoOsc?.disconnect();
-            lfoOsc?.stop();
-            lfoOsc?.disconnect();
-            noiseSrc?.stop();
-            noiseSrc?.disconnect();
+            vcoOsc?.stop()
+            vcoOsc?.disconnect()
+            lfoOsc?.stop()
+            lfoOsc?.disconnect()
+            noiseSrc?.stop()
+            noiseSrc?.disconnect()
         } catch {}
 
-        ;[vcoOutGain, lfoOutGain, noiseOutGain, filterNode, vcaGainNode].forEach((n) => {
-            try { n?.disconnect() } catch {}
+        ;[
+            vcoOutGain,
+            lfoOutGain,
+            noiseOutGain,
+            mixerNode,
+            filterNode,
+            vcaGainNode,
+        ].forEach(n => {
+            try {
+                n?.disconnect()
+            } catch {}
         })
 
         vcoOsc = lfoOsc = noiseSrc = null
         vcoOutGain = lfoOutGain = noiseOutGain = null
-        filterNode = vcaGainNode = inverterGain = triggerEnvelope = null
+        filterNode =
+            mixerNode =
+            vcaGainNode =
+            inverterGain =
+            triggerEnvelope =
+                null
     }
 
     // Nodes will be lazily initialized by the setter functions above
     return {
         // State
-        audioReady, vcoFrequency, vcoWaveform, lfoFrequency, lfoWaveform,
-        filterCutoff, filterResonance, filterType,
-        envelopeAttack, envelopeDecay,
-        vcoLevel, noiseLevel, vcaMode,
+        audioReady,
+        vcoFrequency,
+        vcoWaveform,
+        lfoFrequency,
+        lfoWaveform,
+        filterCutoff,
+        filterResonance,
+        filterType,
+        envelopeAttack,
+        envelopeDecay,
+        vcoLevel,
+        noiseLevel,
+        vcaMode,
 
         // Actions
-        setVcoFrequency, setVcoWaveform,
-        setLfoFrequency, setLfoWaveform,
-        setFilterCutoff, setFilterResonance, setFilterType,
-        setMixerLevels, setVcaMode,
-        setEnvelopeAttack, setEnvelopeDecay,
+        setVcoFrequency,
+        setVcoWaveform,
+        setLfoFrequency,
+        setLfoWaveform,
+        setFilterCutoff,
+        setFilterResonance,
+        setFilterType,
+        setMixerLevels,
+        setVcaMode,
+        setEnvelopeAttack,
+        setEnvelopeDecay,
         triggerEnvelope: triggerVCAEnvelope,
         getVCAOutputNode,
         getVCAInputNode,
@@ -304,11 +352,12 @@ export const useSynthStore = defineStore('synth', () => {
         getVCFInputNode,
         getVCFOutputNode,
         getNoiseOutputNode,
+        getMixerOutputNode,
         getLFOInputNode,
         getLFOOutputNode,
 
         // Lifecycle
         resume,
-        destroySynth
+        destroySynth,
     }
 })
