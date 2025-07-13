@@ -14,14 +14,14 @@ export const usePatchStore = defineStore('patch', () => {
         if (output && input) {
             try {
                 output.connect(input);
-                patches.value.push({
-                    from: { id: fromModule.id, index: fromIndex },
-                    to: { id: toModule.id, index: toIndex }
-                });
             } catch (e) {
                 console.error('Patch failed:', e);
             }
         }
+        patches.value.push({
+            from: { id: fromModule.id, index: fromIndex },
+            to: { id: toModule.id, index: toIndex }
+        });
     };
 
     const disconnectNodes = (fromModule, fromIndex, toModule, toIndex) => {
@@ -31,17 +31,17 @@ export const usePatchStore = defineStore('patch', () => {
         if (output && input) {
             try {
                 output.disconnect(input);
-                patches.value = patches.value.filter(
-                    p =>
-                        !(p.from.id === fromModule.id &&
-                            p.from.index === fromIndex &&
-                            p.to.id === toModule.id &&
-                            p.to.index === toIndex)
-                );
             } catch (e) {
                 console.error('Unpatch failed:', e);
             }
         }
+        patches.value = patches.value.filter(
+            p =>
+                !(p.from.id === fromModule.id &&
+                    p.from.index === fromIndex &&
+                    p.to.id === toModule.id &&
+                    p.to.index === toIndex)
+        );
     };
 
     const removeConnectionsForModule = (moduleId) => {
