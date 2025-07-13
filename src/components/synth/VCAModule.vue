@@ -49,13 +49,19 @@ import {useModuleRegistry} from "../../composables/useModuleRegistry";
 
 const synth = useSynthStore();
 const registry = useModuleRegistry();
+const patchStore = usePatchStore();
+const id = 'vca-module';
 
-const getOutputNode = (index) => {
-    return synth.getVcoOutputNode?.(index); // or use direct reference
+const getOutputNode = () => {
+    return synth.getVCAOutputNode?.()
+};
+
+const getInputNode = () => {
+    return synth.getVCAInputNode?.()
 };
 
 onMounted(() => {
-    registry.register(id, { id, getOutputNode });
+    registry.register(id, { id, getInputNode, getOutputNode });
 });
 
 onUnmounted(() => {
@@ -91,8 +97,6 @@ const modeLabel = computed(() => {
     return `${Math.round(vcaMode.value * 100)}% Blend`
 })
 
-const patchStore = usePatchStore();
-const id = 'vca-module';
 
 const connectedInputs = computed(() =>
     patchStore
@@ -102,8 +106,8 @@ const connectedInputs = computed(() =>
 
 const handlePatch = ({ type, index }) => {
     if (type === 'input') {
-        const fromModule = registry.get('vca-module');
-        const toModule = registry.get('vco-module');
+        const fromModule = registry.get('vco-module');
+        const toModule = registry.get('vca-module');
 
         if (fromModule && toModule) {
             patchStore.togglePatch(fromModule, 0, toModule, index);
