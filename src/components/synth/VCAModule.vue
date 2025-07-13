@@ -104,14 +104,7 @@ const connectedInputs = computed(() =>
         .map(p => p.to.index)
 );
 
-const handlePatch = ({ type, index }) => {
-    if (type === 'input') {
-        const fromModule = registry.get('vco-module');
-        const toModule = registry.get('vca-module');
-
-        if (fromModule && toModule) {
-            patchStore.togglePatch(fromModule, 0, toModule, index);
-        }
-    }
+const handlePatch = (jack) => {
+    patchStore.selectJack(jack)
 };
 </script>

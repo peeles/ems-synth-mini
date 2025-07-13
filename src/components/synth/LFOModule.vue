@@ -88,13 +88,6 @@ onMounted(async () => {
 })
 
 const handlePatch = ({ type, index }) => {
-    if (type === 'output') {
-        const from = registry.get(id)
-        const to = registry.get('vca-module')
-
-        if (from && to) {
-            patchStore.togglePatch(from, index, to, 0)
-        }
-    }
+    patchStore.selectJack({ type, moduleId: id, index })
 }
 </script>

@@ -124,21 +124,7 @@ onMounted(() => {
     // Optional: synth.initVCF() if not globally initialized
 })
 
-const handlePatch = ({ type, index }) => {
-    if (type === 'input') {
-        const from = registry.get('vco-module')
-        const to = registry.get(id)
-
-        if (from && to) {
-            patchStore.togglePatch(from, 0, to, index)
-        }
-    } else if (type === 'output') {
-        const from = registry.get(id)
-        const to = registry.get('vca-module')
-
-        if (from && to) {
-            patchStore.togglePatch(from, index, to, 0)
-        }
-    }
+const handlePatch = (jack) => {
+    patchStore.selectJack(jack)
 }
 </script>

@@ -93,14 +93,7 @@ onMounted(async () => {
     await synth.resume()
 })
 
-const handlePatch = ({ type, index }) => {
-    if (type === 'output') {
-        const fromModule = registry.get('vco-module')
-        const toModule = registry.get('vca-module')
-
-        if (fromModule && toModule) {
-            patchStore.togglePatch(fromModule, index, toModule, 0)
-        }
-    }
+const handlePatch = (jack) => {
+    patchStore.selectJack(jack)
 }
 </script>
