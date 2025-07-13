@@ -1,7 +1,9 @@
 <template>
     <SynthPanel :id="id">
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-4 uppercase"
+            >
                 LFO Modulator
             </h3>
         </template>
@@ -54,56 +56,52 @@
 </template>
 
 <script setup>
-import SynthPanel from '../SynthPanel.vue'
-import JackPanel from '../JackPanel.vue'
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useSynthStore } from '../../storage/synthStore'
-import { useModuleRegistry } from '../../composables/useModuleRegistry'
-import { usePatchStore } from '../../storage/patchStore'
+import SynthPanel from '../SynthPanel.vue';
+import JackPanel from '../JackPanel.vue';
+import {computed, onMounted, onUnmounted} from 'vue';
+import {useSynthStore} from '../../storage/synthStore';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {usePatchStore} from '../../storage/patchStore';
 
-const synth = useSynthStore()
-const registry = useModuleRegistry()
-const patchStore = usePatchStore()
-const id = 'lfo-module'
+const synth = useSynthStore();
+const registry = useModuleRegistry();
+const patchStore = usePatchStore();
+const id = 'lfo-module';
 
-const getOutputNode = () => synth.getLFOOutputNode?.()
-const getInputNode = () => synth.getLFOInputNode?.()
+const getOutputNode = () => synth.getLFOOutputNode?.();
+const getInputNode = () => synth.getLFOInputNode?.();
 
 onMounted(() => {
-    registry.register(id, { id, getInputNode, getOutputNode })
-})
+    registry.register(id, {id, getInputNode, getOutputNode});
+});
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id)
-    registry.unregister(id)
-})
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+});
 
 const connectedInputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, false)
-        .map(p => p.to.index)
+    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
 );
 
 const connectedOutputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, true)
-        .map(p => p.from.index)
+    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
 );
 
 const lfoFrequency = computed({
     get: () => synth.lfoFrequency,
     set: val => synth.setLfoFrequency(val),
-})
+});
 
 const lfoWaveform = computed({
     get: () => synth.lfoWaveform,
     set: val => synth.setLfoWaveform(val),
-})
+});
 onMounted(async () => {
-    await synth.resume()
-})
+    await synth.resume();
+});
 
-const handlePatch = ({ type, index }) => {
-    patchStore.selectJack({ type, moduleId: id, index })
-}
+const handlePatch = ({type, index}) => {
+    patchStore.selectJack({type, moduleId: id, index});
+};
 </script>

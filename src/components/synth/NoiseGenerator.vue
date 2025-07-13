@@ -41,45 +41,43 @@
 </template>
 
 <script setup>
-import SynthPanel from '../SynthPanel.vue'
-import JackPanel from '../JackPanel.vue'
-import {computed, onMounted, onUnmounted} from 'vue'
-import {useSynthStore} from '../../storage/synthStore'
-import {useModuleRegistry} from '../../composables/useModuleRegistry'
-import {usePatchStore} from '../../storage/patchStore'
+import SynthPanel from '../SynthPanel.vue';
+import JackPanel from '../JackPanel.vue';
+import {computed, onMounted, onUnmounted} from 'vue';
+import {useSynthStore} from '../../storage/synthStore';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {usePatchStore} from '../../storage/patchStore';
 
-const synthStore = useSynthStore()
-const registry = useModuleRegistry()
-const patchStore = usePatchStore()
-const id = 'noise-module'
+const synthStore = useSynthStore();
+const registry = useModuleRegistry();
+const patchStore = usePatchStore();
+const id = 'noise-module';
 
-const getOutputNode = () => synthStore.getNoiseOutputNode?.()
+const getOutputNode = () => synthStore.getNoiseOutputNode?.();
 
 onMounted(() => {
-    registry.register(id, { id, getOutputNode })
-})
+    registry.register(id, {id, getOutputNode});
+});
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id)
-    registry.unregister(id)
-})
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+});
 
 const connectedOutputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, true)
-        .map(p => p.from.index)
-)
+    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
+);
 
 const noiseLevel = computed({
     get: () => synthStore.noiseLevel,
     set: val => synthStore.setMixerLevels(synthStore.vcoLevel, val),
-})
+});
 
 onMounted(async () => {
-    await synthStore.resume()
-})
+    await synthStore.resume();
+});
 
-const handlePatch = ({ type, index }) => {
-  patchStore.selectJack({ type, moduleId: id, index })
-}
+const handlePatch = ({type, index}) => {
+    patchStore.selectJack({type, moduleId: id, index});
+};
 </script>

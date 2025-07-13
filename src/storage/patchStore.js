@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { useModuleRegistry } from '../composables/useModuleRegistry';
+import {defineStore} from 'pinia';
+import {ref} from 'vue';
+import {useModuleRegistry} from '../composables/useModuleRegistry';
 
 export const usePatchStore = defineStore('patch', () => {
     const patches = ref([]);
@@ -19,8 +19,8 @@ export const usePatchStore = defineStore('patch', () => {
             }
         }
         patches.value.push({
-            from: { id: fromModule.id, index: fromIndex },
-            to: { id: toModule.id, index: toIndex }
+            from: {id: fromModule.id, index: fromIndex},
+            to: {id: toModule.id, index: toIndex},
         });
     };
 
@@ -37,19 +37,21 @@ export const usePatchStore = defineStore('patch', () => {
         }
         patches.value = patches.value.filter(
             p =>
-                !(p.from.id === fromModule.id &&
+                !(
+                    p.from.id === fromModule.id &&
                     p.from.index === fromIndex &&
                     p.to.id === toModule.id &&
-                    p.to.index === toIndex)
+                    p.to.index === toIndex
+                )
         );
     };
 
-    const removeConnectionsForModule = (moduleId) => {
+    const removeConnectionsForModule = moduleId => {
         const toRemove = patches.value.filter(
-            (p) => p.from.id === moduleId || p.to.id === moduleId
+            p => p.from.id === moduleId || p.to.id === moduleId
         );
 
-        toRemove.forEach((p) => {
+        toRemove.forEach(p => {
             const fromModule = registry.get(p.from.id);
             const toModule = registry.get(p.to.id);
             if (fromModule && toModule) {
@@ -64,7 +66,7 @@ export const usePatchStore = defineStore('patch', () => {
         });
 
         patches.value = patches.value.filter(
-            (p) => p.from.id !== moduleId && p.to.id !== moduleId
+            p => p.from.id !== moduleId && p.to.id !== moduleId
         );
     };
 
@@ -90,7 +92,7 @@ export const usePatchStore = defineStore('patch', () => {
         );
     };
 
-    const selectJack = (jack) => {
+    const selectJack = jack => {
         if (!selectedJack.value) {
             selectedJack.value = jack;
             return;
@@ -100,7 +102,11 @@ export const usePatchStore = defineStore('patch', () => {
         const second = jack;
 
         // ignore if same type or same jack
-        if (first.moduleId === second.moduleId && first.index === second.index && first.type === second.type) {
+        if (
+            first.moduleId === second.moduleId &&
+            first.index === second.index &&
+            first.type === second.type
+        ) {
             selectedJack.value = null;
             return;
         }
@@ -132,6 +138,6 @@ export const usePatchStore = defineStore('patch', () => {
         togglePatch,
         getConnectionsFor,
         selectJack,
-        removeConnectionsForModule
+        removeConnectionsForModule,
     };
 });

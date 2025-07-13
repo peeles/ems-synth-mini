@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import {reactive} from 'vue';
 
 const moduleMap = reactive(new Map());
 
@@ -7,11 +7,11 @@ export const useModuleRegistry = () => {
         moduleMap.set(id, module);
     };
 
-    const unregister = (id) => {
+    const unregister = id => {
         moduleMap.delete(id);
     };
 
-    const get = (id) => {
+    const get = id => {
         return moduleMap.get(id);
     };
 
@@ -23,6 +23,6 @@ export const useModuleRegistry = () => {
         register,
         unregister,
         get,
-        list
+        list,
     };
-}
+};

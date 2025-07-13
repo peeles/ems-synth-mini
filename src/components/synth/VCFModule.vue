@@ -1,7 +1,9 @@
 <template>
     <SynthPanel :id="id">
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-4 uppercase"
+            >
                 Voltage Filter
             </h3>
         </template>
@@ -44,11 +46,15 @@
 
         <ul class="grid grid-cols-3 max-w-md gap-x-1 my-3 text-xs mx-auto">
             <li class="relative">
-                <input class="sr-only peer" type="radio" value="lowpass" name="filterType" id="low_pass">
+                <input
+                    class="sr-only peer"
+                    type="radio"
+                    value="lowpass"
+                    name="filterType"
+                    id="low_pass"
+                />
                 <label
-                    class="flex py-1.5 px-2 bg-transparent border border-gray-¶00 rounded cursor-pointer
-                    focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2
-                    peer-checked:border-transparent"
+                    class="flex py-1.5 px-2 bg-transparent border border-gray-¶00 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
                     for="low_pass"
                 >
                     Low-Pass
@@ -56,11 +62,15 @@
             </li>
 
             <li class="relative">
-                <input class="sr-only peer" type="radio" value="highpass" name="filterType" id="high_pass">
+                <input
+                    class="sr-only peer"
+                    type="radio"
+                    value="highpass"
+                    name="filterType"
+                    id="high_pass"
+                />
                 <label
-                    class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer
-                    focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2
-                    peer-checked:border-transparent"
+                    class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
                     for="high_pass"
                 >
                     High-Pass
@@ -68,11 +78,15 @@
             </li>
 
             <li class="relative">
-                <input class="sr-only peer" type="radio" value="bandpass" name="filterType" id="band_pass">
+                <input
+                    class="sr-only peer"
+                    type="radio"
+                    value="bandpass"
+                    name="filterType"
+                    id="band_pass"
+                />
                 <label
-                    class="flex py-1.5 px-2  bg-transparent border border-gray-700 rounded cursor-pointer
-                    focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2
-                    peer-checked:border-transparent"
+                    class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
                     for="band_pass"
                 >
                     Band-Pass
@@ -80,19 +94,19 @@
             </li>
         </ul>
 
-<!--        <div class="block mb-3">-->
-<!--            <label class="block text-xs font-semibold mb-1">-->
-<!--                Type-->
-<!--            </label>-->
-<!--            <select-->
-<!--                v-model="filterType"-->
-<!--                class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"-->
-<!--            >-->
-<!--                <option value="lowpass">Low-Pass</option>-->
-<!--                <option value="highpass">High-Pass</option>-->
-<!--                <option value="bandpass">Band-Pass</option>-->
-<!--            </select>-->
-<!--        </div>-->
+        <!--        <div class="block mb-3">-->
+        <!--            <label class="block text-xs font-semibold mb-1">-->
+        <!--                Type-->
+        <!--            </label>-->
+        <!--            <select-->
+        <!--                v-model="filterType"-->
+        <!--                class="w-full text-[10px] px-3 py-1.5 border border-black bg-yellow-50 font-mono uppercase rounded-sm"-->
+        <!--            >-->
+        <!--                <option value="lowpass">Low-Pass</option>-->
+        <!--                <option value="highpass">High-Pass</option>-->
+        <!--                <option value="bandpass">Band-Pass</option>-->
+        <!--            </select>-->
+        <!--        </div>-->
 
         <section class="flex flex-row items-center justify-between mt-8">
             <JackPanel
@@ -114,62 +128,58 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useSynthStore } from '../../storage/synthStore'
-import { useModuleRegistry } from '../../composables/useModuleRegistry'
-import { usePatchStore } from '../../storage/patchStore'
-import SynthPanel from "../SynthPanel.vue";
-import JackPanel from '../JackPanel.vue'
+import {computed, onMounted, onUnmounted} from 'vue';
+import {useSynthStore} from '../../storage/synthStore';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {usePatchStore} from '../../storage/patchStore';
+import SynthPanel from '../SynthPanel.vue';
+import JackPanel from '../JackPanel.vue';
 
-const synth = useSynthStore()
-const registry = useModuleRegistry()
-const patchStore = usePatchStore()
-const id = 'vcf-module'
+const synth = useSynthStore();
+const registry = useModuleRegistry();
+const patchStore = usePatchStore();
+const id = 'vcf-module';
 
-const getInputNode = () => synth.getVCFInputNode?.()
-const getOutputNode = () => synth.getVCFOutputNode?.()
+const getInputNode = () => synth.getVCFInputNode?.();
+const getOutputNode = () => synth.getVCFOutputNode?.();
 
 onMounted(() => {
-    registry.register(id, { id, getInputNode, getOutputNode })
-})
+    registry.register(id, {id, getInputNode, getOutputNode});
+});
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id)
-    registry.unregister(id)
-})
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+});
 
 const connectedInputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, false)
-        .map(p => p.to.index)
-)
+    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
+);
 
 const connectedOutputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, true)
-        .map(p => p.from.index)
-)
+    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
+);
 
 const filterCutoff = computed({
     get: () => synth.filterCutoff,
-    set: (val) => synth.setFilterCutoff(val)
-})
+    set: val => synth.setFilterCutoff(val),
+});
 
 const filterResonance = computed({
     get: () => synth.filterResonance,
-    set: (val) => synth.setFilterResonance(val)
-})
+    set: val => synth.setFilterResonance(val),
+});
 
 const filterType = computed({
     get: () => synth.filterType,
-    set: (val) => synth.setFilterType(val)
-})
+    set: val => synth.setFilterType(val),
+});
 
 onMounted(() => {
     // Optional: synth.initVCF() if not globally initialized
-})
+});
 
-const handlePatch = (jack) => {
-    patchStore.selectJack(jack)
-}
+const handlePatch = jack => {
+    patchStore.selectJack(jack);
+};
 </script>

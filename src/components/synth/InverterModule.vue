@@ -5,14 +5,16 @@
         </div>
 
         <div class="mt-3 text-center">
-          <span class="inline-block px-2 py-1 bg-gray-200 text-[10px] font-mono rounded">
-            Gain = –1
-          </span>
+            <span
+                class="inline-block px-2 py-1 bg-gray-200 text-[10px] font-mono rounded"
+            >
+                Gain = –1
+            </span>
         </div>
     </SynthPanel>
 </template>
 
 <script setup>
 // No interactive logic — this is a routing utility
-import SynthPanel from "../SynthPanel.vue";
+import SynthPanel from '../SynthPanel.vue';
 </script>

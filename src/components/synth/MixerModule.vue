@@ -39,44 +39,44 @@
 </template>
 
 <script setup>
-import SynthPanel from '../SynthPanel.vue'
-import JackPanel from '../JackPanel.vue'
-import {computed, onMounted, onUnmounted} from 'vue'
-import {useSynthStore} from '../../storage/synthStore'
-import {usePatchStore} from '../../storage/patchStore'
-import {useModuleRegistry} from '../../composables/useModuleRegistry'
+import SynthPanel from '../SynthPanel.vue';
+import JackPanel from '../JackPanel.vue';
+import {computed, onMounted, onUnmounted} from 'vue';
+import {useSynthStore} from '../../storage/synthStore';
+import {usePatchStore} from '../../storage/patchStore';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
 
-const synth = useSynthStore()
-const patchStore = usePatchStore()
-const registry = useModuleRegistry()
-const id = 'mixer-module'
+const synth = useSynthStore();
+const patchStore = usePatchStore();
+const registry = useModuleRegistry();
+const id = 'mixer-module';
 
-const getOutputNode = () => synth.getMixerOutputNode?.()
+const getOutputNode = () => synth.getMixerOutputNode?.();
 
 onMounted(() => {
-    registry.register(id, {id, getOutputNode})
-})
+    registry.register(id, {id, getOutputNode});
+});
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id)
-    registry.unregister(id)
-})
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+});
 
 const vcoLevel = computed({
     get: () => synth.vcoLevel,
     set: val => synth.setMixerLevels(val, synth.noiseLevel),
-})
+});
 
 const noiseLevel = computed({
     get: () => synth.noiseLevel,
     set: val => synth.setMixerLevels(synth.vcoLevel, val),
-})
+});
 
 const connectedOutputs = computed(() =>
     patchStore.getConnectionsFor(id, true).map(p => p.from.index)
-)
+);
 
 const handlePatch = jack => {
-    patchStore.selectJack(jack)
-}
+    patchStore.selectJack(jack);
+};
 </script>

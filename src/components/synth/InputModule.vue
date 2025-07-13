@@ -68,12 +68,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import SynthPanel from "../SynthPanel.vue";
-import JackPanel from "../JackPanel.vue";
-import { usePatchStore } from "../../storage/patchStore";
-import { useModuleRegistry } from "../../composables/useModuleRegistry";
-import {useSynthEngine} from "../../composables/useSynthEngine";
+import {ref, computed, onMounted, onUnmounted} from 'vue';
+import SynthPanel from '../SynthPanel.vue';
+import JackPanel from '../JackPanel.vue';
+import {usePatchStore} from '../../storage/patchStore';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {useSynthEngine} from '../../composables/useSynthEngine';
 
 const patchStore = usePatchStore();
 const registry = useModuleRegistry();
@@ -90,28 +90,28 @@ const getOutputNode = () => {
 };
 
 onMounted(() => {
-    registry.register(id, { id, getOutputNode });
+    registry.register(id, {id, getOutputNode});
 });
 
 onUnmounted(() => {
     patchStore.removeConnectionsForModule(id);
     registry.unregister(id);
-    try { outputGain?.disconnect(); } catch {}
+    try {
+        outputGain?.disconnect();
+    } catch {}
 });
 
 const connectedOutputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, true)
-        .map(p => p.from.index)
+    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
 );
 
 // Placeholder state — can wire into synthStore or audio input later
-const extSignal = ref(0.5)
-const extEnvelope = ref(0.5)
-const highLevel = ref(0.5)
-const lowLevel = ref(0.5)
+const extSignal = ref(0.5);
+const extEnvelope = ref(0.5);
+const highLevel = ref(0.5);
+const lowLevel = ref(0.5);
 
-const handlePatch = (jack) => {
+const handlePatch = jack => {
     patchStore.selectJack(jack);
 };
 </script>

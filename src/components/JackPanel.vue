@@ -1,22 +1,23 @@
 <template>
     <div class="flex flex-col items-center">
-        <div class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2">
+        <div
+            class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2"
+        >
             <div
                 v-for="i in count"
                 :key="i"
                 :class="{
                     'bg-yellow-400': connected.includes(i - 1),
-                    'bg-gray-800': !connected.includes(i - 1)
+                    'bg-gray-800': !connected.includes(i - 1),
                 }"
                 :id="`${moduleId}-${type}-${i - 1}`"
                 class="w-3 h-3 rounded-full cursor-pointer border border-gray-600"
                 @click="handleClick(i - 1)"
             />
         </div>
-        <span
-            v-if="type !== null"
-            class="mt-1 text-[8px] uppercase"
-        >{{ type }}</span>
+        <span v-if="type !== null" class="mt-1 text-[8px] uppercase">{{
+            type
+        }}</span>
     </div>
 </template>
 
@@ -32,22 +33,22 @@ const props = defineProps({
         validator: val => ['input', 'output', null].includes(val),
     },
     moduleId: {
-        type:String,
+        type: String,
         required: true,
     },
     connected: {
         type: Array,
-        default: () => []
-    }
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(['patch']);
 
-const handleClick = (index) => {
+const handleClick = index => {
     emit('patch', {
         type: props.type,
         moduleId: props.moduleId,
-        index
+        index,
     });
 };
 </script>

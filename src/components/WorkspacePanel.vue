@@ -11,7 +11,9 @@
         class="relative w-full max-w-full h-screen flex flex-col mx-auto p-4"
     >
         <div class="flex flex-1 flex-col gap-4">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mx-16 grid-flow-dense">
+            <div
+                class="grid grid-cols-2 sm:grid-cols-4 gap-4 mx-16 grid-flow-dense"
+            >
                 <div class=""><LFOModule /></div>
                 <div class=""><VCOModule /></div>
                 <div class=""><VCFModule /></div>
@@ -37,26 +39,26 @@
 </template>
 
 <script setup>
-import { useSynthStore } from '../storage/synthStore';
+import {useSynthStore} from '../storage/synthStore';
 import {onMounted, onUnmounted, ref} from 'vue';
-import EnvelopeGenerator from "./synth/EnvelopeGenerator.vue";
-import NoiseGenerator from "./synth/NoiseGenerator.vue";
-import SliderKeyboard from "./synth/SliderKeyboard.vue";
-import LFOModule from "./synth/LFOModule.vue";
-import VCOModule from "./synth/VCOModule.vue";
-import VCFModule from "./synth/VCFModule.vue";
-import InverterModule from "./synth/InverterModule.vue";
-import VCAModule from "./synth/VCAModule.vue";
-import MixerModule from "./synth/MixerModule.vue";
-import MasterVolume from "./synth/MasterVolume.vue";
-import SynthPanel from "./SynthPanel.vue";
-import PatchCables from "./PatchCables.vue";
+import EnvelopeGenerator from './synth/EnvelopeGenerator.vue';
+import NoiseGenerator from './synth/NoiseGenerator.vue';
+import SliderKeyboard from './synth/SliderKeyboard.vue';
+import LFOModule from './synth/LFOModule.vue';
+import VCOModule from './synth/VCOModule.vue';
+import VCFModule from './synth/VCFModule.vue';
+import InverterModule from './synth/InverterModule.vue';
+import VCAModule from './synth/VCAModule.vue';
+import MixerModule from './synth/MixerModule.vue';
+import MasterVolume from './synth/MasterVolume.vue';
+import SynthPanel from './SynthPanel.vue';
+import PatchCables from './PatchCables.vue';
 
 const audioReady = ref(false);
 const synth = useSynthStore();
 
 onMounted(() => {
-    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('pointerdown', unlock, {once: true});
 });
 
 const unlock = async () => {
@@ -75,8 +77,8 @@ const unlock = async () => {
 };
 
 onUnmounted(() => {
-    synth.destroySynth()
-})
+    synth.destroySynth();
+});
 </script>
 
 <style>

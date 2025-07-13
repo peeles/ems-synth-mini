@@ -17,15 +17,15 @@
                     @patch="handlePatch"
                 />
             </section>
-            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-8 uppercase"
+            >
                 VCA
             </h3>
         </template>
 
         <div class="flex flex-col justify-center text-center">
-            <label class="block text-xs font-semibold mb-2">
-                Mix Mode
-            </label>
+            <label class="block text-xs font-semibold mb-2"> Mix Mode </label>
 
             <VerticalSlider
                 :min="0"
@@ -44,13 +44,13 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted} from 'vue'
-import { useSynthStore } from '../../storage/synthStore'
-import { usePatchStore } from "../../storage/patchStore";
-import SynthPanel from "../SynthPanel.vue";
-import VerticalSlider from "../VerticalSlider.vue";
-import JackPanel from "../JackPanel.vue";
-import {useModuleRegistry} from "../../composables/useModuleRegistry";
+import {computed, onMounted, onUnmounted} from 'vue';
+import {useSynthStore} from '../../storage/synthStore';
+import {usePatchStore} from '../../storage/patchStore';
+import SynthPanel from '../SynthPanel.vue';
+import VerticalSlider from '../VerticalSlider.vue';
+import JackPanel from '../JackPanel.vue';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
 
 const synth = useSynthStore();
 const registry = useModuleRegistry();
@@ -58,65 +58,60 @@ const patchStore = usePatchStore();
 const id = 'vca-module';
 
 const getOutputNode = () => {
-    return synth.getVCAOutputNode?.()
+    return synth.getVCAOutputNode?.();
 };
 
 const getInputNode = () => {
-    return synth.getVCAInputNode?.()
+    return synth.getVCAInputNode?.();
 };
 
 onMounted(() => {
-    registry.register(id, { id, getInputNode, getOutputNode });
+    registry.register(id, {id, getInputNode, getOutputNode});
 });
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id)
+    patchStore.removeConnectionsForModule(id);
     registry.unregister(id);
 });
 
 const vcaMode = computed({
     get: () => synth.vcaMode,
-    set: (val) => synth.setVcaMode(val)
-})
+    set: val => synth.setVcaMode(val),
+});
 
 const modeLabel = computed(() => {
     if (vcaMode.value <= 0.1) {
-        return 'Envelope'
+        return 'Envelope';
     }
 
     if (vcaMode.value <= 0.2) {
-        return 'Sine Wave'
+        return 'Sine Wave';
     }
 
     if (vcaMode.value <= 0.3) {
-        return 'Linear'
+        return 'Linear';
     }
 
     if (vcaMode.value <= 0.4) {
-        return 'Exponential'
+        return 'Exponential';
     }
 
     if (vcaMode.value >= 0.9) {
-        return 'Ring Mod'
+        return 'Ring Mod';
     }
 
-    return `${Math.round(vcaMode.value * 100)}% Blend`
-})
-
+    return `${Math.round(vcaMode.value * 100)}% Blend`;
+});
 
 const connectedInputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, false)
-        .map(p => p.to.index)
+    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
 );
 
 const connectedOutputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, true)
-        .map(p => p.from.index)
-)
+    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
+);
 
-const handlePatch = (jack) => {
-    patchStore.selectJack(jack)
+const handlePatch = jack => {
+    patchStore.selectJack(jack);
 };
 </script>

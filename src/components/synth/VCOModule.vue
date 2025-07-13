@@ -1,7 +1,9 @@
 <template>
     <SynthPanel :id="id">
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-4 uppercase"
+            >
                 Voltage Oscillator
             </h3>
         </template>
@@ -54,45 +56,41 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useSynthStore } from '../../storage/synthStore'
-import { useModuleRegistry } from '../../composables/useModuleRegistry'
-import { usePatchStore } from '../../storage/patchStore'
-import SynthPanel from '../SynthPanel.vue'
-import JackPanel from '../JackPanel.vue'
+import {computed, onMounted, onUnmounted} from 'vue';
+import {useSynthStore} from '../../storage/synthStore';
+import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {usePatchStore} from '../../storage/patchStore';
+import SynthPanel from '../SynthPanel.vue';
+import JackPanel from '../JackPanel.vue';
 
-const synth = useSynthStore()
-const registry = useModuleRegistry()
-const patchStore = usePatchStore()
-const id = 'vco-module'
+const synth = useSynthStore();
+const registry = useModuleRegistry();
+const patchStore = usePatchStore();
+const id = 'vco-module';
 
-const getOutputNode = (index) => {
-    return synth.getVCOOutputNode?.(index)
-}
+const getOutputNode = index => {
+    return synth.getVCOOutputNode?.(index);
+};
 
-const getInputNode = (index) => {
-    return synth.getVCOInputNode?.(index)
-}
+const getInputNode = index => {
+    return synth.getVCOInputNode?.(index);
+};
 
 onMounted(() => {
-    registry.register(id, { id, getInputNode, getOutputNode })
-})
+    registry.register(id, {id, getInputNode, getOutputNode});
+});
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id)
-    registry.unregister(id)
-})
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+});
 
 const connectedInputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, false)
-        .map(p => p.to.index)
+    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
 );
 
 const connectedOutputs = computed(() =>
-    patchStore
-        .getConnectionsFor(id, true)
-        .map(p => p.from.index)
+    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
 );
 
 const vcoFrequency = computed({
@@ -103,13 +101,13 @@ const vcoFrequency = computed({
 const vcoWaveform = computed({
     get: () => synth.vcoWaveform,
     set: val => synth.setVcoWaveform(val),
-})
+});
 
 onMounted(async () => {
-    await synth.resume()
-})
+    await synth.resume();
+});
 
-const handlePatch = (jack) => {
-    patchStore.selectJack(jack)
-}
+const handlePatch = jack => {
+    patchStore.selectJack(jack);
+};
 </script>
