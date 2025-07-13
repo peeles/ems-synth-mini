@@ -56,10 +56,10 @@
 <script setup>
 import SynthPanel from '../SynthPanel.vue'
 import JackPanel from '../JackPanel.vue'
-import {computed, onMounted, onUnmounted} from 'vue'
-import {useSynthStore} from '../../storage/synthStore'
-import {useModuleRegistry} from '../../composables/useModuleRegistry'
-import {usePatchStore} from '../../storage/patchStore'
+import { computed, onMounted, onUnmounted } from 'vue'
+import { useSynthStore } from '../../storage/synthStore'
+import { useModuleRegistry } from '../../composables/useModuleRegistry'
+import { usePatchStore } from '../../storage/patchStore'
 
 const synth = useSynthStore()
 const registry = useModuleRegistry()
@@ -67,9 +67,10 @@ const patchStore = usePatchStore()
 const id = 'lfo-module'
 
 const getOutputNode = () => synth.getLFOOutputNode?.()
+const getInputNode = () => synth.getLFOInputNode?.()
 
 onMounted(() => {
-    registry.register(id, { id, getOutputNode })
+    registry.register(id, { id, getInputNode, getOutputNode })
 })
 
 onUnmounted(() => {

@@ -54,6 +54,11 @@ export const useSynthStore = defineStore('synth', () => {
         return vcoOutGain
     }
 
+    const getVCOInputNode = () => {
+        ensureVCO()
+        return vcoOsc?.frequency || null
+    }
+
     const getVCFInputNode = () => {
         ensureVCF()
         return filterNode
@@ -72,6 +77,11 @@ export const useSynthStore = defineStore('synth', () => {
     const getLFOOutputNode = () => {
         ensureLFO()
         return lfoOutGain
+    }
+
+    const getLFOInputNode = () => {
+        ensureLFO()
+        return lfoOsc?.frequency || null
     }
 
     const initVCF = () => {
@@ -280,10 +290,12 @@ export const useSynthStore = defineStore('synth', () => {
         triggerEnvelope: triggerVCAEnvelope,
         getVCAOutputNode,
         getVCAInputNode,
+        getVCOInputNode,
         getVCOOutputNode,
         getVCFInputNode,
         getVCFOutputNode,
         getNoiseOutputNode,
+        getLFOInputNode,
         getLFOOutputNode,
 
         // Lifecycle
