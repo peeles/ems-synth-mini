@@ -60,8 +60,12 @@ export const useSynthEngine = () => {
         const ctx = getContext()
         try {
             const filter = ctx.createBiquadFilter()
+            const minFreq = 20
             filter.type = type
-            filter.frequency.setValueAtTime(frequency, ctx.currentTime)
+            filter.frequency.setValueAtTime(
+                Math.max(minFreq, frequency),
+                ctx.currentTime
+            )
             filter.Q.setValueAtTime(q, ctx.currentTime)
             return filter
         } catch (e) {

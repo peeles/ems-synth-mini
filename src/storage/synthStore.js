@@ -179,16 +179,36 @@ export const useSynthStore = defineStore('synth', () => {
         if (lfoOsc) lfoOsc.type = val
     }
 
+    const FILTER_MIN_FREQ = 20
+    const FILTER_MIN_Q = 0.1
+    const FILTER_MAX_Q = 20
+    const FILTER_SMOOTH_TIME = 0.02
+
     const setFilterCutoff = (val) => {
         filterCutoff.value = val
+        const clamped = Math.max(FILTER_MIN_FREQ, val)
+        filterCutoff.value = clamped
         ensureVCF()
         filterNode?.frequency.setValueAtTime(val, ctx.currentTime)
+        if (!filterNode) return
+        const now = ctx.currentTime
+        filterNode.frequency.cancelScheduledValues(now)
+        filterNode.frequency.setTargetAtTime(clamped, now, FILTER_SMOOTH_TIME)
     }
 
     const setFilterResonance = (val) => {
         filterResonance.value = val
+        const clamped = Math.min(
+            FILTER_MAX_Q,
+            Math.max(FILTER_MIN_Q, val)
+        )
+        filterResonance.value = clamped
         ensureVCF()
         filterNode?.Q.setValueAtTime(val, ctx.currentTime)
+        if (!filterNode) return
+        const now = ctx.currentTime
+        filterNode.Q.cancelScheduledValues(now)
+        filterNode.Q.setTargetAtTime(clamped, now, FILTER_SMOOTH_TIME)
     }
 
     const setFilterType = (val) => {
