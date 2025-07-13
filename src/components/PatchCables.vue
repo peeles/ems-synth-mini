@@ -1,5 +1,8 @@
 <template>
-    <svg class="absolute inset-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+        ref="svg"
+        class="absolute inset-0 pointer-events-none" xmlns="http://www.w3.org/2000/svg"
+    >
         <line
             v-for="(patch, idx) in lines"
             :key="idx"
@@ -14,17 +17,26 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref } from 'vue'
+import {onMounted, watch, ref} from 'vue'
 import { usePatchStore } from '../storage/patchStore'
 
-const patchStore = usePatchStore()
-const lines = ref([])
+const patchStore = usePatchStore();
+const lines = ref([]);
+const svg = ref(null);
 
 const getPosition = (moduleId, type, index) => {
     const el = document.getElementById(`${moduleId}-${type}-${index}`)
-    if (!el) return { x: 0, y: 0 }
+    const svgEl = svg.value;
+    if (!el || !svgEl) {
+        return {x: 0, y: 0}
+    }
+
     const rect = el.getBoundingClientRect()
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+    const svgRect = svgEl.getBoundingClientRect()
+    return {
+        x: rect.left - svgRect.left + rect.width / 2,
+        y: rect.top - svgRect.top + rect.height / 2,
+    }
 }
 
 const updateLines = () => {

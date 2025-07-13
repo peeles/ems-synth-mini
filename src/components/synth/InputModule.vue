@@ -74,16 +74,19 @@ import JackPanel from "../JackPanel.vue";
 import { usePatchStore } from "../../storage/patchStore";
 import { useModuleRegistry } from "../../composables/useModuleRegistry";
 import { useSynthStore } from "../../storage/synthStore";
+import {useSynthEngine} from "../../composables/useSynthEngine";
 
 const patchStore = usePatchStore();
 const registry = useModuleRegistry();
 const synth = useSynthStore();
+const engine = useSynthEngine();
+const context = engine.context;
 const id = 'input-module';
 
 let outputGain = null;
 const getOutputNode = () => {
     if (!outputGain) {
-        outputGain = synth.context.createGain();
+        outputGain = context.createGain();
     }
     return outputGain;
 };

@@ -46,7 +46,7 @@ export const useSynthStore = defineStore('synth', () => {
 
     const getVCAInputNode = () => {
         ensureVCA()
-        return vcaGainNode
+        return vcaGainNode.gain
     }
 
     const getVCOOutputNode = () => {
