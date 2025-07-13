@@ -242,6 +242,14 @@ export const useSynthStore = defineStore('synth', () => {
         lfoOutGain?.gain.setValueAtTime(mode, ctx.currentTime)
     }
 
+    const setEnvelopeAttack = (val) => {
+        envelopeAttack.value = val
+    }
+
+    const setEnvelopeDecay = (val) => {
+        envelopeDecay.value = val
+    }
+
     // === Envelope Action ===
     const triggerVCAEnvelope = () => {
         ensureVCA()
@@ -287,6 +295,7 @@ export const useSynthStore = defineStore('synth', () => {
         setLfoFrequency, setLfoWaveform,
         setFilterCutoff, setFilterResonance, setFilterType,
         setMixerLevels, setVcaMode,
+        setEnvelopeAttack, setEnvelopeDecay,
         triggerEnvelope: triggerVCAEnvelope,
         getVCAOutputNode,
         getVCAInputNode,
