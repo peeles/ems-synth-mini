@@ -120,6 +120,12 @@ export const usePatchStore = defineStore('patch', () => {
         const from = first.type === 'output' ? first : second;
         const to = first.type === 'input' ? first : second;
 
+        // disallow connections from a module back into itself
+        if (from.moduleId === to.moduleId) {
+            selectedJack.value = null;
+            return;
+        }
+
         const fromModule = registry.get(from.moduleId);
         const toModule = registry.get(to.moduleId);
 

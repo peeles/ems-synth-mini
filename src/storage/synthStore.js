@@ -167,7 +167,6 @@ export const useSynthStore = defineStore('synth', () => {
         noiseOutGain.connect(mixerNode);
     };
 
-    // Lazy initializer helpers
     const ensureVCF = () => {
         if (!filterNode) initVCF();
         ensureMixer();
@@ -238,7 +237,11 @@ export const useSynthStore = defineStore('synth', () => {
         filterCutoff.value = clamped;
         ensureVCF();
         filterNode?.frequency.setValueAtTime(val, ctx.currentTime);
-        if (!filterNode) return;
+
+        if (!filterNode) {
+            return;
+        }
+
         const now = ctx.currentTime;
         filterNode.frequency.cancelScheduledValues(now);
         filterNode.frequency.setTargetAtTime(clamped, now, FILTER_SMOOTH_TIME);
@@ -250,7 +253,11 @@ export const useSynthStore = defineStore('synth', () => {
         filterResonance.value = clamped;
         ensureVCF();
         filterNode?.Q.setValueAtTime(val, ctx.currentTime);
-        if (!filterNode) return;
+
+        if (!filterNode) {
+            return;
+        }
+
         const now = ctx.currentTime;
         filterNode.Q.cancelScheduledValues(now);
         filterNode.Q.setTargetAtTime(clamped, now, FILTER_SMOOTH_TIME);
@@ -259,7 +266,10 @@ export const useSynthStore = defineStore('synth', () => {
     const setFilterType = val => {
         filterType.value = val;
         ensureVCF();
-        if (filterNode) filterNode.type = val;
+
+        if (filterNode) {
+            filterNode.type = val;
+        }
     };
 
     const setMixerLevels = (vcoLvl, noiseLvl) => {
@@ -299,14 +309,22 @@ export const useSynthStore = defineStore('synth', () => {
     };
 
     const destroySynth = () => {
-        try {
-            vcoOsc?.stop();
-            vcoOsc?.disconnect();
-            lfoOsc?.stop();
-            lfoOsc?.disconnect();
-            noiseSrc?.stop();
-            noiseSrc?.disconnect();
-        } catch {}
+        const safelyStopAndDisconnect = node => {
+            try {
+                node?.stop?.();
+            } catch (e) {
+                console.warn('Error stopping node:', e);
+            }
+            try {
+                node?.disconnect?.();
+            } catch (e) {
+                console.warn('Error disconnecting node:', e);
+            }
+        };
+
+        safelyStopAndDisconnect(vcoOsc);
+        safelyStopAndDisconnect(lfoOsc);
+        safelyStopAndDisconnect(noiseSrc);
 
         [
             vcoOutGain,
@@ -319,20 +337,21 @@ export const useSynthStore = defineStore('synth', () => {
         ].forEach(n => {
             try {
                 n?.disconnect();
-            } catch {}
+            } catch (e) {
+                console.warn('Error disconnecting node:', e);
+            }
         });
 
         vcoOsc = lfoOsc = noiseSrc = null;
         vcoOutGain = lfoOutGain = noiseOutGain = null;
         filterNode =
             mixerNode =
-            vcaGainNode =
-            inverterGain =
-            triggerEnvelope =
-                null;
+                vcaGainNode =
+                    inverterGain =
+                        triggerEnvelope =
+                            null;
     };
 
-    // Nodes will be lazily initialized by the setter functions above
     return {
         // State
         audioReady,
