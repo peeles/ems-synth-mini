@@ -11,39 +11,47 @@ export const usePatchStore = defineStore('patch', () => {
         const output = fromModule.getOutputNode(fromIndex);
         const input = toModule.getInputNode(toIndex);
 
-        if (output && input) {
-            try {
-                output.connect(input);
-            } catch (e) {
-                console.error('Patch failed:', e);
-            }
+        if (!output || !input) {
+            return false;
         }
-        patches.value.push({
-            from: {id: fromModule.id, index: fromIndex},
-            to: {id: toModule.id, index: toIndex},
-        });
+
+        try {
+            output.connect(input);
+            patches.value.push({
+                from: {id: fromModule.id, index: fromIndex},
+                to: {id: toModule.id, index: toIndex},
+            });
+            return true;
+        } catch (e) {
+            console.error('Patch failed:', e);
+            return false;
+        }
     };
 
     const disconnectNodes = (fromModule, fromIndex, toModule, toIndex) => {
         const output = fromModule.getOutputNode(fromIndex);
         const input = toModule.getInputNode(toIndex);
 
-        if (output && input) {
-            try {
-                output.disconnect(input);
-            } catch (e) {
-                console.error('Unpatch failed:', e);
-            }
+        if (!output || !input) {
+            return false;
         }
-        patches.value = patches.value.filter(
-            p =>
-                !(
-                    p.from.id === fromModule.id &&
-                    p.from.index === fromIndex &&
-                    p.to.id === toModule.id &&
-                    p.to.index === toIndex
-                )
-        );
+
+        try {
+            output.disconnect(input);
+            patches.value = patches.value.filter(
+                p =>
+                    !(
+                        p.from.id === fromModule.id &&
+                        p.from.index === fromIndex &&
+                        p.to.id === toModule.id &&
+                        p.to.index === toIndex
+                    )
+            );
+            return true;
+        } catch (e) {
+            console.error('Unpatch failed:', e);
+            return false;
+        }
     };
 
     const removeConnectionsForModule = moduleId => {
@@ -80,9 +88,7 @@ export const usePatchStore = defineStore('patch', () => {
         );
 
         if (exists) {
-            disconnectNodes(fromModule, fromIndex, toModule, toIndex);
-        } else {
-            connectNodes(fromModule, fromIndex, toModule, toIndex);
+            return disconnectNodes(fromModule, fromIndex, toModule, toIndex);
         }
     };
 
