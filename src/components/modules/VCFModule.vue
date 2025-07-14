@@ -99,15 +99,16 @@
 
         <section class="flex flex-row items-center justify-between mt-8">
             <JackPanel
-                :count="1"
-                type="input"
+                :count="3"
+                :type="'input'"
                 :module-id="id"
                 :connected="connectedInputs"
+                :orientation="'horizontal'"
                 @patch="handlePatch"
             />
             <JackPanel
                 :count="1"
-                type="output"
+                :type="'output'"
                 :module-id="id"
                 :connected="connectedOutputs"
                 @patch="handlePatch"
@@ -129,7 +130,7 @@ const registry = useModuleRegistry();
 const patchStore = usePatchStore();
 const id = 'vcf-module';
 
-const getInputNode = () => synth.getVCFInputNode?.();
+const getInputNode = index => synth.getVCFInputNode?.(index);
 const getOutputNode = () => synth.getVCFOutputNode?.();
 
 onMounted(() => {

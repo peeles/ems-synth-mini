@@ -67,8 +67,12 @@
             </div>
 
             <div class="flex flex-col flex-1 items-end gap-y-2.5">
-                <div
-                    class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2"
+                <JackPanel
+                    :count="1"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
                 />
                 <div
                     class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2"
@@ -89,12 +93,37 @@
 </template>
 
 <script setup>
-import {computed} from 'vue';
+import {computed, onMounted, onUnmounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import SynthPanel from '../SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
+import {usePatchStore} from "../../storage/patchStore";
+import {useModuleRegistry} from "../../composables/useModuleRegistry";
+import JackPanel from "../JackPanel.vue";
 
 const synth = useSynthStore();
+const registry = useModuleRegistry();
+const patchStore = usePatchStore();
+const id = 'envelope-generator';
+
+const getInputNode = index => synth.getEnvelopeTriggerInputNode?.(index);
+
+onMounted(() => {
+    registry.register(id, {id, getInputNode});
+});
+
+onUnmounted(() => {
+    patchStore.removeConnectionsForModule(id);
+    registry.unregister(id);
+});
+
+const connectedInputs = computed(() =>
+    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
+);
+
+const handlePatch = jack => {
+    patchStore.selectJack(jack);
+};
 
 const envelopeAttack = computed({
     get: () => synth.envelopeAttack,

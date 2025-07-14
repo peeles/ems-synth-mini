@@ -2,6 +2,7 @@
     <div class="flex flex-col items-center">
         <div
             class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2"
+            :class="orientation === 'vertical' ? 'flex-col' : 'flex-row'"
         >
             <div
                 v-for="i in count"
@@ -39,6 +40,11 @@ const props = defineProps({
     connected: {
         type: Array,
         default: () => [],
+    },
+    orientation: {
+        type: String,
+        default: 'vertical',
+        validator: val => ['vertical', 'horizontal'].includes(val),
     },
 });
 

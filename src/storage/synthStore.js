@@ -25,11 +25,15 @@ export const useSynthStore = defineStore('synth', () => {
     let vcoOsc, vcoOutGain;
     let lfoOsc, lfoOutGain;
     let noiseSrc, noiseOutGain;
+    let filterInputGain;
     let filterNode;
     let mixerNode;
     let vcaGainNode;
     let inverterGain;
     let triggerEnvelope; // now from engine.createEnvelopeGain()
+    let envelopeTriggerGain;
+    let triggerPollId;
+    let prevTrigger = 0;
 
     async function resume() {
         await ctx.resume();
@@ -60,9 +64,20 @@ export const useSynthStore = defineStore('synth', () => {
         return vcoOsc?.frequency || null;
     };
 
-    const getVCFInputNode = () => {
+    const getVCFInputNode = (index) => {
         ensureVCF();
-        return filterNode;
+
+        if (index === 0) {
+            return filterInputGain;
+        }
+        if (index === 1) {
+            return filterNode.frequency;
+        }
+        if (index === 2) {
+            return filterNode.Q;
+        }
+
+        return null;
     };
 
     const getVCFOutputNode = () => {
@@ -102,23 +117,34 @@ export const useSynthStore = defineStore('synth', () => {
 
     const initMixer = () => {
         mixerNode = ctx.createGain();
-        mixerNode.connect(filterNode);
+        if (filterInputGain) {
+            mixerNode.connect(filterInputGain);
+        }
+    };
+
+    const getEnvelopeTriggerInputNode = () => {
+        ensureEnvelopeTrigger();
+        return envelopeTriggerGain?.gain || null;
     };
 
     const initVCF = () => {
+        filterInputGain = ctx.createGain();
         filterNode = engine.createFilterNode({
             type: filterType.value,
             frequency: filterCutoff.value,
             q: filterResonance.value,
         });
+
+        filterInputGain.connect(filterNode);
         mixerNode?.disconnect();
-        mixerNode?.connect(filterNode);
+        mixerNode?.connect(filterInputGain);
     };
 
     const initVCA = () => {
         const envelope = engine.createEnvelopeGain();
         vcaGainNode = envelope.gainNode;
         triggerEnvelope = envelope.triggerEnvelope;
+        ensureEnvelopeTrigger();
 
         // Route filter → VCA → output
         filterNode?.connect(vcaGainNode);
@@ -129,6 +155,23 @@ export const useSynthStore = defineStore('synth', () => {
     const initInverter = () => {
         inverterGain = ctx.createGain();
         inverterGain.gain.value = -1;
+    };
+
+    const initEnvelopeTrigger = () => {
+        envelopeTriggerGain = ctx.createGain();
+        envelopeTriggerGain.gain.value = 0;
+        const poll = () => {
+            if (envelopeTriggerGain.gain.value > 0.5 && prevTrigger <= 0.5) {
+                triggerVCAEnvelope();
+            }
+            prevTrigger = envelopeTriggerGain.gain.value;
+            triggerPollId = requestAnimationFrame(poll);
+        };
+        triggerPollId = requestAnimationFrame(poll);
+    };
+
+    const ensureEnvelopeTrigger = () => {
+        if (!envelopeTriggerGain) initEnvelopeTrigger();
     };
 
     const initVCO = () => {
@@ -168,13 +211,14 @@ export const useSynthStore = defineStore('synth', () => {
     };
 
     const ensureVCF = () => {
-        if (!filterNode) initVCF();
-        ensureMixer();
+        if (!filterNode || !filterInputGain) initVCF();
+        if (!mixerNode) initMixer();
     };
 
     const ensureVCA = () => {
         ensureVCF();
         if (!vcaGainNode) initVCA();
+        ensureEnvelopeTrigger();
     };
 
     const ensureVCO = () => {
@@ -331,6 +375,7 @@ export const useSynthStore = defineStore('synth', () => {
             lfoOutGain,
             noiseOutGain,
             mixerNode,
+            filterInputGain,
             filterNode,
             vcaGainNode,
             inverterGain,
@@ -342,14 +387,21 @@ export const useSynthStore = defineStore('synth', () => {
             }
         });
 
+        if (triggerPollId) {
+            cancelAnimationFrame(triggerPollId);
+            triggerPollId = null;
+        }
+
+        envelopeTriggerGain = null;
         vcoOsc = lfoOsc = noiseSrc = null;
         vcoOutGain = lfoOutGain = noiseOutGain = null;
-        filterNode =
-            mixerNode =
-                vcaGainNode =
-                    inverterGain =
-                        triggerEnvelope =
-                            null;
+        filterInputGain =
+            filterNode =
+                mixerNode =
+                    vcaGainNode =
+                        inverterGain =
+                            triggerEnvelope =
+                                null;
     };
 
     return {
@@ -393,6 +445,7 @@ export const useSynthStore = defineStore('synth', () => {
         getLFOOutputNode,
         getInverterInputNode,
         getInverterOutputNode,
+        getEnvelopeTriggerInputNode,
 
         // Lifecycle
         resume,
