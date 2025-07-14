@@ -7,6 +7,22 @@ export const usePatchStore = defineStore('patch', () => {
     const selectedJack = ref(null);
     const registry = useModuleRegistry();
 
+    const colours = [
+        '#ffcc00',
+        '#33ccff',
+        '#ff66cc',
+        '#66ff66',
+        '#ff9933',
+        '#cc66ff',
+    ];
+    const nextColourIndex = ref(0);
+
+    const getNextColour = () => {
+        const colour = colours[nextColourIndex.value % colours.length];
+        nextColourIndex.value++;
+        return colour;
+    };
+
     const connectNodes = (fromModule, fromIndex, toModule, toIndex) => {
         const output = fromModule.getOutputNode(fromIndex);
         const input = toModule.getInputNode(toIndex);
@@ -20,6 +36,7 @@ export const usePatchStore = defineStore('patch', () => {
             patches.value.push({
                 from: {id: fromModule.id, index: fromIndex},
                 to: {id: toModule.id, index: toIndex},
+                colour: getNextColour(),
             });
             return true;
         } catch (e) {
@@ -90,6 +107,8 @@ export const usePatchStore = defineStore('patch', () => {
         if (exists) {
             return disconnectNodes(fromModule, fromIndex, toModule, toIndex);
         }
+
+        return connectNodes(fromModule, fromIndex, toModule, toIndex);
     };
 
     const getConnectionsFor = (moduleId, isOutput) => {

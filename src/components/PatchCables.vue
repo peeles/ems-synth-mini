@@ -1,7 +1,9 @@
 <template>
     <svg
         ref="svg"
-        class="absolute inset-0 pointer-events-none"
+        class="absolute z-50 top-0 left-0 right-0 bottom-0 pointer-events-none"
+        width="100%"
+        height="100%"
         xmlns="http://www.w3.org/2000/svg"
     >
         <line
@@ -11,7 +13,7 @@
             :y1="patch.y1"
             :x2="patch.x2"
             :y2="patch.y2"
-            stroke="#ffcc00"
+            :stroke="patch.colour"
             stroke-width="2"
         />
     </svg>
@@ -45,7 +47,7 @@ const lines = computed(() => {
     return patchStore.patches.map(p => {
         const from = getPosition(p.from.id, 'output', p.from.index);
         const to = getPosition(p.to.id, 'input', p.to.index);
-        return {x1: from.x, y1: from.y, x2: to.x, y2: to.y};
+        return {x1: from.x, y1: from.y, x2: to.x, y2: to.y, colour: p.colour};
     });
 });
 
