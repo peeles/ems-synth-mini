@@ -61,10 +61,12 @@ import SynthPanel from './SynthPanel.vue'
 import JackPanel from '../JackPanel.vue'
 import { usePatchStore } from '../../storage/patchStore'
 import { useModuleRegistry } from '../../composables/useModuleRegistry'
+import { useSynthStore } from '../../storage/synthStore'
 
 const engine = useSynthEngine()
 const patchStore = usePatchStore()
 const registry = useModuleRegistry()
+const synth = useSynthStore()
 const id = 'master-output'
 const context = engine.context
 
@@ -98,9 +100,21 @@ const toggleMute = () => {
     masterGain.gain.linearRampToValueAtTime(target, context.currentTime + 0.2)
 }
 
-// Patch registration
+// Patch registration and default routing
+let vcaOut = null
 onMounted(() => {
     registry.register(id, { id, getInputNode })
+    vcaOut = synth.getVCAOutputNode?.()
+    if (vcaOut) {
+        try {
+            vcaOut.disconnect()
+        } catch {}
+        try {
+            vcaOut.connect(inputGain)
+        } catch (e) {
+            console.warn('Failed to route VCA to MasterOutput', e)
+        }
+    }
 })
 
 const connectedInputs = computed(() =>
@@ -180,6 +194,12 @@ onUnmounted(() => {
 
     patchStore.removeConnectionsForModule(id)
     registry.unregister(id)
+    if (vcaOut) {
+        try {
+            vcaOut.disconnect(inputGain)
+            vcaOut.connect(context.destination)
+        } catch {}
+    }
 
     inputGain.disconnect()
     masterGain.disconnect()
