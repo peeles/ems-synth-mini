@@ -41,24 +41,39 @@
         >
             {{ muted ? 'Unmute' : 'Mute' }}
         </button>
+
+        <section class="flex flex-row justify-center mt-4">
+            <JackPanel
+                :count="1"
+                type="input"
+                :module-id="id"
+                :connected="connectedInputs"
+                @patch="handlePatch"
+            />
+        </section>
     </SynthPanel>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useSynthEngine } from '../../composables/useSynthEngine'
-import SynthPanel from "./SynthPanel.vue";
-import {useSynthStore} from "../../storage/synthStore";
+import SynthPanel from './SynthPanel.vue'
+import JackPanel from '../JackPanel.vue'
+import { usePatchStore } from '../../storage/patchStore'
+import { useModuleRegistry } from '../../composables/useModuleRegistry'
 
-const emit = defineEmits(['ready'])
-const engine = useSynthEngine();
-const synth = useSynthStore();
-const context = engine.context;
+const engine = useSynthEngine()
+const patchStore = usePatchStore()
+const registry = useModuleRegistry()
+const id = 'master-output'
+const context = engine.context
 
 // Nodes
 const inputGain = context.createGain()
 const masterGain = context.createGain()
 const analyser = context.createAnalyser()
+
+const getInputNode = () => inputGain
 
 // Routing: input -> master -> analyser -> speakers
 inputGain.connect(masterGain)
@@ -85,12 +100,16 @@ const toggleMute = () => {
 
 // Patch registration
 onMounted(() => {
-    emit('ready', {
-        id: 'master',
-        input: inputGain,
-        output: null,
-    })
+    registry.register(id, { id, getInputNode })
 })
+
+const connectedInputs = computed(() =>
+    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
+)
+
+const handlePatch = jack => {
+    patchStore.selectJack(jack)
+}
 
 // Meter + scope state
 const scopeCanvas = ref(null)
@@ -151,13 +170,16 @@ onMounted(() => {
 
 onUnmounted(() => {
     if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
+        cancelAnimationFrame(animationFrame)
     }
 
     if (scopeCanvas.value) {
         const ctx = scopeCanvas.value.getContext('2d')
         ctx.clearRect(0, 0, scopeCanvas.value.width, scopeCanvas.value.height)
     }
+
+    patchStore.removeConnectionsForModule(id)
+    registry.unregister(id)
 
     inputGain.disconnect()
     masterGain.disconnect()
