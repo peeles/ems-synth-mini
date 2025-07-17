@@ -6,10 +6,16 @@
             </h3>
         </template>
 
-        <canvas
-            ref="scopeCanvas"
-            class="w-full h-24 bg-black rounded-md border border-gray-700 mb-3"
-        />
+        <div class="relative w-full aspect-video h-auto bg-stone-700 mx-auto rounded-md shadow-[inset_0_0_25px_rgba(0,0,0,0.5)]">
+            <div class="absolute inset-[1%] bg-black rounded-lg shadow-inner p-1">
+                <canvas
+                    ref="scopeCanvas"
+                    class="w-full h-full rounded-md"
+                />
+            </div>
+        </div>
+
+
 
         <div class="flex items-center gap-2 mb-4">
             <div
@@ -61,10 +67,12 @@ import SynthPanel from './SynthPanel.vue'
 import JackPanel from '../JackPanel.vue'
 import { usePatchStore } from '../../storage/patchStore'
 import { useModuleRegistry } from '../../composables/useModuleRegistry'
+import {useSynthStore} from "../../storage/synthStore";
 
-const engine = useSynthEngine()
-const patchStore = usePatchStore()
-const registry = useModuleRegistry()
+const engine = useSynthEngine();
+const patchStore = usePatchStore();
+const registry = useModuleRegistry();
+const synth = useSynthStore();
 const id = 'master-output'
 const context = engine.context
 
@@ -98,9 +106,22 @@ const toggleMute = () => {
     masterGain.gain.linearRampToValueAtTime(target, context.currentTime + 0.2)
 }
 
+let vcaOut = null;
+
 // Patch registration
 onMounted(() => {
-    registry.register(id, { id, getInputNode })
+    registry.register(id, { id, getInputNode });
+    vcaOut = synth.getVCAOutputNode?.()
+    if (vcaOut) {
+        try {
+            vcaOut.disconnect()
+        } catch {}
+        try {
+            vcaOut.connect(inputGain)
+        } catch (e) {
+            console.warn('Failed to route VCA to MasterOutput', e)
+        }
+    }
 })
 
 const connectedInputs = computed(() =>
@@ -180,6 +201,13 @@ onUnmounted(() => {
 
     patchStore.removeConnectionsForModule(id)
     registry.unregister(id)
+
+    if (vcaOut) {
+        try {
+            vcaOut.disconnect(inputGain)
+            vcaOut.connect(context.destination)
+        } catch {}
+    }
 
     inputGain.disconnect()
     masterGain.disconnect()
