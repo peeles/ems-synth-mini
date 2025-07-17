@@ -47,7 +47,7 @@
 import {computed, onMounted, onUnmounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import {usePatchStore} from '../../storage/patchStore';
-import SynthPanel from '../SynthPanel.vue';
+import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
 import JackPanel from '../JackPanel.vue';
 import {useModuleRegistry} from '../../composables/useModuleRegistry';

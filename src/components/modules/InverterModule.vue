@@ -33,7 +33,7 @@
 
 <script setup>
 import {computed, onMounted, onUnmounted} from 'vue';
-import SynthPanel from '../SynthPanel.vue';
+import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 import {useSynthStore} from '../../storage/synthStore';
 import {usePatchStore} from '../../storage/patchStore';

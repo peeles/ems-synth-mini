@@ -60,7 +60,7 @@ import {computed, onMounted, onUnmounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import {useModuleRegistry} from '../../composables/useModuleRegistry';
 import {usePatchStore} from '../../storage/patchStore';
-import SynthPanel from '../SynthPanel.vue';
+import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 
 const synth = useSynthStore();

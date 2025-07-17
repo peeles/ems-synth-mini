@@ -27,7 +27,7 @@
                     <InverterModule />
                 </div>
                 <div class=""><VCAModule /></div>
-                <div class=""><MasterVolume /></div>
+                <div class=""><MasterOutput /></div>
             </div>
         </div>
 
@@ -50,9 +50,9 @@ import VCFModule from './modules/VCFModule.vue';
 import InverterModule from './modules/InverterModule.vue';
 import VCAModule from './modules/VCAModule.vue';
 import MixerModule from './modules/MixerModule.vue';
-import MasterVolume from './modules/MasterVolume.vue';
-import SynthPanel from './SynthPanel.vue';
+import SynthPanel from './modules/SynthPanel.vue';
 import PatchCables from './PatchCables.vue';
+import MasterOutput from "./modules/MasterOutput.vue";
 
 const audioReady = ref(false);
 const synth = useSynthStore();

@@ -61,7 +61,7 @@
 import {ref, onMounted, onUnmounted, computed} from 'vue';
 import {useSynthEngine} from '../../composables/useSynthEngine';
 import {useSynthStore} from '../../storage/synthStore';
-import SynthPanel from '../SynthPanel.vue';
+import SynthPanel from './SynthPanel.vue';
 
 const engine = useSynthEngine();
 const synth = useSynthStore();
@@ -143,14 +143,25 @@ onUnmounted(() => {
 });
 
 const leftColor = computed(() => {
-    if (leftLevel.value > 0.7) return 'bg-red-600';
-    if (leftLevel.value > 0.4) return 'bg-yellow-400';
+    if (leftLevel.value > 0.7) {
+        return 'bg-red-600';
+    }
+
+    if (leftLevel.value > 0.4) {
+        return 'bg-yellow-400';
+    }
+
     return 'bg-green-600';
 });
 
 const rightColor = computed(() => {
-    if (rightLevel.value > 0.7) return 'bg-red-600';
-    if (rightLevel.value > 0.4) return 'bg-yellow-400';
+    if (rightLevel.value > 0.7) {
+        return 'bg-red-600';
+    }
+
+    if (rightLevel.value > 0.4) {
+        return 'bg-yellow-400';
+    }
     return 'bg-green-600';
 });
 </script>

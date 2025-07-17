@@ -95,7 +95,7 @@
 <script setup>
 import {computed, onMounted, onUnmounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
-import SynthPanel from '../SynthPanel.vue';
+import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
 import {usePatchStore} from "../../storage/patchStore";
 import {useModuleRegistry} from "../../composables/useModuleRegistry";

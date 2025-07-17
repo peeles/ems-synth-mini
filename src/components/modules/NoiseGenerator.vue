@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import SynthPanel from '../SynthPanel.vue';
+import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 import {computed, onMounted, onUnmounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
