@@ -15,20 +15,6 @@
             </div>
         </div>
 
-
-
-        <div class="flex items-center gap-2 mb-4">
-            <div
-                v-for="(level, i) in [pulseLeft, pulseRight]"
-                :key="i"
-                class="flex-1 h-2 rounded transition-transform duration-75 origin-bottom"
-                :style="{
-                  backgroundColor: getMeterColor(level),
-                  transform: `scaleY(${level / 255})`
-                }"
-            />
-        </div>
-
         <label class="text-xs block mb-1">Master Volume</label>
         <input
             type="range"

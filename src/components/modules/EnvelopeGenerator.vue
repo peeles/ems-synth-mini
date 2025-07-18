@@ -67,6 +67,12 @@
             </div>
 
             <div class="flex flex-col flex-1 items-end gap-y-2.5">
+                <div class="flex justify-center mt-2">
+                    <div
+                        class="w-3 h-3 rounded-full border border-black"
+                        :class="envelopeActive ? 'bg-green-500' : 'bg-gray-700'"
+                    />
+                </div>
                 <JackPanel
                     :count="1"
                     type="input"
@@ -93,7 +99,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted} from 'vue';
+import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
@@ -106,15 +112,30 @@ const registry = useModuleRegistry();
 const patchStore = usePatchStore();
 const id = 'envelope-generator';
 
+const level = ref(0);
+let rafId;
+
+const envelopeActive = computed(() => level.value > 0.01);
+
 const getInputNode = index => synth.getEnvelopeTriggerInputNode?.(index);
 
 onMounted(() => {
     registry.register(id, {id, getInputNode});
+    const update = () => {
+        const gain = synth.getVCAInputNode?.();
+        level.value = gain ? gain.value : 0;
+        rafId = requestAnimationFrame(update);
+    };
+    update();
 });
 
 onUnmounted(() => {
     patchStore.removeConnectionsForModule(id);
     registry.unregister(id);
+
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+    }
 });
 
 const connectedInputs = computed(() =>

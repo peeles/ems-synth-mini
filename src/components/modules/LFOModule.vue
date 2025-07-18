@@ -1,6 +1,12 @@
 <template>
     <SynthPanel :id="id">
         <template #heading>
+            <div class="flex justify-center mt-2">
+                <div
+                    class="w-3 h-3 rounded-full border border-black"
+                    :class="lfoHigh ? 'bg-green-500' : 'bg-gray-700'"
+                />
+            </div>
             <h3
                 class="text-center text-wrap text-xl font-medium mb-4 uppercase"
             >
@@ -58,26 +64,52 @@
 <script setup>
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
-import {computed, onMounted, onUnmounted} from 'vue';
+import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import {useModuleRegistry} from '../../composables/useModuleRegistry';
 import {usePatchStore} from '../../storage/patchStore';
+import {useSynthEngine} from "../../composables/useSynthEngine";
 
 const synth = useSynthStore();
 const registry = useModuleRegistry();
 const patchStore = usePatchStore();
 const id = 'lfo-module';
+const engine = useSynthEngine();
+const context = engine.context;
+
+const level = ref(0);
+let analyser, buffer, rafId;
+
+const lfoHigh = computed(() => level.value > 0);
 
 const getOutputNode = () => synth.getLFOOutputNode?.();
 const getInputNode = () => synth.getLFOInputNode?.();
 
 onMounted(() => {
     registry.register(id, {id, getInputNode, getOutputNode});
+    const out = synth.getLFOOutputNode?.();
+    if (out) {
+        analyser = context.createAnalyser();
+        analyser.fftSize = 32;
+        buffer = new Uint8Array(analyser.frequencyBinCount);
+        out.connect(analyser);
+        const update = () => {
+            analyser.getByteTimeDomainData(buffer);
+            level.value = (buffer[0] - 128) / 128;
+            rafId = requestAnimationFrame(update);
+        };
+        update();
+    }
 });
 
 onUnmounted(() => {
     patchStore.removeConnectionsForModule(id);
     registry.unregister(id);
+
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+        analyser?.disconnect();
+    }
 });
 
 const connectedInputs = computed(() =>
