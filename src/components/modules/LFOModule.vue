@@ -66,13 +66,10 @@ import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
-import {useModuleRegistry} from '../../composables/useModuleRegistry';
-import {usePatchStore} from '../../storage/patchStore';
+import {useModuleConnections} from '../../composables/useModuleConnections';
 import {useSynthEngine} from "../../composables/useSynthEngine";
 
 const synth = useSynthStore();
-const registry = useModuleRegistry();
-const patchStore = usePatchStore();
 const id = 'lfo-module';
 const engine = useSynthEngine();
 const context = engine.context;
@@ -85,8 +82,12 @@ const lfoHigh = computed(() => level.value > 0);
 const getOutputNode = () => synth.getLFOOutputNode?.();
 const getInputNode = () => synth.getLFOInputNode?.();
 
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
+    getInputNode,
+    getOutputNode,
+});
+
 onMounted(() => {
-    registry.register(id, {id, getInputNode, getOutputNode});
     const out = synth.getLFOOutputNode?.();
     if (out) {
         analyser = context.createAnalyser();
@@ -103,22 +104,11 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id);
-    registry.unregister(id);
-
     if (rafId) {
         cancelAnimationFrame(rafId);
         analyser?.disconnect();
     }
 });
-
-const connectedInputs = computed(() =>
-    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
-);
-
-const connectedOutputs = computed(() =>
-    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
-);
 
 const lfoFrequency = computed({
     get: () => synth.lfoFrequency,
@@ -132,8 +122,4 @@ const lfoWaveform = computed({
 onMounted(async () => {
     await synth.resume();
 });
-
-const handlePatch = ({type, index}) => {
-    patchStore.selectJack({type, moduleId: id, index});
-};
 </script>

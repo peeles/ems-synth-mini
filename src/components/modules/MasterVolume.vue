@@ -62,6 +62,7 @@ import {ref, onMounted, onUnmounted, computed} from 'vue';
 import {useSynthEngine} from '../../composables/useSynthEngine';
 import {useSynthStore} from '../../storage/synthStore';
 import SynthPanel from './SynthPanel.vue';
+import {useModuleLifecycle} from '../../composables/useModuleLifecycle';
 
 const engine = useSynthEngine();
 const synth = useSynthStore();
@@ -120,6 +121,7 @@ onMounted(() => {
     analyserR = context.createAnalyser();
     analyserL.fftSize = 256;
     analyserR.fftSize = 256;
+    useModuleLifecycle(splitter, analyserL, analyserR);
 
     bufferL = new Uint8Array(analyserL.frequencyBinCount);
     bufferR = new Uint8Array(analyserR.frequencyBinCount);

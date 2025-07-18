@@ -79,8 +79,14 @@ const lines = computed(() => {
     });
 });
 
+let pending = false;
 const updateLines = () => {
-    resizeTrigger.value++;
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+        resizeTrigger.value++;
+        pending = false;
+    });
 };
 
 const calculatePathLength = () => {

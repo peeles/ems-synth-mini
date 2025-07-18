@@ -1,11 +1,22 @@
 import {onUnmounted} from 'vue';
-export const useModuleLifecycle = nodeRef => {
+
+/**
+ * Ensure provided AudioNodes are properly stopped and disconnected
+ * when the component using them unmounts.
+ */
+export const useModuleLifecycle = (...nodes) => {
     onUnmounted(() => {
-        try {
-            nodeRef?.stop?.();
-            nodeRef?.disconnect?.();
-        } catch (e) {
-            console.warn('Module cleanup failed:', e);
-        }
+        nodes.forEach(node => {
+            try {
+                node?.stop?.();
+            } catch (e) {
+                console.warn('Module cleanup failed while stopping:', e);
+            }
+            try {
+                node?.disconnect?.();
+            } catch (e) {
+                console.warn('Module cleanup failed while disconnecting:', e);
+            }
+        });
     });
 };
