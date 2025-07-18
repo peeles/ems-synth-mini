@@ -41,26 +41,16 @@
 <script setup>
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
-import {computed, onMounted, onUnmounted} from 'vue';
+import {computed, onMounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
-import {usePatchStore} from '../../storage/patchStore';
-import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {useModuleConnections} from '../../composables/useModuleConnections';
 
 const synth = useSynthStore();
-const patchStore = usePatchStore();
-const registry = useModuleRegistry();
 const id = 'mixer-module';
 
 const getOutputNode = () => synth.getMixerOutputNode?.();
 
-onMounted(() => {
-    registry.register(id, {id, getOutputNode});
-});
-
-onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id);
-    registry.unregister(id);
-});
+const {connectedOutputs, handlePatch} = useModuleConnections(id, {getOutputNode});
 
 const vcoLevel = computed({
     get: () => synth.vcoLevel,
@@ -71,12 +61,4 @@ const noiseLevel = computed({
     get: () => synth.noiseLevel,
     set: val => synth.setMixerLevels(synth.vcoLevel, val),
 });
-
-const connectedOutputs = computed(() =>
-    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
-);
-
-const handlePatch = jack => {
-    patchStore.selectJack(jack);
-};
 </script>

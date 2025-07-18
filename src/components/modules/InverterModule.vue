@@ -32,39 +32,22 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted} from 'vue';
+import {computed, onMounted} from 'vue';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 import {useSynthStore} from '../../storage/synthStore';
-import {usePatchStore} from '../../storage/patchStore';
-import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {useModuleConnections} from '../../composables/useModuleConnections';
 
 const synth = useSynthStore();
-const patchStore = usePatchStore();
-const registry = useModuleRegistry();
 const id = 'inverter-module';
 
 const getInputNode = () => synth.getInverterInputNode?.();
 const getOutputNode = () => synth.getInverterOutputNode?.();
 
-onMounted(() => {
-    registry.register(id, {id, getInputNode, getOutputNode});
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
+    getInputNode,
+    getOutputNode,
 });
 
-onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id);
-    registry.unregister(id);
-});
-
-const connectedInputs = computed(() =>
-    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
-);
-
-const connectedOutputs = computed(() =>
-    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
-);
-
-const handlePatch = jack => {
-    patchStore.selectJack(jack);
-};
+onMounted(() => {});
 </script>

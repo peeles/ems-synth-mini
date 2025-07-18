@@ -44,17 +44,14 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted} from 'vue';
+import {computed, onMounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
-import {usePatchStore} from '../../storage/patchStore';
 import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
 import JackPanel from '../JackPanel.vue';
-import {useModuleRegistry} from '../../composables/useModuleRegistry';
+import {useModuleConnections} from '../../composables/useModuleConnections';
 
 const synth = useSynthStore();
-const registry = useModuleRegistry();
-const patchStore = usePatchStore();
 const id = 'vca-module';
 
 const getOutputNode = () => {
@@ -65,13 +62,9 @@ const getInputNode = () => {
     return synth.getVCAInputNode?.();
 };
 
-onMounted(() => {
-    registry.register(id, {id, getInputNode, getOutputNode});
-});
-
-onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id);
-    registry.unregister(id);
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
+    getInputNode,
+    getOutputNode,
 });
 
 const vcaMode = computed({
@@ -103,15 +96,4 @@ const modeLabel = computed(() => {
     return `${Math.round(vcaMode.value * 100)}% Blend`;
 });
 
-const connectedInputs = computed(() =>
-    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
-);
-
-const connectedOutputs = computed(() =>
-    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
-);
-
-const handlePatch = jack => {
-    patchStore.selectJack(jack);
-};
 </script>

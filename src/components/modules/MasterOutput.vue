@@ -51,13 +51,11 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useSynthEngine } from '../../composables/useSynthEngine'
 import SynthPanel from './SynthPanel.vue'
 import JackPanel from '../JackPanel.vue'
-import { usePatchStore } from '../../storage/patchStore'
-import { useModuleRegistry } from '../../composables/useModuleRegistry'
+import { useModuleConnections } from '../../composables/useModuleConnections'
+import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
 import {useSynthStore} from "../../storage/synthStore";
 
 const engine = useSynthEngine();
-const patchStore = usePatchStore();
-const registry = useModuleRegistry();
 const synth = useSynthStore();
 const id = 'master-output'
 const context = engine.context
@@ -66,6 +64,8 @@ const context = engine.context
 const inputGain = context.createGain()
 const masterGain = context.createGain()
 const analyser = context.createAnalyser()
+
+useModuleLifecycle(inputGain, masterGain, analyser)
 
 const getInputNode = () => inputGain
 
@@ -94,9 +94,10 @@ const toggleMute = () => {
 
 let vcaOut = null;
 
+const {connectedInputs, handlePatch} = useModuleConnections(id, {getInputNode})
+
 // Patch registration
 onMounted(() => {
-    registry.register(id, { id, getInputNode });
     vcaOut = synth.getVCAOutputNode?.()
     if (vcaOut) {
         try {
@@ -110,13 +111,7 @@ onMounted(() => {
     }
 })
 
-const connectedInputs = computed(() =>
-    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
-)
 
-const handlePatch = jack => {
-    patchStore.selectJack(jack)
-}
 
 // Meter + scope state
 const scopeCanvas = ref(null)
@@ -184,9 +179,6 @@ onUnmounted(() => {
         const ctx = scopeCanvas.value.getContext('2d')
         ctx.clearRect(0, 0, scopeCanvas.value.width, scopeCanvas.value.height)
     }
-
-    patchStore.removeConnectionsForModule(id)
-    registry.unregister(id)
 
     if (vcaOut) {
         try {

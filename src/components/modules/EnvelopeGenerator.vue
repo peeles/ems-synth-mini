@@ -103,13 +103,10 @@ import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
-import {usePatchStore} from "../../storage/patchStore";
-import {useModuleRegistry} from "../../composables/useModuleRegistry";
+import {useModuleConnections} from "../../composables/useModuleConnections";
 import JackPanel from "../JackPanel.vue";
 
 const synth = useSynthStore();
-const registry = useModuleRegistry();
-const patchStore = usePatchStore();
 const id = 'envelope-generator';
 
 const level = ref(0);
@@ -119,8 +116,9 @@ const envelopeActive = computed(() => level.value > 0.01);
 
 const getInputNode = index => synth.getEnvelopeTriggerInputNode?.(index);
 
+const {connectedInputs, handlePatch} = useModuleConnections(id, {getInputNode});
+
 onMounted(() => {
-    registry.register(id, {id, getInputNode});
     const update = () => {
         const gain = synth.getVCAInputNode?.();
         level.value = gain ? gain.value : 0;
@@ -130,21 +128,10 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id);
-    registry.unregister(id);
-
     if (rafId) {
         cancelAnimationFrame(rafId);
     }
 });
-
-const connectedInputs = computed(() =>
-    patchStore.getConnectionsFor(id, false).map(p => p.to.index)
-);
-
-const handlePatch = jack => {
-    patchStore.selectJack(jack);
-};
 
 const envelopeAttack = computed({
     get: () => synth.envelopeAttack,

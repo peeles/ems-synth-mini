@@ -43,30 +43,16 @@
 <script setup>
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
-import {computed, onMounted, onUnmounted} from 'vue';
+import {computed, onMounted} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
-import {useModuleRegistry} from '../../composables/useModuleRegistry';
-import {usePatchStore} from '../../storage/patchStore';
+import {useModuleConnections} from '../../composables/useModuleConnections';
 
 const synthStore = useSynthStore();
-const registry = useModuleRegistry();
-const patchStore = usePatchStore();
 const id = 'noise-module';
 
 const getOutputNode = () => synthStore.getNoiseOutputNode?.();
 
-onMounted(() => {
-    registry.register(id, {id, getOutputNode});
-});
-
-onUnmounted(() => {
-    patchStore.removeConnectionsForModule(id);
-    registry.unregister(id);
-});
-
-const connectedOutputs = computed(() =>
-    patchStore.getConnectionsFor(id, true).map(p => p.from.index)
-);
+const {connectedOutputs, handlePatch} = useModuleConnections(id, {getOutputNode});
 
 const noiseLevel = computed({
     get: () => synthStore.noiseLevel,
@@ -76,8 +62,4 @@ const noiseLevel = computed({
 onMounted(async () => {
     await synthStore.resume();
 });
-
-const handlePatch = ({type, index}) => {
-    patchStore.selectJack({type, moduleId: id, index});
-};
 </script>
