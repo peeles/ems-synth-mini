@@ -192,9 +192,13 @@ export const useSynthStore = defineStore('synth', () => {
         const result = engine.createOscillatorNode({
             frequency: lfoFrequency.value,
             type: lfoWaveform.value,
-            gain: 1.0,
+            gain: vcaMode.value,
         });
-        if (!result) return;
+
+        if (!result) {
+            return;
+        }
+
         lfoOsc = result.osc;
         lfoOutGain = result.gain;
         lfoOutGain.connect(vcaGainNode.gain); // ring mod
@@ -202,7 +206,11 @@ export const useSynthStore = defineStore('synth', () => {
 
     const initNoise = () => {
         const result = engine.createNoiseNode();
-        if (!result) return;
+
+        if (!result) {
+            return;
+        }
+
         noiseSrc = result.source;
         noiseOutGain = result.gain;
         ensureVCF();
