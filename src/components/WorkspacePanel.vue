@@ -23,7 +23,6 @@
                 <div class=""><MixerModule /></div>
                 <div class=""><EnvelopeGenerator /></div>
                 <div class="flex flex-col gap-4">
-                    <NoiseGenerator />
                     <InverterModule />
                 </div>
                 <div class=""><VCAModule /></div>
@@ -42,7 +41,6 @@
 import {useSynthStore} from '../storage/synthStore';
 import {onMounted, onUnmounted, ref} from 'vue';
 import EnvelopeGenerator from './modules/EnvelopeGenerator.vue';
-import NoiseGenerator from './modules/NoiseGenerator.vue';
 import SliderKeyboard from './modules/SliderKeyboard.vue';
 import LFOModule from './modules/LFOModule.vue';
 import VCOModule from './modules/VCOModule.vue';

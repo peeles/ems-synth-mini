@@ -9,7 +9,7 @@
                     max="1"
                     step="0.01"
                     v-model.number="vcoLevel"
-                    class="w-4 h-24 accent-black bg-gray-200 rounded"
+                    class="w-full h-4 accent-black bg-gray-200 rounded"
                 />
                 <span class="mt-1 text-[10px]">VCO</span>
             </div>
@@ -22,7 +22,7 @@
                     max="1"
                     step="0.01"
                     v-model.number="noiseLevel"
-                    class="w-4 h-24 accent-black bg-gray-200 rounded"
+                    class="w-full h-4 accent-black bg-gray-200 rounded"
                 />
                 <span class="mt-1 text-[10px]">Noise</span>
             </div>
