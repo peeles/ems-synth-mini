@@ -44,60 +44,17 @@
             </div>
         </section>
 
-        <ul class="grid grid-cols-3 max-w-md gap-x-1 my-3 text-xs mx-auto">
-            <li class="relative">
-                <input
-                    class="sr-only peer"
-                    type="radio"
-                    value="lowpass"
-                    name="filterType"
-                    id="low_pass"
-                    v-model="filterType"
-                />
-                <label
-                    class="flex py-1.5 px-2 bg-transparent border border-gray-¶00 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
-                    for="low_pass"
-                >
-                    Low-Pass
-                </label>
-            </li>
+        <RadioButtonGroup
+            :name="filterType"
+            v-model="filterType"
+            :options="[
+                { name: 'Low-Pass', value: 'lowpass' },
+                { name: 'High-Pass', value: 'highpass' },
+                { name: 'Band-Pass', value: 'bandpass' },
+            ]"
+        />
 
-            <li class="relative">
-                <input
-                    class="sr-only peer"
-                    type="radio"
-                    value="highpass"
-                    name="filterType"
-                    id="high_pass"
-                    v-model="filterType"
-                />
-                <label
-                    class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
-                    for="high_pass"
-                >
-                    High-Pass
-                </label>
-            </li>
-
-            <li class="relative">
-                <input
-                    class="sr-only peer"
-                    type="radio"
-                    value="bandpass"
-                    name="filterType"
-                    id="band_pass"
-                    v-model="filterType"
-                />
-                <label
-                    class="flex py-1.5 px-2 bg-transparent border border-gray-700 rounded cursor-pointer focus:outline-none hover:bg-gray-50/25 peer-checked:ring-gray-500 peer-checked:ring-2 peer-checked:border-transparent"
-                    for="band_pass"
-                >
-                    Band-Pass
-                </label>
-            </li>
-        </ul>
-
-        <section class="flex flex-row items-center justify-between mt-8">
+        <section class="flex flex-row items-center justify-between mt-6">
             <JackPanel
                 :count="3"
                 :type="'input'"
@@ -123,6 +80,7 @@ import {useSynthStore} from '../../storage/synthStore';
 import {useModuleConnections} from '../../composables/useModuleConnections';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
+import RadioButtonGroup from "../base/RadioButtonGroup.vue";
 
 const synth = useSynthStore();
 const id = 'vcf-module';
