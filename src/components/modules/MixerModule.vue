@@ -26,6 +26,7 @@
                     :max="1"
                     :step="0.05"
                     :show-labels="false"
+                    @dblclick="synth.resetParam('vcoLevel')"
                 />
                 <label class="block text-xs font-semibold mb-1 mt-3">
                     {{ (vcoLevel * 10).toFixed(1) }}
@@ -67,6 +68,7 @@
                     :max="1"
                     :step="0.05"
                     :show-labels="false"
+                    @dblclick="synth.resetParam('noiseLevel')"
                 />
                 <label class="block text-xs font-semibold mb-1 mt-3">
                     {{ (noiseLevel * 10).toFixed(1) }}

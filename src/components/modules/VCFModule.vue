@@ -19,6 +19,7 @@
                     max="10000"
                     step="1"
                     v-model.number="filterCutoff"
+                    @dblclick="synth.resetParam('filterCutoff')"
                     class="w-full h-[8px] accent-black bg-black/10 rounded-full"
                 />
                 <p class="text-center text-xs mt-1 text-gray-700">
@@ -36,6 +37,7 @@
                     max="20"
                     step="0.1"
                     v-model.number="filterResonance"
+                    @dblclick="synth.resetParam('filterResonance')"
                     class="w-full h-[8px] accent-black bg-black/10 rounded-full"
                 />
                 <p class="text-center text-xs mt-1 text-gray-700">

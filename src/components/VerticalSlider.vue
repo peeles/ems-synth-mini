@@ -10,6 +10,7 @@
             :step="step"
             v-model="value"
             @input="$emit('update:modelValue', +value)"
+            @dblclick="$emit('dblclick')"
             class="absolute origin-center rotate-[-90deg] h-2 rounded accent-black bg-black/10 cursor-pointer"
             :class="!showLabels ? 'w-52' : 'w-40'"
         />
@@ -45,7 +46,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'dblclick']);
 const value = ref(props.modelValue);
 
 watch(

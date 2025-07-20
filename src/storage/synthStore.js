@@ -2,6 +2,18 @@ import {defineStore} from 'pinia';
 import {ref} from 'vue';
 import {useSynthEngine} from '../composables/useSynthEngine';
 
+export const DEFAULTS = {
+    vcoFrequency: 440,
+    lfoFrequency: 5,
+    filterCutoff: 800,
+    filterResonance: 1,
+    envelopeAttack: 0.2,
+    envelopeDecay: 0.5,
+    vcoLevel: 1,
+    noiseLevel: 1,
+    vcaMode: 0,
+};
+
 export const useSynthStore = defineStore('synth', () => {
     const audioReady = ref(false);
     const engine = useSynthEngine();
@@ -347,6 +359,40 @@ export const useSynthStore = defineStore('synth', () => {
         envelopeDecay.value = val;
     };
 
+    const resetParam = key => {
+        const val = DEFAULTS[key];
+        if (val === undefined) return;
+        switch (key) {
+            case 'vcoFrequency':
+                setVcoFrequency(val);
+                break;
+            case 'lfoFrequency':
+                setLfoFrequency(val);
+                break;
+            case 'filterCutoff':
+                setFilterCutoff(val);
+                break;
+            case 'filterResonance':
+                setFilterResonance(val);
+                break;
+            case 'envelopeAttack':
+                setEnvelopeAttack(val);
+                break;
+            case 'envelopeDecay':
+                setEnvelopeDecay(val);
+                break;
+            case 'vcoLevel':
+                setMixerLevels(val, noiseLevel.value);
+                break;
+            case 'noiseLevel':
+                setMixerLevels(vcoLevel.value, val);
+                break;
+            case 'vcaMode':
+                setVcaMode(val);
+                break;
+        }
+    };
+
     // === Envelope Action ===
     const triggerVCAEnvelope = () => {
         ensureVCA();
@@ -440,6 +486,7 @@ export const useSynthStore = defineStore('synth', () => {
         setVcaMode,
         setEnvelopeAttack,
         setEnvelopeDecay,
+        resetParam,
         triggerEnvelope: triggerVCAEnvelope,
         getVCAOutputNode,
         getVCAInputNode,
