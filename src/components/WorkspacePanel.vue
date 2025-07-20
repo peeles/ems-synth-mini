@@ -19,15 +19,15 @@
                 <div class=""><VCFModule /></div>
                 <div class=""><SynthPanel /></div>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-6 gap-4 mx-4">
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mx-4">
                 <div class=""><MixerModule /></div>
                 <div class=""><EnvelopeGenerator /></div>
                 <div class="flex flex-col gap-4">
                     <InverterModule />
+                    <Oscilloscope />
                 </div>
                 <div class=""><VCAModule /></div>
                 <div class=""><MasterOutput /></div>
-                <div class=""><Oscilloscope /></div>
             </div>
         </div>
 
@@ -79,8 +79,3 @@ onUnmounted(() => {
     synth.destroySynth();
 });
 </script>
-
-<style>
-/* Tailwind CSS is used for most styling. We could define custom classes if needed. */
-/* Example of a custom background via Tailwind config or here: */
-</style>

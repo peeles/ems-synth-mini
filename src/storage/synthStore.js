@@ -359,7 +359,7 @@ export const useSynthStore = defineStore('synth', () => {
         envelopeDecay.value = val;
     };
 
-    const resetParam = key => {
+    const resetParam = (key) => {
         const val = DEFAULTS[key];
         if (val === undefined) return;
         switch (key) {

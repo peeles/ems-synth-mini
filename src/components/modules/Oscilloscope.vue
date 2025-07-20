@@ -1,10 +1,5 @@
 <template>
     <SynthPanel>
-        <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
-                Oscilloscope
-            </h3>
-        </template>
         <div class="relative w-full aspect-video h-auto bg-stone-700 mx-auto rounded-md shadow-[inset_0_0_25px_rgba(0,0,0,0.5)]">
             <div class="absolute inset-[1%] bg-black rounded-lg shadow-inner p-1">
                 <canvas ref="scopeCanvas" class="w-full h-full rounded-md" />
