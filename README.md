@@ -29,7 +29,8 @@ The interface exposes a simplified set of modules which can be patched together:
 - **Envelope Generator** – attack and decay sliders and a manual trigger button.
 - **VCA** – gain stage whose behaviour is set with the *Mix Mode* slider.
 - **Inverter** – simple phase‑inverting utility.
-- **Master Output** – final stage with oscilloscope display.
+- **Master Output** – final stage routing audio to the speakers.
+- **Oscilloscope** – real-time waveform display.
 - **Master Volume** – stereo level meter and output level control.
 - **Input Module** – placeholder sliders representing external sources.
 - **Slider Keyboard** – touch strip that sets the VCO frequency and triggers the envelope.
