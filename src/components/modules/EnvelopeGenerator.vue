@@ -1,9 +1,18 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <h3 class="w-1/2 text-wrap text-xl font-medium mb-8 uppercase">
-                Trapezoid Generator
-            </h3>
+            <section class="flex flex-row items-center justify-between mb-8">
+                <h3 class="w-1/2 text-wrap text-xl font-medium uppercase">
+                    Envelope Generator
+                </h3>
+                <JackPanel
+                    :count="1"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
+                />
+            </section>
         </template>
 
         <div class="flex flex-row">
@@ -13,15 +22,15 @@
                 </label>
 
                 <VerticalSlider
-                    :min="0.01"
-                    :max="2"
-                    :step="0.01"
-                    :show-labels="false"
                     v-model="envelopeAttack"
+                    :min="0"
+                    :max="1"
+                    :step="0.05"
+                    :show-labels="false"
                 />
 
                 <label class="block text-xs font-medium mb-1 mt-3">
-                    {{ envelopeAttack.toFixed(2) }}
+                    {{ (envelopeAttack * 10).toFixed(1) }}
                 </label>
             </div>
 
@@ -56,13 +65,13 @@
                 </label>
                 <VerticalSlider
                     v-model.number="envelopeDecay"
-                    :min="0.01"
-                    :max="5"
-                    :step="0.01"
+                    :min="0"
+                    :max="1"
+                    :step="0.05"
                     :show-labels="false"
                 />
                 <label class="block text-xs font-semibold mb-1 mt-3">
-                    {{ envelopeDecay.toFixed(2) }}
+                    {{ (envelopeDecay * 10).toFixed(1) }}
                 </label>
             </div>
 
@@ -73,13 +82,6 @@
                         :class="envelopeActive ? 'bg-green-500' : 'bg-gray-700'"
                     />
                 </div>
-                <JackPanel
-                    :count="1"
-                    type="input"
-                    :module-id="id"
-                    :connected="connectedInputs"
-                    @patch="handlePatch"
-                />
                 <div
                     class="bg-transparent border-2 border-stone-600 rounded-sm px-1.5 py-2 flex flex-col items-center gap-2"
                 />

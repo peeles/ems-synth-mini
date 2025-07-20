@@ -31,7 +31,7 @@
         </div>
 
         <div class="flex flex-col gap-6 py-6">
-            <div class=""><SliderKeyboard /></div>
+
         </div>
         <PatchCables />
     </div>
@@ -41,7 +41,6 @@
 import {useSynthStore} from '../storage/synthStore';
 import {onMounted, onUnmounted, ref} from 'vue';
 import EnvelopeGenerator from './modules/EnvelopeGenerator.vue';
-import SliderKeyboard from './modules/SliderKeyboard.vue';
 import LFOModule from './modules/LFOModule.vue';
 import VCOModule from './modules/VCOModule.vue';
 import VCFModule from './modules/VCFModule.vue';
