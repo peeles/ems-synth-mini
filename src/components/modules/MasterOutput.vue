@@ -16,6 +16,7 @@
             step="0.01"
             v-model="volume"
             @input="updateVolume"
+            @dblclick="volume = DEFAULT_VOLUME; updateVolume()"
             class="w-full accent-green-500"
         />
 
@@ -65,7 +66,8 @@ inputGain.connect(masterGain)
 masterGain.connect(context.destination)
 
 // Volume state
-const volume = ref(0.8)
+const DEFAULT_VOLUME = 0.8
+const volume = ref(DEFAULT_VOLUME)
 const muted = ref(false)
 masterGain.gain.setValueAtTime(volume.value, context.currentTime)
 

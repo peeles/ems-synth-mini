@@ -33,6 +33,7 @@
                 :step="0.01"
                 :show-labels="false"
                 v-model.number="vcaMode"
+                @dblclick="synth.resetParam('vcaMode')"
                 class="mx-auto"
             />
 

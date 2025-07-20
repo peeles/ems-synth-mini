@@ -14,6 +14,7 @@
                 max="15"
                 step="0.1"
                 v-model.number="lfoFrequency"
+                @dblclick="synth.resetParam('lfoFrequency')"
                 class="w-full h-[8px] accent-black bg-black/10 rounded-full mb-3"
             />
             <p class="text-center text-xs text-gray-700">

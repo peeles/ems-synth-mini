@@ -27,6 +27,7 @@
                     :max="1"
                     :step="0.05"
                     :show-labels="false"
+                    @dblclick="synth.resetParam('envelopeAttack')"
                 />
 
                 <label class="block text-xs font-medium mb-1 mt-3">
@@ -69,6 +70,7 @@
                     :max="1"
                     :step="0.05"
                     :show-labels="false"
+                    @dblclick="synth.resetParam('envelopeDecay')"
                 />
                 <label class="block text-xs font-semibold mb-1 mt-3">
                     {{ (envelopeDecay * 10).toFixed(1) }}
