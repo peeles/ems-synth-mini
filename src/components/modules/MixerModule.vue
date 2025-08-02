@@ -47,7 +47,7 @@
                                 ></div>
                                 <span
                                     class="w-6 text-center text-xs font-bold"
-                                >{{ 10 - (n - 1) }}</span
+                                    >{{ 10 - (n - 1) }}</span
                                 >
                                 <div
                                     class="flex-1 border-t border-gray-800 mx-1"
@@ -84,14 +84,16 @@ import JackPanel from '../JackPanel.vue';
 import {computed} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import {useModuleConnections} from '../../composables/useModuleConnections';
-import VerticalSlider from "../VerticalSlider.vue";
+import VerticalSlider from '../VerticalSlider.vue';
 
 const synth = useSynthStore();
 const id = 'mixer-module';
 
 const getOutputNode = () => synth.getMixerOutputNode?.();
 
-const {connectedOutputs, handlePatch} = useModuleConnections(id, {getOutputNode});
+const {connectedOutputs, handlePatch} = useModuleConnections(id, {
+    getOutputNode,
+});
 
 const vcoLevel = computed({
     get: () => synth.vcoLevel,

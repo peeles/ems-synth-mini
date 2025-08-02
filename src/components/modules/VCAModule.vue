@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted} from 'vue';
+import {computed} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
@@ -63,10 +63,13 @@ const getInputNode = () => {
     return synth.getVCAInputNode?.();
 };
 
-const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
-    getInputNode,
-    getOutputNode,
-});
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(
+    id,
+    {
+        getInputNode,
+        getOutputNode,
+    }
+);
 
 const vcaMode = computed({
     get: () => synth.vcaMode,
@@ -96,5 +99,4 @@ const modeLabel = computed(() => {
 
     return `${Math.round(vcaMode.value * 100)}% Blend`;
 });
-
 </script>

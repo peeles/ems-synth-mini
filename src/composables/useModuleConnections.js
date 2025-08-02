@@ -6,7 +6,10 @@ import {useModuleRegistry} from './useModuleRegistry';
  * Helper composable to register a module with the global registry
  * and expose reactive lists of connected jacks.
  */
-export const useModuleConnections = (id, {getInputNode = null, getOutputNode = null} = {}) => {
+export const useModuleConnections = (
+    id,
+    {getInputNode = null, getOutputNode = null} = {}
+) => {
     const patchStore = usePatchStore();
     const registry = useModuleRegistry();
 

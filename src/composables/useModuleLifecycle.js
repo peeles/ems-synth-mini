@@ -11,6 +11,8 @@ export const useModuleLifecycle = (...nodes) => {
                 node?.stop?.();
             } catch (e) {
                 console.warn('Module cleanup failed while stopping:', e);
+
+                throw e;
             }
             try {
                 node?.disconnect?.();

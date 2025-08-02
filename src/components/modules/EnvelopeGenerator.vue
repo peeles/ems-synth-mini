@@ -107,8 +107,8 @@ import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
-import {useModuleConnections} from "../../composables/useModuleConnections";
-import JackPanel from "../JackPanel.vue";
+import {useModuleConnections} from '../../composables/useModuleConnections';
+import JackPanel from '../JackPanel.vue';
 
 const synth = useSynthStore();
 const id = 'envelope-generator';

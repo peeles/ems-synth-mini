@@ -5,15 +5,15 @@
  * @returns {Function} A debounced version of the function.
  */
 export function useDebounce(fn, delay) {
-    let timeoutId = null
+    let timeoutId = null;
 
     return (...args) => {
         if (timeoutId) {
-            clearTimeout(timeoutId)
+            clearTimeout(timeoutId);
         }
         timeoutId = setTimeout(() => {
-            fn(...args)
-            timeoutId = null
-        }, delay)
-    }
+            fn(...args);
+            timeoutId = null;
+        }, delay);
+    };
 }

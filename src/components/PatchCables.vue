@@ -7,12 +7,23 @@
         xmlns="http://www.w3.org/2000/svg"
     >
         <defs>
-            <linearGradient id="cableGradient" x1="0%" y1="50%" x2="100%" y2="50%">
+            <linearGradient
+                id="cableGradient"
+                x1="0%"
+                y1="50%"
+                x2="100%"
+                y2="50%"
+            >
                 <stop offset="0%" stop-color="#888" />
                 <stop offset="100%" stop-color="#444" />
             </linearGradient>
             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.3)" />
+                <feDropShadow
+                    dx="2"
+                    dy="2"
+                    stdDeviation="3"
+                    flood-color="rgba(0,0,0,0.3)"
+                />
             </filter>
         </defs>
 
@@ -28,15 +39,15 @@
             stroke-linejoin="round"
             :stroke-dasharray="patch.length"
             :stroke-dashoffset="patch.length"
-            :style="{'animation': 'drawCable 2s ease-out forwards'}"
+            :style="{animation: 'drawCable 2s ease-out forwards'}"
             filter="url(#shadow)"
         />
     </svg>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref, nextTick } from 'vue';
-import { usePatchStore } from '../storage/patchStore';
+import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {usePatchStore} from '../storage/patchStore';
 
 const patchStore = usePatchStore();
 const svg = ref(null);
@@ -47,7 +58,7 @@ const getPosition = (moduleId, type, index) => {
     const el = document.getElementById(`${moduleId}-${type}-${index}`);
     const svgEl = svg.value;
     if (!el || !svgEl) {
-        return { x: 0, y: 0 };
+        return {x: 0, y: 0};
     }
 
     const rect = el.getBoundingClientRect();
@@ -67,14 +78,14 @@ const lines = computed(() => {
 
         // Control point for the Bezier curve (middle point between A and B, adjusted for a smooth arc)
         const controlX = (from.x + to.x) / 2;
-        const controlY = (from.y + to.y) / 2 - 100;  // Adjust for more curve
+        const controlY = (from.y + to.y) / 2 - 100; // Adjust for more curve
 
         // Generate the Bezier path
         const path = `M ${from.x} ${from.y} C ${controlX} ${controlY}, ${controlX} ${controlY}, ${to.x} ${to.y}`;
 
         return {
             path,
-            length: 0 // Placeholder for path length
+            length: 0, // Placeholder for path length
         };
     });
 });
@@ -92,8 +103,7 @@ const updateLines = () => {
 const calculatePathLength = () => {
     nextTick(() => {
         paths.value.forEach((pathElement, index) => {
-            const length = pathElement.getTotalLength();
-            lines.value[index].length = length; // Set the path length dynamically
+            lines.value[index].length = pathElement.getTotalLength(); // Set the path length dynamically
         });
     });
 };

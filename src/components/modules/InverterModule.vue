@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted} from 'vue';
+import {onMounted} from 'vue';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 import {useSynthStore} from '../../storage/synthStore';
@@ -44,10 +44,13 @@ const id = 'inverter-module';
 const getInputNode = () => synth.getInverterInputNode?.();
 const getOutputNode = () => synth.getInverterOutputNode?.();
 
-const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
-    getInputNode,
-    getOutputNode,
-});
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(
+    id,
+    {
+        getInputNode,
+        getOutputNode,
+    }
+);
 
 onMounted(() => {});
 </script>

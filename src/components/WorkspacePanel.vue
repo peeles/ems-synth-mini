@@ -31,9 +31,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-6 py-6">
-
-        </div>
+        <div class="flex flex-col gap-6 py-6"></div>
         <PatchCables />
     </div>
 </template>
@@ -50,8 +48,8 @@ import VCAModule from './modules/VCAModule.vue';
 import MixerModule from './modules/MixerModule.vue';
 import SynthPanel from './modules/SynthPanel.vue';
 import PatchCables from './PatchCables.vue';
-import MasterOutput from "./modules/MasterOutput.vue";
-import Oscilloscope from "./modules/Oscilloscope.vue";
+import MasterOutput from './modules/MasterOutput.vue';
+import Oscilloscope from './modules/Oscilloscope.vue';
 
 const audioReady = ref(false);
 const synth = useSynthStore();

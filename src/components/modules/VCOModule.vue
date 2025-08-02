@@ -1,7 +1,9 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-4 uppercase"
+            >
                 Voltage Oscillator
             </h3>
         </template>
@@ -26,10 +28,10 @@
             name="vcoWaveForm"
             v-model="vcoWaveform"
             :options="[
-                { name: 'Sine', value: 'sine' },
-                { name: 'Square', value: 'square' },
-                { name: 'Saw', value: 'sawtooth' },
-                { name: 'Triangle', value: 'triangle' },
+                {name: 'Sine', value: 'sine'},
+                {name: 'Square', value: 'square'},
+                {name: 'Saw', value: 'sawtooth'},
+                {name: 'Triangle', value: 'triangle'},
             ]"
         />
 
@@ -58,7 +60,7 @@ import {useSynthStore} from '../../storage/synthStore';
 import {useModuleConnections} from '../../composables/useModuleConnections';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
-import RadioButtonGroup from "../base/RadioButtonGroup.vue";
+import RadioButtonGroup from '../base/RadioButtonGroup.vue';
 
 const synth = useSynthStore();
 const id = 'vco-module';
@@ -71,10 +73,13 @@ const getInputNode = index => {
     return synth.getVCOInputNode?.(index);
 };
 
-const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
-    getInputNode,
-    getOutputNode,
-});
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(
+    id,
+    {
+        getInputNode,
+        getOutputNode,
+    }
+);
 
 const vcoFrequency = computed({
     get: () => synth.vcoFrequency,

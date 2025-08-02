@@ -1,9 +1,14 @@
-import {defineStore} from "pinia";
+import {defineStore} from 'pinia';
 
 export const useModuleStore = defineStore('modules', () => {
     let {
-        filterType, filterCutoff, filterResonance,
-        vcoFrequency, vcoWaveform, lfoFrequency, lfoWaveform
+        filterType,
+        filterCutoff,
+        filterResonance,
+        vcoFrequency,
+        vcoWaveform,
+        lfoFrequency,
+        lfoWaveform,
     } = refs;
 
     let vcoOsc, vcoOutGain;
@@ -130,8 +135,17 @@ export const useModuleStore = defineStore('modules', () => {
         ensureInverter,
         // Expose nodes if needed
         getNodes: () => ({
-            vcoOsc, vcoOutGain, lfoOsc, lfoOutGain, noiseSrc, noiseOutGain,
-            filterNode, mixerNode, vcaGainNode, inverterGain, triggerEnvelope
-        })
+            vcoOsc,
+            vcoOutGain,
+            lfoOsc,
+            lfoOutGain,
+            noiseSrc,
+            noiseOutGain,
+            filterNode,
+            mixerNode,
+            vcaGainNode,
+            inverterGain,
+            triggerEnvelope,
+        }),
     };
 });
