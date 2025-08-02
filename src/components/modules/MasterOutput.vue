@@ -1,59 +1,94 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
-                Master Output
-            </h3>
+            <section class="flex flex-row items-center justify-between mb-8">
+                <h3 class="w-1/2 text-wrap text-xl font-medium uppercase">
+                    Master Output
+                </h3>
+            </section>
         </template>
 
-
-
-        <div class="flex justify-around items-end h-[140px] mb-4">
-            <!-- Left Meter -->
-            <div
-                class="relative w-6 h-full bg-gray-300 border border-black rounded-sm overflow-hidden"
-            >
-                <div
-                    v-for="tick in 20"
-                    :key="'l' + tick"
-                    class="absolute left-0 w-full h-[1px] bg-black/20"
-                    :style="{bottom: `${(tick / 20) * 100}%`}"
-                />
-                <div
-                    class="absolute bottom-0 left-0 w-full transition-all duration-100"
-                    :class="leftColor"
-                    :style="{height: `${leftLevel * 100}%`}"
-                />
+        <section class="flex justify-around items-end h-58 mb-8">
+            <div class="flex flex-col items-center justify-start h-full">
+                <div class="relative w-6 text-center mt-0.5">
+                    <VerticalSlider
+                        v-model.number="volume"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
+                        :show-labels="false"
+                        @input="updateVolume"
+                        @dblclick="volume = DEFAULT_VOLUME; updateVolume()"
+                        class="!w-6"
+                    />
+                    <label class="w-full block text-xs font-semibold mt-3 mx-auto">
+                        {{ (volume * 10).toFixed(0) }}
+                    </label>
+                </div>
             </div>
 
-            <!-- Right Meter -->
-            <div
-                class="relative w-6 h-full bg-gray-300 border border-black rounded-sm overflow-hidden"
-            >
-                <div
-                    v-for="tick in 20"
-                    :key="'r' + tick"
-                    class="absolute left-0 w-full h-[1px] bg-black/20"
-                    :style="{bottom: `${(tick / 20) * 100}%`}"
-                />
-                <div
-                    class="absolute bottom-0 left-0 w-full transition-all duration-100"
-                    :class="rightColor"
-                    :style="{height: `${rightLevel * 100}%`}"
-                />
+            <div class="flex flex-col items-center justify-start h-full">
+                <div class="relative flex flex-col items-center h-53 justify-between mt-0.5">
+                    <template v-for="n in 11" :key="n">
+                        <div class="flex items-center w-14">
+                            <div class="flex-1 border-t border-gray-800 mx-1" />
+                            <span
+                                class="w-6 text-center text-xs font-bold"
+                            >{{ 10 - (n - 1) }}</span
+                            >
+                            <div class="flex-1 border-t border-gray-800 mx-1" />
+                        </div>
+                    </template>
+                </div>
             </div>
-        </div>
 
-        <!-- Labels -->
-        <div
-            class="flex justify-around mt-1 text-[10px] font-mono uppercase tracking-wider"
-        >
-            <span>L</span>
-            <span>R</span>
-        </div>
+            <div class="relative w-6 h-full">
+                <div class="relative w-full h-52 mt-0.5 bg-gray-300 border border-black rounded-sm overflow-hidden">
+                    <div
+                        v-for="tick in 20"
+                        :key="'l' + tick"
+                        class="absolute left-0 w-full h-[1px] bg-black/20"
+                        :style="{bottom: `${(tick / 20) * 100}%`}"
+                    />
+                    <div
+                        class="absolute bottom-0 left-0 w-full transition-all duration-100"
+                        :class="leftColor"
+                        :style="{height: `${leftLevel * 100}%`}"
+                    />
+                </div>
+                <label class="w-full block text-xs text-center font-semibold mt-3 mx-auto">
+                    L
+                </label>
+            </div>
 
-        <div class="mt-2 text-center text-[10px]">
-            <label class="inline-flex items-center space-x-2 cursor-pointer">
+            <div class="relative w-6 h-full">
+                <div class="relative w-6 h-52 mt-0.5 bg-gray-300 border border-black rounded-sm overflow-hidden">
+                    <div
+                        v-for="tick in 20"
+                        :key="'r' + tick"
+                        class="absolute left-0 w-full h-[1px] bg-black/20"
+                        :style="{bottom: `${(tick / 20) * 100}%`}"
+                    />
+                    <div
+                        class="absolute bottom-0 left-0 w-full transition-all duration-100"
+                        :class="rightColor"
+                        :style="{height: `${rightLevel * 100}%`}"
+                    />
+                </div>
+                <label class="w-full block text-xs text-center font-semibold mt-3 mx-auto">
+                    R
+                </label>
+            </div>
+        </section>
+
+        <div class="flex flex-row items-center justify-between gap-6">
+            <button
+                @click="toggleMute"
+                class="w-1/2 bg-red-600 hover:bg-red-500 text-white text-xs py-1 px-2 rounded"
+            >
+                {{ muted ? 'Unmute' : 'Mute' }}
+            </button>
+            <label class="w-1/2 text-[10px] inline-flex items-center space-x-2 cursor-pointer">
                 <input
                     type="checkbox"
                     v-model="normalize"
@@ -62,26 +97,6 @@
                 <span>Normalize Gain</span>
             </label>
         </div>
-
-        <label class="text-xs block mt-3 mb-1">Master Volume</label>
-        <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            v-model="volume"
-            @input="updateVolume"
-            @dblclick="volume = DEFAULT_VOLUME; updateVolume()"
-            class="w-full accent-green-500"
-        />
-
-        <!-- Mute -->
-        <button
-            @click="toggleMute"
-            class="mt-3 bg-red-600 hover:bg-red-500 text-white text-xs py-1 px-2 rounded"
-        >
-            {{ muted ? 'Unmute' : 'Mute' }}
-        </button>
 
         <section class="flex flex-row justify-center mt-4">
             <JackPanel
@@ -96,13 +111,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useSynthEngine } from '../../composables/useSynthEngine'
+import {ref, onMounted, onUnmounted, computed} from 'vue'
+import {useSynthEngine} from '../../composables/useSynthEngine'
 import SynthPanel from './SynthPanel.vue'
 import JackPanel from '../JackPanel.vue'
-import { useModuleConnections } from '../../composables/useModuleConnections'
-import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
+import {useModuleConnections} from '../../composables/useModuleConnections'
+import {useModuleLifecycle} from '../../composables/useModuleLifecycle'
 import {useSynthStore} from "../../storage/synthStore";
+import VerticalSlider from "../VerticalSlider.vue";
 
 const engine = useSynthEngine();
 const synth = useSynthStore();
@@ -187,11 +203,14 @@ const {connectedInputs, handlePatch} = useModuleConnections(id, {getInputNode})
 
 // Patch registration
 onMounted(() => {
-    vcaOut = synth.getVCAOutputNode?.()
+    synth.setMasterOutputNode?.(masterGain);
+    vcaOut = synth.getVCAOutputNode?.();
+
     if (vcaOut) {
         try {
             vcaOut.disconnect()
-        } catch {}
+        } catch {
+        }
         try {
             vcaOut.connect(inputGain)
         } catch (e) {
@@ -219,14 +238,15 @@ onMounted(() => {
 })
 
 
-
 onUnmounted(() => {
+    synth.setMasterOutputNode?.(null)
 
     if (vcaOut) {
         try {
             vcaOut.disconnect(inputGain)
             vcaOut.connect(context.destination)
-        } catch {}
+        } catch {
+        }
     }
 
     cancelAnimationFrame(rafId)
@@ -259,6 +279,7 @@ const rightColor = computed(() => {
     if (rightLevel.value > 0.4) {
         return 'bg-yellow-400'
     }
+
     return 'bg-green-600'
 })
 </script>

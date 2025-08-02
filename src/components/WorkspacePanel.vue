@@ -23,8 +23,8 @@
                 <div class=""><MixerModule /></div>
                 <div class=""><EnvelopeGenerator /></div>
                 <div class="flex flex-col gap-4">
-                    <InverterModule />
                     <Oscilloscope />
+                    <InverterModule />
                 </div>
                 <div class=""><VCAModule /></div>
                 <div class=""><MasterOutput /></div>

@@ -42,6 +42,7 @@ export const useSynthStore = defineStore('synth', () => {
     let mixerNode;
     let vcaGainNode;
     let inverterGain;
+    let masterOutputNode = null;
     let triggerEnvelope; // now from engine.createEnvelopeGain()
     let envelopeTriggerGain;
     let triggerPollId;
@@ -106,6 +107,12 @@ export const useSynthStore = defineStore('synth', () => {
         ensureMixer();
         return mixerNode;
     };
+
+    const setMasterOutputNode = node => {
+        masterOutputNode = node;
+    };
+
+    const getMasterOutputNode = () => masterOutputNode;
 
     const getLFOOutputNode = () => {
         ensureLFO();
@@ -488,6 +495,8 @@ export const useSynthStore = defineStore('synth', () => {
         setEnvelopeDecay,
         resetParam,
         triggerEnvelope: triggerVCAEnvelope,
+        setMasterOutputNode,
+        getMasterOutputNode,
         getVCAOutputNode,
         getVCAInputNode,
         getVCOInputNode,
