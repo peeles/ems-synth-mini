@@ -1,111 +1,140 @@
 <template>
-    <SynthPanel>
-        <div class="relative w-full aspect-video h-auto bg-stone-700 mx-auto rounded-md shadow-[inset_0_0_25px_rgba(0,0,0,0.5)]">
-            <div class="absolute inset-[1%] bg-black rounded-lg shadow-inner p-1">
-                <canvas ref="scopeCanvas" class="w-full h-full rounded-md" />
-            </div>
+    <div class="relative w-full aspect-square bg-black rounded-lg ">
+        <canvas ref="scopeCanvas" class="absolute top-0 left-0 right-0 inset-0"></canvas>
+
+        <div class="absolute top-2 left-2 flex gap-2 text-xs text-green-400">
+            <button @click="phaseLocked = !phaseLocked" class="px-2 py-1 bg-green-900/30 rounded">
+                Phase Lock: {{ phaseLocked ? 'On' : 'Off' }}
+            </button>
         </div>
-    </SynthPanel>
+    </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useSynthEngine } from '../../composables/useSynthEngine'
-import { useSynthStore } from '../../storage/synthStore'
 import { useModuleLifecycle } from '../../composables/useModuleLifecycle'
-import SynthPanel from './SynthPanel.vue'
 
 const engine = useSynthEngine()
-const synth = useSynthStore()
 const context = engine.context
+const masterGain = context.createGain();
 
-const scopeCanvas = ref(null)
+// ---- ANALYSER ----
 const analyser = context.createAnalyser()
+analyser.fftSize = 2048
+analyser.smoothingTimeConstant = 0.8
 useModuleLifecycle(analyser)
 
-let sourceNode = null
-let rafId = null
-let canvas
-let ctx
-let dpr = 1
+const scopeCanvas = ref(null)
+let ctx = null
+let animationFrame = null
+let bufferLength = analyser.fftSize
+let dataArray = new Uint8Array(bufferLength)
 
-const resize = () => {
-    if (!canvas || !ctx) return
-    dpr = window.devicePixelRatio || 1
+const phaseLocked = ref(true)
+
+// ---- VISUAL SETTINGS ----
+const MAX_POINTS = 512
+const lineColor = '#4ade80'
+const bgFade = 'rgba(0, 0, 0, 0.25)'
+
+// ---- PERFORMANCE ----
+const FPS = 60
+const frameInterval = 1000 / FPS
+let lastFrameTime = 0
+
+// Resize canvas to device pixel ratio for crisp lines
+const resizeCanvas = () => {
+    const canvas = scopeCanvas.value
+    if (!canvas) return
+    const dpr = window.devicePixelRatio || 1
     canvas.width = canvas.clientWidth * dpr
     canvas.height = canvas.clientHeight * dpr
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.scale(dpr, dpr)
+}
+
+// Convert byte data → smoothed points centered vertically
+const processPoints = (canvas) => {
+    const downsample = Math.floor(bufferLength / MAX_POINTS)
+    const points = []
+    const sliceWidth = canvas.clientWidth / MAX_POINTS
+
+    let x = 0
+    let startIndex = 0
+
+    if (phaseLocked.value) {
+        for (let i = 1; i < bufferLength; i++) {
+            if (dataArray[i - 1] < 128 && dataArray[i] >= 128) {
+                startIndex = i
+                break
+            }
+        }
+    }
+
+    for (let i = 0; i < MAX_POINTS; i++) {
+        const idx = (startIndex + i * downsample) % bufferLength
+        const v = (dataArray[idx] - 128) / 128.0 // -1 → +1
+        const y = canvas.clientHeight / 2 + v * (canvas.clientHeight / 2)
+        points.push({ x, y })
+        x += sliceWidth
+    }
+    return points
+}
+
+// Draw smooth curve
+const drawCurve = (points) => {
+    ctx.beginPath()
+    ctx.moveTo(points[0].x, points[0].y)
+    for (let i = 1; i < points.length - 2; i++) {
+        const xc = (points[i].x + points[i + 1].x) / 2
+        const yc = (points[i].y + points[i + 1].y) / 2
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc)
+    }
+    const n = points.length - 1
+    ctx.quadraticCurveTo(points[n - 1].x, points[n - 1].y, points[n].x, points[n].y)
+    ctx.stroke()
+}
+
+// Render loop
+const render = (time) => {
+    animationFrame = requestAnimationFrame(render)
+    const delta = time - lastFrameTime
+    if (delta < frameInterval) return
+    lastFrameTime = time - (delta % frameInterval)
+
+    analyser.getByteTimeDomainData(dataArray)
+    const canvas = scopeCanvas.value
+    if (!canvas) return
+
+    ctx.fillStyle = bgFade
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    ctx.strokeStyle = lineColor
+    ctx.lineWidth = 1.5
+    ctx.shadowColor = lineColor
+    ctx.shadowBlur = 4
+
+    const points = processPoints(canvas)
+    drawCurve(points)
 }
 
 onMounted(() => {
-    canvas = scopeCanvas.value
-    ctx = canvas.getContext('2d')
-
-    sourceNode =
-        synth.getMixerOutputNode?.() || synth.getVCAOutputNode?.()
-
-    if (sourceNode) {
-        try {
-            sourceNode.connect(analyser)
-        } catch {}
+    // ✅ Route from master gain (final output)
+    if (masterGain) {
+        try { masterGain.connect(analyser) } catch {}
     }
 
-    analyser.fftSize = 1024
-    const bufferLength = analyser.fftSize
-    const dataArray = new Uint8Array(bufferLength)
+    ctx = scopeCanvas.value.getContext('2d')
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
 
-    const draw = () => {
-        rafId = requestAnimationFrame(draw)
-
-        analyser.getByteTimeDomainData(dataArray)
-
-        const width = canvas.width / dpr
-        const height = canvas.height / dpr
-
-        ctx.fillStyle = 'black'
-        ctx.fillRect(0, 0, width, height)
-
-        ctx.lineWidth = 2
-        ctx.strokeStyle = '#4ade80'
-        ctx.beginPath()
-
-        const sliceWidth = width / bufferLength
-        let x = 0
-
-        for (let i = 0; i < bufferLength; i++) {
-            const v = dataArray[i] / 128.0
-            const y = (v * height) / 2
-            if (i === 0) {
-                ctx.moveTo(x, y)
-            } else {
-                ctx.lineTo(x, y)
-            }
-            x += sliceWidth
-        }
-
-        ctx.lineTo(width, height / 2)
-        ctx.stroke()
-    }
-
-    nextTick(() => {
-        requestAnimationFrame(() => {
-            resize()
-            draw()
-        })
-    })
-    window.addEventListener('resize', resize)
+    render()
 })
 
 onUnmounted(() => {
-    if (rafId) {
-        cancelAnimationFrame(rafId)
-    }
-    window.removeEventListener('resize', resize)
-
-    try {
-        sourceNode?.disconnect(analyser)
-    } catch {}
-
+    if (animationFrame) cancelAnimationFrame(animationFrame)
+    window.removeEventListener('resize', resizeCanvas)
     analyser.disconnect()
 })
 </script>
