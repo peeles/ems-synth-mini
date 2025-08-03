@@ -1,7 +1,13 @@
-import {defineStore} from 'pinia';
+import {defineStore, storeToRefs} from 'pinia';
+import {useSynthStore} from './synthStore';
+import {useSynthEngine} from '../composables/useSynthEngine';
 
+// Centralised store for managing WebAudio modules. This keeps all
+// AudioNode construction and lazy initialisation in one place so the
+// synth store can focus purely on parameter state.
 export const useModuleStore = defineStore('modules', () => {
-    let {
+    const synth = useSynthStore();
+    const {
         filterType,
         filterCutoff,
         filterResonance,
@@ -9,36 +15,51 @@ export const useModuleStore = defineStore('modules', () => {
         vcoWaveform,
         lfoFrequency,
         lfoWaveform,
-    } = refs;
+    } = storeToRefs(synth);
 
+    const engine = useSynthEngine();
+    const ctx = engine.context;
+
+    // === AudioNode references ===
     let vcoOsc, vcoOutGain;
     let lfoOsc, lfoOutGain;
     let noiseSrc, noiseOutGain;
-    let filterNode;
+    let filterInputGain, filterNode;
     let mixerNode;
     let vcaGainNode;
     let inverterGain;
     let triggerEnvelope;
+    let envelopeTriggerGain;
+    let triggerPollId;
+    let prevTrigger = 0;
+
+    // === Module Initialisers ===
 
     const initMixer = () => {
         mixerNode = ctx.createGain();
-        mixerNode.connect(filterNode);
+        if (filterInputGain) {
+            mixerNode.connect(filterInputGain);
+        }
     };
 
     const initVCF = () => {
+        filterInputGain = ctx.createGain();
         filterNode = engine.createFilterNode({
             type: filterType.value,
             frequency: filterCutoff.value,
             q: filterResonance.value,
         });
+        filterInputGain.connect(filterNode);
         mixerNode?.disconnect();
-        mixerNode?.connect(filterNode);
+        mixerNode?.connect(filterInputGain);
     };
 
     const initVCA = () => {
         const envelope = engine.createEnvelopeGain();
         vcaGainNode = envelope.gainNode;
         triggerEnvelope = envelope.triggerEnvelope;
+        ensureEnvelopeTrigger();
+
         filterNode?.connect(vcaGainNode);
         vcaGainNode.connect(ctx.destination);
     };
@@ -71,6 +92,7 @@ export const useModuleStore = defineStore('modules', () => {
         if (!result) return;
         lfoOsc = result.osc;
         lfoOutGain = result.gain;
+        ensureVCA();
         lfoOutGain.connect(vcaGainNode.gain);
     };
 
@@ -84,10 +106,24 @@ export const useModuleStore = defineStore('modules', () => {
         noiseOutGain.connect(mixerNode);
     };
 
-    // Lazy initializer helpers
+    const initEnvelopeTrigger = () => {
+        envelopeTriggerGain = ctx.createGain();
+        envelopeTriggerGain.gain.value = 0;
+        const poll = () => {
+            if (envelopeTriggerGain.gain.value > 0.5 && prevTrigger <= 0.5) {
+                triggerEnvelope?.();
+            }
+            prevTrigger = envelopeTriggerGain.gain.value;
+            triggerPollId = requestAnimationFrame(poll);
+        };
+        triggerPollId = requestAnimationFrame(poll);
+    };
+
+    // === Lazy Initialisers ===
+
     const ensureVCF = () => {
-        if (!filterNode) initVCF();
-        ensureMixer();
+        if (!filterNode || !filterInputGain) initVCF();
+        if (!mixerNode) initMixer();
     };
 
     const ensureVCA = () => {
@@ -118,14 +154,63 @@ export const useModuleStore = defineStore('modules', () => {
         if (!inverterGain) initInverter();
     };
 
+    const ensureEnvelopeTrigger = () => {
+        if (!envelopeTriggerGain) initEnvelopeTrigger();
+    };
+
+    const destroyAll = () => {
+        const safelyStopAndDisconnect = node => {
+            try {
+                node?.stop?.();
+            } catch (e) {
+                console.warn('Error stopping node:', e);
+            }
+            try {
+                node?.disconnect?.();
+            } catch (e) {
+                console.warn('Error disconnecting node:', e);
+            }
+        };
+
+        safelyStopAndDisconnect(vcoOsc);
+        safelyStopAndDisconnect(lfoOsc);
+        safelyStopAndDisconnect(noiseSrc);
+
+        [
+            vcoOutGain,
+            lfoOutGain,
+            noiseOutGain,
+            mixerNode,
+            filterInputGain,
+            filterNode,
+            vcaGainNode,
+            inverterGain,
+            envelopeTriggerGain,
+        ].forEach(n => {
+            try {
+                n?.disconnect();
+            } catch (e) {
+                console.warn('Error disconnecting node:', e);
+            }
+        });
+
+        if (triggerPollId) {
+            cancelAnimationFrame(triggerPollId);
+            triggerPollId = null;
+        }
+
+        vcoOsc = lfoOsc = noiseSrc = null;
+        vcoOutGain = lfoOutGain = noiseOutGain = null;
+        filterInputGain =
+            filterNode =
+            mixerNode =
+            vcaGainNode =
+            inverterGain =
+                null;
+        envelopeTriggerGain = triggerEnvelope = null;
+    };
+
     return {
-        initMixer,
-        initVCF,
-        initVCA,
-        initInverter,
-        initVCO,
-        initLFO,
-        initNoise,
         ensureVCF,
         ensureVCA,
         ensureVCO,
@@ -133,7 +218,7 @@ export const useModuleStore = defineStore('modules', () => {
         ensureNoise,
         ensureMixer,
         ensureInverter,
-        // Expose nodes if needed
+        ensureEnvelopeTrigger,
         getNodes: () => ({
             vcoOsc,
             vcoOutGain,
@@ -142,10 +227,13 @@ export const useModuleStore = defineStore('modules', () => {
             noiseSrc,
             noiseOutGain,
             filterNode,
+            filterInputGain,
             mixerNode,
             vcaGainNode,
             inverterGain,
+            envelopeTriggerGain,
             triggerEnvelope,
         }),
+        destroyAll,
     };
 });
