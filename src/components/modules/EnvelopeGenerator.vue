@@ -93,12 +93,12 @@
             </div>
         </div>
 
-        <button
+        <BaseButton
             @click="triggerEnvelope"
-            class="w-full text-sm font-medium mt-2 px-3 py-1 bg-green-700 text-white rounded hover:bg-green-800 transition"
+            class="text-xs justify-center font-semibold"
         >
             Trigger
-        </button>
+        </BaseButton>
     </SynthPanel>
 </template>
 
@@ -109,6 +109,7 @@ import SynthPanel from './SynthPanel.vue';
 import VerticalSlider from '../VerticalSlider.vue';
 import {useModuleConnections} from '../../composables/useModuleConnections';
 import JackPanel from '../JackPanel.vue';
+import BaseButton from '../base/BaseButton.vue';
 
 const synth = useSynthStore();
 const id = 'envelope-generator';

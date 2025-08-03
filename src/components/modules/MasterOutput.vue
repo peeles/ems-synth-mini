@@ -96,22 +96,26 @@
         </section>
 
         <div class="flex flex-row items-center justify-between gap-6">
-            <button
+            <BaseButton
+                id="mute-button"
+                title="Toggle Mute"
+                name="mute"
+                :aria-activedescendant="true"
                 @click="toggleMute"
-                class="w-1/2 bg-red-600 hover:bg-red-500 text-white text-xs py-1 px-2 rounded"
+                class="!w-1/2 text-xs justify-center font-semibold"
             >
                 {{ muted ? 'Unmute' : 'Mute' }}
-            </button>
-            <label
-                class="w-1/2 text-[10px] inline-flex items-center space-x-2 cursor-pointer"
+            </BaseButton>
+            <BaseButton
+                id="normalise-button"
+                title="Toggle Normalise"
+                name="normalise"
+                :aria-activedescendant="true"
+                @click="toggleNormalise"
+                class="!w-1/2 text-xs justify-center font-semibold"
             >
-                <input
-                    type="checkbox"
-                    v-model="normalize"
-                    class="accent-black"
-                />
-                <span>Normalize Gain</span>
-            </label>
+                {{ normalise ? 'Auto-Gain' : 'Manual Gain' }}
+            </BaseButton>
         </div>
 
         <section class="flex flex-row justify-center mt-4">
@@ -135,6 +139,7 @@ import {useModuleConnections} from '../../composables/useModuleConnections';
 import {useModuleLifecycle} from '../../composables/useModuleLifecycle';
 import {useSynthStore} from '../../storage/synthStore';
 import VerticalSlider from '../VerticalSlider.vue';
+import BaseButton from '../base/BaseButton.vue';
 
 const engine = useSynthEngine();
 const synth = useSynthStore();
@@ -161,7 +166,7 @@ masterGain.gain.setValueAtTime(volume.value, context.currentTime);
 // Meter state
 const leftLevel = ref(0);
 const rightLevel = ref(0);
-const normalize = ref(true);
+const normalise = ref(true);
 const GAIN_SCALE = 4;
 
 let splitter, analyserL, analyserR, bufferL, bufferR, rafId;
@@ -192,7 +197,7 @@ const update = () => {
             sum += norm * norm;
         }
         const raw = Math.sqrt(sum / data.length);
-        return normalize.value ? Math.min(raw * GAIN_SCALE, 1) : raw;
+        return normalise.value ? Math.min(raw * GAIN_SCALE, 1) : raw;
     };
 
     leftLevel.value = rms(bufferL);
@@ -215,6 +220,17 @@ const toggleMute = () => {
     const target = muted.value ? 0 : volume.value;
     masterGain.gain.cancelScheduledValues(context.currentTime);
     masterGain.gain.linearRampToValueAtTime(target, context.currentTime + 0.2);
+};
+
+const toggleNormalise = () => {
+    normalise.value = !normalise.value;
+    if (normalise.value) {
+        leftLevel.value = Math.min(leftLevel.value * GAIN_SCALE, 1);
+        rightLevel.value = Math.min(rightLevel.value * GAIN_SCALE, 1);
+    } else {
+        leftLevel.value /= GAIN_SCALE;
+        rightLevel.value /= GAIN_SCALE;
+    }
 };
 
 let vcaOut = null;

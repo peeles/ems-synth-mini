@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest';
-import {useSynthEngine} from '../src/composables/useSynthEngine.js';
+import {useSynthEngine} from '../../src/composables/useSynthEngine.js';
 
 class FakeAudioContext {
     constructor() {
