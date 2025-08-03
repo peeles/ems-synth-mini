@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
-import { useModuleRegistry } from '../composables/useModuleRegistry';
+import {defineStore} from 'pinia';
+import {ref, watch} from 'vue';
+import {useModuleRegistry} from '../composables/useModuleRegistry';
 
 export const usePatchStore = defineStore('patch', () => {
     const registry = useModuleRegistry();
@@ -28,7 +28,8 @@ export const usePatchStore = defineStore('patch', () => {
         return colour;
     };
 
-    const makeKey = (from, to) => `${from.id}:${from.index}->${to.id}:${to.index}`;
+    const makeKey = (from, to) =>
+        `${from.id}:${from.index}->${to.id}:${to.index}`;
 
     const loadFromStorage = () => {
         if (typeof window === 'undefined') return;
@@ -54,28 +55,49 @@ export const usePatchStore = defineStore('patch', () => {
     };
 
     watch(
-        () => JSON.stringify({ patches: patches.value, idx: nextColourIndex.value }),
+        () =>
+            JSON.stringify({
+                patches: patches.value,
+                idx: nextColourIndex.value,
+            }),
         saveToStorage
     );
 
-    const connectNodes = (fromModule, fromIndex, toModule, toIndex) => {
+    const connectNodes = (fromModule, fromIndex, toModule, toIndex, {record = true} = {}) => {
         const output = fromModule.getOutputNode(fromIndex);
         const input = toModule.getInputNode(toIndex);
-        if (!output || !input) return false;
-        const key = makeKey({ id: fromModule.id, index: fromIndex }, { id: toModule.id, index: toIndex });
-        if (activeConnections.has(key)) return true;
+
+        if (!output || !input) {
+            return false;
+        }
+
+        const key = makeKey(
+            {id: fromModule.id, index: fromIndex},
+            {id: toModule.id, index: toIndex}
+        );
+
+        if (activeConnections.has(key)) {
+            return true;
+        }
+
         try {
             output.connect(input);
-            const patch = {
-                from: { id: fromModule.id, index: fromIndex },
-                to: { id: toModule.id, index: toIndex },
-                colour: getNextColour(),
-                group: fromModule.type || 'ungrouped',
-            };
-            patches.value.push(patch);
-            activeConnections.set(key, { output, input, isParam: input instanceof AudioParam });
-            pushUndo({ type: 'connect', patch });
-            redoStack.value = [];
+            if (record) {
+                const patch = {
+                    from: {id: fromModule.id, index: fromIndex},
+                    to: {id: toModule.id, index: toIndex},
+                    colour: getNextColour(),
+                    group: fromModule.type || 'ungrouped',
+                };
+                patches.value.push(patch);
+                pushUndo({type: 'connect', patch});
+                redoStack.value = [];
+            }
+            activeConnections.set(key, {
+                output,
+                input,
+                isParam: input instanceof AudioParam,
+            });
             return true;
         } catch (e) {
             console.error('Patch failed:', e);
@@ -84,10 +106,13 @@ export const usePatchStore = defineStore('patch', () => {
     };
 
     const safeDisconnect = (fromModule, fromIndex, toModule, toIndex) => {
-        const key = makeKey({ id: fromModule.id, index: fromIndex }, { id: toModule.id, index: toIndex });
+        const key = makeKey(
+            {id: fromModule.id, index: fromIndex},
+            {id: toModule.id, index: toIndex}
+        );
         const connection = activeConnections.get(key);
         if (!connection) return;
-        const { output, input } = connection;
+        const {output, input} = connection;
         try {
             output.disconnect(input);
         } catch {
@@ -111,7 +136,7 @@ export const usePatchStore = defineStore('patch', () => {
         if (!existingPatch) return false;
         safeDisconnect(fromModule, fromIndex, toModule, toIndex);
         patches.value = patches.value.filter(p => p !== existingPatch);
-        pushUndo({ type: 'disconnect', patch: existingPatch });
+        pushUndo({type: 'disconnect', patch: existingPatch});
         redoStack.value = [];
         return true;
     };
@@ -141,13 +166,23 @@ export const usePatchStore = defineStore('patch', () => {
             const patch = last.patch;
             const fromModule = registry.get(patch.from.id);
             const toModule = registry.get(patch.to.id);
-            safeDisconnect(fromModule, patch.from.index, toModule, patch.to.index);
+            safeDisconnect(
+                fromModule,
+                patch.from.index,
+                toModule,
+                patch.to.index
+            );
             patches.value = patches.value.filter(p => p !== patch);
         } else if (last.type === 'disconnect') {
             const patch = last.patch;
             const fromModule = registry.get(patch.from.id);
             const toModule = registry.get(patch.to.id);
-            connectNodes(fromModule, patch.from.index, toModule, patch.to.index);
+            connectNodes(
+                fromModule,
+                patch.from.index,
+                toModule,
+                patch.to.index
+            );
         }
         redoStack.value.push(last);
     };
@@ -159,17 +194,28 @@ export const usePatchStore = defineStore('patch', () => {
             const patch = action.patch;
             const fromModule = registry.get(patch.from.id);
             const toModule = registry.get(patch.to.id);
-            connectNodes(fromModule, patch.from.index, toModule, patch.to.index);
+            connectNodes(
+                fromModule,
+                patch.from.index,
+                toModule,
+                patch.to.index
+            );
         } else if (action.type === 'disconnect') {
             const patch = action.patch;
             const fromModule = registry.get(patch.from.id);
             const toModule = registry.get(patch.to.id);
-            disconnectNodes(fromModule, patch.from.index, toModule, patch.to.index);
+            disconnectNodes(
+                fromModule,
+                patch.from.index,
+                toModule,
+                patch.to.index
+            );
         }
         undoStack.value.push(action);
     };
 
-    const getPatchesByGroup = group => patches.value.filter(p => p.group === group);
+    const getPatchesByGroup = group =>
+        patches.value.filter(p => p.group === group);
 
     const recallGroup = group => {
         resetPatches();
@@ -231,12 +277,42 @@ export const usePatchStore = defineStore('patch', () => {
         }
         const fromModule = registry.get(from.moduleId);
         const toModule = registry.get(to.moduleId);
-        if (fromModule && toModule) togglePatch(fromModule, from.index, toModule, to.index);
+        if (fromModule && toModule)
+            togglePatch(fromModule, from.index, toModule, to.index);
         selectedJack.value = null;
     };
 
     const getConnectionsFor = (moduleId, isOutput) =>
-        patches.value.filter(p => (isOutput ? p.from.id === moduleId : p.to.id === moduleId));
+        patches.value.filter(p =>
+            isOutput ? p.from.id === moduleId : p.to.id === moduleId
+        );
+
+    const removeConnectionsForModule = (id) => {
+        const toRemove = patches.value.filter(
+            p => p.from.id === id || p.to.id === id
+        );
+        if (!toRemove.length) return;
+        toRemove.forEach(p => {
+            const fromModule = registry.get(p.from.id);
+            const toModule = registry.get(p.to.id);
+            if (fromModule && toModule) {
+                safeDisconnect(fromModule, p.from.index, toModule, p.to.index);
+            } else {
+                const key = makeKey(p.from, p.to);
+                activeConnections.delete(key);
+            }
+        });
+        patches.value = patches.value.filter(
+            p => p.from.id !== id && p.to.id !== id
+        );
+        undoStack.value = undoStack.value.filter(
+            a => !(a.patch && (a.patch.from.id === id || a.patch.to.id === id))
+        );
+        redoStack.value = redoStack.value.filter(
+            a => !(a.patch && (a.patch.from.id === id || a.patch.to.id === id))
+        );
+        saveToStorage();
+    };
 
     loadFromStorage();
 
@@ -248,7 +324,7 @@ export const usePatchStore = defineStore('patch', () => {
         togglePatch,
         getConnectionsFor,
         selectJack,
-        removeConnectionsForModule: resetPatches,
+        removeConnectionsForModule,
         reapplyAllConnections,
         resetPatches,
         undo,
