@@ -169,7 +169,7 @@ export const useSynthStore = defineStore('synth', () => {
         filterCutoff.value = clamped;
         modules.ensureVCF();
         const {filterNode} = modules.getNodes();
-        filterNode?.frequency.setValueAtTime(val, ctx.currentTime);
+        filterNode?.frequency.setValueAtTime(clamped, ctx.currentTime);
         if (!filterNode) {
             return;
         }
@@ -184,7 +184,7 @@ export const useSynthStore = defineStore('synth', () => {
         filterResonance.value = clamped;
         modules.ensureVCF();
         const {filterNode} = modules.getNodes();
-        filterNode?.Q.setValueAtTime(val, ctx.currentTime);
+        filterNode?.Q.setValueAtTime(clamped, ctx.currentTime);
         if (!filterNode) {
             return;
         }

@@ -15,7 +15,7 @@ export function useDebounce(fn, delay) {
             clearTimeout(timeoutId);
         }
         timeoutId = null;
-    }
+    };
 
     /**
      * Schedules the debounced function call.
@@ -24,13 +24,13 @@ export function useDebounce(fn, delay) {
     const run = (...args) => {
         cancel();
         timeoutId = setTimeout(() => {
-                fn(...args);
-                timeoutId = null;
-            }, delay);
+            fn(...args);
+            timeoutId = null;
+        }, delay);
     };
 
     return {
         run,
-        cancel
+        cancel,
     };
 }

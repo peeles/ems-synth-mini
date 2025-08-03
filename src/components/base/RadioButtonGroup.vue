@@ -1,8 +1,8 @@
 <template>
     <ul class="flex gap-1 my-3 text-xs mx-auto">
         <li
-            v-for="(option, index) in options"
-            :key="index"
+            v-for="option in options"
+            :key="option.value"
             class="relative flex-1"
         >
             <input
