@@ -46,12 +46,11 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
+import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {usePatchStore} from '../storage/patchStore';
 
 const patchStore = usePatchStore();
 const svg = ref(null);
-const resizeTrigger = ref(0);
 const paths = ref([]); // Store path refs
 
 const getPosition = (moduleId, type, index) => {
@@ -70,9 +69,10 @@ const getPosition = (moduleId, type, index) => {
 };
 
 // Calculate smooth Bezier curve and animate stroke
-const lines = computed(() => {
-    resizeTrigger.value;
-    return patchStore.patches.map(p => {
+const lines = ref([]);
+
+const buildLines = () => {
+    lines.value = patchStore.patches.map(p => {
         const from = getPosition(p.from.id, 'output', p.from.index);
         const to = getPosition(p.to.id, 'input', p.to.index);
 
@@ -88,30 +88,41 @@ const lines = computed(() => {
             length: 0, // Placeholder for path length
         };
     });
-});
+};
 
 let pending = false;
 const updateLines = () => {
     if (pending) return;
     pending = true;
     requestAnimationFrame(() => {
-        resizeTrigger.value++;
+        buildLines();
+        calculatePathLength();
         pending = false;
     });
 };
 
 const calculatePathLength = () => {
     nextTick(() => {
-        paths.value.forEach((pathElement, index) => {
-            lines.value[index].length = pathElement.getTotalLength(); // Set the path length dynamically
+        lines.value = lines.value.map((line, index) => {
+            const pathElement = paths.value[index];
+            const length = pathElement ? pathElement.getTotalLength() : 0;
+            return {...line, length};
         });
     });
 };
 
+watch(
+    () => patchStore.patches,
+    () => {
+        buildLines();
+        calculatePathLength();
+    },
+    {deep: true}
+);
+
 onMounted(() => {
     updateLines();
     window.addEventListener('resize', updateLines);
-    calculatePathLength(); // Calculate path lengths after mounted
 });
 
 onUnmounted(() => {
