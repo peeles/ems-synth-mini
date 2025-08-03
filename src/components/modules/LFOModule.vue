@@ -1,7 +1,9 @@
 <template>
     <SynthPanel :id="id">
         <template #heading>
-            <h3 class="text-center text-wrap text-xl font-medium mb-4 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-4 uppercase"
+            >
                 LFO Modulator
             </h3>
         </template>
@@ -26,10 +28,10 @@
             name="lfoWaveForm"
             v-model="lfoWaveform"
             :options="[
-                { name: 'Sine', value: 'sine' },
-                { name: 'Square', value: 'square' },
-                { name: 'Saw', value: 'sawtooth' },
-                { name: 'Triangle', value: 'triangle' },
+                {name: 'Sine', value: 'sine'},
+                {name: 'Square', value: 'square'},
+                {name: 'Saw', value: 'sawtooth'},
+                {name: 'Triangle', value: 'triangle'},
             ]"
         />
 
@@ -46,7 +48,9 @@
                     class="w-3 h-3 rounded-full border border-stone-600"
                     :class="lfoHigh ? 'bg-green-500' : 'bg-stone-400'"
                 />
-                <span class="block text-[9px] mt-3 uppercase text-center">Activity</span>
+                <span class="block text-[9px] mt-3 uppercase text-center"
+                    >Activity</span
+                >
             </div>
             <JackPanel
                 :count="1"
@@ -63,10 +67,10 @@
 import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '../../storage/synthStore';
 import {useModuleConnections} from '../../composables/useModuleConnections';
-import {useSynthEngine} from "../../composables/useSynthEngine";
+import {useSynthEngine} from '../../composables/useSynthEngine';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
-import RadioButtonGroup from "../base/RadioButtonGroup.vue";
+import RadioButtonGroup from '../base/RadioButtonGroup.vue';
 
 const synth = useSynthStore();
 const id = 'lfo-module';
@@ -81,10 +85,13 @@ const lfoHigh = computed(() => level.value > 0);
 const getOutputNode = () => synth.getLFOOutputNode?.();
 const getInputNode = () => synth.getLFOInputNode?.();
 
-const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
-    getInputNode,
-    getOutputNode,
-});
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(
+    id,
+    {
+        getInputNode,
+        getOutputNode,
+    }
+);
 
 onMounted(() => {
     const out = synth.getLFOOutputNode?.();

@@ -50,9 +50,9 @@
             :name="filterType"
             v-model="filterType"
             :options="[
-                { name: 'Low-Pass', value: 'lowpass' },
-                { name: 'High-Pass', value: 'highpass' },
-                { name: 'Band-Pass', value: 'bandpass' },
+                {name: 'Low-Pass', value: 'lowpass'},
+                {name: 'High-Pass', value: 'highpass'},
+                {name: 'Band-Pass', value: 'bandpass'},
             ]"
         />
 
@@ -82,7 +82,7 @@ import {useSynthStore} from '../../storage/synthStore';
 import {useModuleConnections} from '../../composables/useModuleConnections';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
-import RadioButtonGroup from "../base/RadioButtonGroup.vue";
+import RadioButtonGroup from '../base/RadioButtonGroup.vue';
 
 const synth = useSynthStore();
 const id = 'vcf-module';
@@ -90,10 +90,13 @@ const id = 'vcf-module';
 const getInputNode = index => synth.getVCFInputNode?.(index);
 const getOutputNode = () => synth.getVCFOutputNode?.();
 
-const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(id, {
-    getInputNode,
-    getOutputNode,
-});
+const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(
+    id,
+    {
+        getInputNode,
+        getOutputNode,
+    }
+);
 
 const filterCutoff = computed({
     get: () => synth.filterCutoff,

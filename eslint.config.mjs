@@ -5,13 +5,29 @@ import pluginPrettier from "eslint-plugin-prettier";
 
 /** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
-    // Base JS config
+    // 1. Base JS config
     {
-        files: ["**/*.{js,mjs,cjs}"],
+        files: ["**/*.{js,mjs,cjs,vue}"],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: "module",
+            globals: {
+                // ✅ Add browser globals to avoid no-undef
+                window: "readonly",
+                document: "readonly",
+                console: "readonly",
+                requestAnimationFrame: "readonly",
+                cancelAnimationFrame: "readonly",
+            },
+        },
         ...pluginJs.configs.recommended,
+        rules: {
+            "no-console": "off", // Optional: allow console in dev
+            "no-debugger": "error",
+        },
     },
 
-    // Vue SFC support
+    // 2. Vue SFC support
     {
         files: ["**/*.vue"],
         languageOptions: {
@@ -19,15 +35,19 @@ export default [
             parserOptions: {
                 ecmaVersion: 2022,
                 sourceType: "module",
-                parser: "@babel/eslint-parser", // Enables parsing <script> blocks correctly
+                parser: "@babel/eslint-parser",
                 requireConfigFile: false,
                 babelOptions: {
                     presets: ["@babel/preset-env"],
                 },
             },
             globals: {
+                // ✅ Browser globals available in Vue SFCs too
                 window: "readonly",
                 document: "readonly",
+                console: "readonly",
+                requestAnimationFrame: "readonly",
+                cancelAnimationFrame: "readonly",
             },
         },
         plugins: {
@@ -35,12 +55,16 @@ export default [
             prettier: pluginPrettier,
         },
         rules: {
-            ...pluginVue.configs["flat/essential"].rules,
+            ...pluginVue.configs["flat/recommended"].rules,
             "prettier/prettier": "error",
         },
     },
 
-    // Global formatting with Prettier (works across files)
+    {
+        ignores: ["README.md", "package.json"],
+    },
+
+    // 3. Global Prettier formatting
     {
         files: ["**/*.{js,vue,json,md}"],
         plugins: {
@@ -48,14 +72,6 @@ export default [
         },
         rules: {
             "prettier/prettier": "error",
-        },
-    },
-
-    // Optional: project-level rule tweaks
-    {
-        rules: {
-            "no-console": "off",
-            "no-debugger": "error",
         },
     },
 ];

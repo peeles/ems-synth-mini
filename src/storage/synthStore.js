@@ -32,6 +32,7 @@ export const useSynthStore = defineStore('synth', () => {
     const vcoLevel = ref(1);
     const noiseLevel = ref(1);
     const vcaMode = ref(0);
+    const masterOutputNode = ref(null);
 
     // === AudioNode References ===
     let vcoOsc, vcoOutGain;
@@ -42,7 +43,6 @@ export const useSynthStore = defineStore('synth', () => {
     let mixerNode;
     let vcaGainNode;
     let inverterGain;
-    let masterOutputNode = null;
     let triggerEnvelope; // now from engine.createEnvelopeGain()
     let envelopeTriggerGain;
     let triggerPollId;
@@ -77,7 +77,7 @@ export const useSynthStore = defineStore('synth', () => {
         return vcoOsc?.frequency || null;
     };
 
-    const getVCFInputNode = (index) => {
+    const getVCFInputNode = index => {
         ensureVCF();
 
         if (index === 0) {
@@ -109,10 +109,10 @@ export const useSynthStore = defineStore('synth', () => {
     };
 
     const setMasterOutputNode = node => {
-        masterOutputNode = node;
+        masterOutputNode.value = node;
     };
 
-    const getMasterOutputNode = () => masterOutputNode;
+    const getMasterOutputNode = () => masterOutputNode.value;
 
     const getLFOOutputNode = () => {
         ensureLFO();
@@ -366,7 +366,7 @@ export const useSynthStore = defineStore('synth', () => {
         envelopeDecay.value = val;
     };
 
-    const resetParam = (key) => {
+    const resetParam = key => {
         const val = DEFAULTS[key];
         if (val === undefined) return;
         switch (key) {
@@ -458,11 +458,11 @@ export const useSynthStore = defineStore('synth', () => {
         vcoOutGain = lfoOutGain = noiseOutGain = null;
         filterInputGain =
             filterNode =
-                mixerNode =
-                    vcaGainNode =
-                        inverterGain =
-                            triggerEnvelope =
-                                null;
+            mixerNode =
+            vcaGainNode =
+            inverterGain =
+            triggerEnvelope =
+                null;
     };
 
     return {
