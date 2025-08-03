@@ -54,16 +54,16 @@ export const usePatchStore = defineStore('patch', () => {
         }
     };
 
-    watch(
-        () =>
-            JSON.stringify({
-                patches: patches.value,
-                idx: nextColourIndex.value,
-            }),
-        saveToStorage
-    );
+    watch(patches, saveToStorage, {deep: true});
+    watch(nextColourIndex, saveToStorage);
 
-    const connectNodes = (fromModule, fromIndex, toModule, toIndex, {record = true} = {}) => {
+    const connectNodes = (
+        fromModule,
+        fromIndex,
+        toModule,
+        toIndex,
+        {record = true} = {}
+    ) => {
         const output = fromModule.getOutputNode(fromIndex);
         const input = toModule.getInputNode(toIndex);
 
@@ -287,7 +287,7 @@ export const usePatchStore = defineStore('patch', () => {
             isOutput ? p.from.id === moduleId : p.to.id === moduleId
         );
 
-    const removeConnectionsForModule = (id) => {
+    const removeConnectionsForModule = id => {
         const toRemove = patches.value.filter(
             p => p.from.id === id || p.to.id === id
         );
