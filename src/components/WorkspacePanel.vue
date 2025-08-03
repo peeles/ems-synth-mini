@@ -3,8 +3,16 @@
         v-if="!audioReady"
         class="transition-opacity duration-700 opacity-100 absolute inset-0 z-50 bg-black bg-opacity-80 flex flex-col items-center justify-center text-center p-6"
     >
-        <div class="text-3xl font-bold mb-4">Click to Start Audio</div>
-        <p class="text-sm opacity-80">Tap anywhere to unlock sound</p>
+        <div class="text-3xl font-bold mb-8">EMS Synth 100</div>
+        <button
+            ref="startButton"
+            @click="unlock"
+            @keydown.enter.prevent="unlock"
+            @keydown.space.prevent="unlock"
+            class="px-6 py-2 bg-white text-black font-bold rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+        >
+            Start Audio
+        </button>
     </div>
     <div
         v-else
@@ -53,9 +61,10 @@ import Oscilloscope from './modules/Oscilloscope.vue';
 
 const audioReady = ref(false);
 const synth = useSynthStore();
+const startButton = ref(null);
 
 onMounted(() => {
-    window.addEventListener('pointerdown', unlock, {once: true});
+    startButton.value?.focus();
 });
 
 const unlock = async () => {
@@ -64,10 +73,8 @@ const unlock = async () => {
         if (synth.audioReady !== undefined) {
             audioReady.value = synth.audioReady;
         } else {
-            // fallback if using local ref
             audioReady.value = true;
         }
-        window.removeEventListener('pointerdown', unlock);
     } catch (e) {
         console.warn('Failed to resume AudioContext:', e);
     }

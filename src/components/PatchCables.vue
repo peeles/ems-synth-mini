@@ -7,16 +7,6 @@
         xmlns="http://www.w3.org/2000/svg"
     >
         <defs>
-            <linearGradient
-                id="cableGradient"
-                x1="0%"
-                y1="50%"
-                x2="100%"
-                y2="50%"
-            >
-                <stop offset="0%" stop-color="#888" />
-                <stop offset="100%" stop-color="#444" />
-            </linearGradient>
             <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
                 <feDropShadow
                     dx="2"
@@ -33,7 +23,7 @@
             ref="paths"
             :d="patch.path"
             fill="none"
-            stroke="url(#cableGradient)"
+            :stroke="patch.colour"
             stroke-width="8"
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -52,11 +42,12 @@ import {usePatchStore} from '../storage/patchStore';
 const patchStore = usePatchStore();
 const svg = ref(null);
 const resizeTrigger = ref(0);
-const paths = ref([]); // Store path refs
+const paths = ref([]);
 
 const getPosition = (moduleId, type, index) => {
     const el = document.getElementById(`${moduleId}-${type}-${index}`);
     const svgEl = svg.value;
+
     if (!el || !svgEl) {
         return {x: 0, y: 0};
     }
@@ -72,18 +63,16 @@ const getPosition = (moduleId, type, index) => {
 // Calculate smooth Bezier curve and animate stroke
 const lines = computed(() => {
     resizeTrigger.value;
-    return patchStore.patches.map(p => {
+
+    return patchStore.patches.map((p) => {
         const from = getPosition(p.from.id, 'output', p.from.index);
         const to = getPosition(p.to.id, 'input', p.to.index);
-
-        // Control point for the Bezier curve (middle point between A and B, adjusted for a smooth arc)
         const controlX = (from.x + to.x) / 2;
-        const controlY = (from.y + to.y) / 2 - 100; // Adjust for more curve
-
-        // Generate the Bezier path
+        const controlY = (from.y + to.y) / 2 - 100;
         const path = `M ${from.x} ${from.y} C ${controlX} ${controlY}, ${controlX} ${controlY}, ${to.x} ${to.y}`;
 
         return {
+            ...p,
             path,
             length: 0, // Placeholder for path length
         };
