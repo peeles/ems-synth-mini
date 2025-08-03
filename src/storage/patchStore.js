@@ -287,6 +287,33 @@ export const usePatchStore = defineStore('patch', () => {
             isOutput ? p.from.id === moduleId : p.to.id === moduleId
         );
 
+    const removeConnectionsForModule = (id) => {
+        const toRemove = patches.value.filter(
+            p => p.from.id === id || p.to.id === id
+        );
+        if (!toRemove.length) return;
+        toRemove.forEach(p => {
+            const fromModule = registry.get(p.from.id);
+            const toModule = registry.get(p.to.id);
+            if (fromModule && toModule) {
+                safeDisconnect(fromModule, p.from.index, toModule, p.to.index);
+            } else {
+                const key = makeKey(p.from, p.to);
+                activeConnections.delete(key);
+            }
+        });
+        patches.value = patches.value.filter(
+            p => p.from.id !== id && p.to.id !== id
+        );
+        undoStack.value = undoStack.value.filter(
+            a => !(a.patch && (a.patch.from.id === id || a.patch.to.id === id))
+        );
+        redoStack.value = redoStack.value.filter(
+            a => !(a.patch && (a.patch.from.id === id || a.patch.to.id === id))
+        );
+        saveToStorage();
+    };
+
     loadFromStorage();
 
     return {
@@ -297,7 +324,7 @@ export const usePatchStore = defineStore('patch', () => {
         togglePatch,
         getConnectionsFor,
         selectJack,
-        removeConnectionsForModule: resetPatches,
+        removeConnectionsForModule,
         reapplyAllConnections,
         resetPatches,
         undo,
