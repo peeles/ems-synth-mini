@@ -32,7 +32,6 @@
 </template>
 
 <script setup>
-import {onMounted} from 'vue';
 import SynthPanel from './SynthPanel.vue';
 import JackPanel from '../JackPanel.vue';
 import {useSynthStore} from '../../storage/synthStore';
@@ -51,6 +50,4 @@ const {connectedInputs, connectedOutputs, handlePatch} = useModuleConnections(
         getOutputNode,
     }
 );
-
-onMounted(() => {});
 </script>

@@ -96,6 +96,7 @@
         <BaseButton
             @click="triggerEnvelope"
             class="text-xs justify-center font-semibold"
+            :active="envelopeActive"
         >
             Trigger
         </BaseButton>
