@@ -144,7 +144,7 @@ const context = engine.context;
 // Nodes
 const inputGain = context.createGain();
 const masterGain = context.createGain();
-useModuleLifecycle(inputGain, masterGain);
+useModuleLifecycle(inputGain);
 
 const getInputNode = () => inputGain;
 

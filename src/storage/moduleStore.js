@@ -2,9 +2,6 @@ import {defineStore, storeToRefs} from 'pinia';
 import {useSynthStore} from './synthStore';
 import {useSynthEngine} from '../composables/useSynthEngine';
 
-// Centralised store for managing WebAudio modules. This keeps all
-// AudioNode construction and lazy initialisation in one place so the
-// synth store can focus purely on parameter state.
 export const useModuleStore = defineStore('modules', () => {
     const synth = useSynthStore();
     const {
@@ -33,8 +30,6 @@ export const useModuleStore = defineStore('modules', () => {
     let triggerPollId;
     let prevTrigger = 0;
 
-    // === Module Initialisers ===
-
     const initMixer = () => {
         mixerNode = ctx.createGain();
         if (filterInputGain) {
@@ -45,9 +40,9 @@ export const useModuleStore = defineStore('modules', () => {
     const initVCF = () => {
         filterInputGain = ctx.createGain();
         filterNode = engine.createFilterNode({
-            type: filterType.value,
-            frequency: filterCutoff.value,
-            q: filterResonance.value,
+            type: filterType,
+            frequency: filterCutoff,
+            q: filterResonance,
         });
         filterInputGain.connect(filterNode);
         mixerNode?.disconnect();
@@ -71,8 +66,8 @@ export const useModuleStore = defineStore('modules', () => {
 
     const initVCO = () => {
         const result = engine.createOscillatorNode({
-            frequency: vcoFrequency.value,
-            type: vcoWaveform.value,
+            frequency: vcoFrequency,
+            type: vcoWaveform,
             gain: 1.0,
         });
         if (!result) return;
@@ -85,8 +80,8 @@ export const useModuleStore = defineStore('modules', () => {
 
     const initLFO = () => {
         const result = engine.createOscillatorNode({
-            frequency: lfoFrequency.value,
-            type: lfoWaveform.value,
+            frequency: lfoFrequency,
+            type: lfoWaveform,
             gain: 1.0,
         });
         if (!result) return;
