@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
-import { ref } from 'vue';
+import {describe, it, expect, beforeEach, vi} from 'vitest';
+import {setActivePinia, createPinia} from 'pinia';
+import {ref} from 'vue';
 
 globalThis.requestAnimationFrame = vi.fn(() => 1);
 globalThis.cancelAnimationFrame = vi.fn();
@@ -9,7 +9,7 @@ const createMockNode = () => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
     stop: vi.fn(),
-    gain: { value: 1, connect: vi.fn(), disconnect: vi.fn() },
+    gain: {value: 1, connect: vi.fn(), disconnect: vi.fn()},
 });
 
 const ctx = {
@@ -40,11 +40,11 @@ const engine = {
     })),
 };
 
-vi.mock('../src/composables/useSynthEngine.js', () => ({
+vi.mock('../../src/composables/useSynthEngine.js', () => ({
     useSynthEngine: () => engine,
 }));
 
-vi.mock('../src/storage/synthStore.js', () => ({
+vi.mock('../../src/storage/synthStore.js', () => ({
     useSynthStore: () => ({
         filterType: ref('lowpass'),
         filterCutoff: ref(800),
@@ -56,7 +56,7 @@ vi.mock('../src/storage/synthStore.js', () => ({
     }),
 }));
 
-import { useModuleStore } from '../src/storage/moduleStore.js';
+import {useModuleStore} from '../../src/storage/moduleStore.js';
 
 describe('moduleStore', () => {
     let modules;

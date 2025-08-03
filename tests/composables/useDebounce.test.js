@@ -1,5 +1,5 @@
 import {describe, it, expect, vi} from 'vitest';
-import {useDebounce} from '../src/composables/useDebounce.js';
+import {useDebounce} from '../../src/composables/useDebounce.js';
 
 describe('useDebounce', () => {
     it('runs the debounced function with the latest arguments', async () => {
