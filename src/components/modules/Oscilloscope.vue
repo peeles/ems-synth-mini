@@ -1,7 +1,7 @@
 <template>
     <div
         ref="scopeContainer"
-        class="relative w-full aspect-video bg-black rounded-lg"
+        class="relative w-full aspect-square bg-black overflow-hidden rounded-lg"
     >
         <canvas
             ref="scopeCanvas"

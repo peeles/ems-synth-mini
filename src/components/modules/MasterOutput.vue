@@ -98,24 +98,23 @@
         <div class="flex flex-row items-center justify-between gap-6">
             <BaseButton
                 id="mute-button"
-                title="Toggle Mute"
+                :active="muted"
+                :label="muted ? 'Unmute' : 'Mute'"
+                class="flex-1 text-xs justify-center font-semibold"
                 name="mute"
-                :aria-activedescendant="true"
+                title="Toggle Mute"
                 @click="toggleMute"
-                class="!w-1/2 text-xs justify-center font-semibold"
-            >
-                {{ muted ? 'Unmute' : 'Mute' }}
-            </BaseButton>
+            />
+
             <BaseButton
                 id="normalise-button"
                 title="Toggle Normalise"
                 name="normalise"
-                :aria-activedescendant="true"
                 @click="toggleNormalise"
-                class="!w-1/2 text-xs justify-center font-semibold"
-            >
-                {{ normalise ? 'Auto-Gain' : 'Manual Gain' }}
-            </BaseButton>
+                class="flex-1 text-xs justify-center font-semibold"
+                :active="normalise"
+                :label="normalise ? 'Auto-Gain' : 'Manual Gain'"
+            />
         </div>
 
         <section class="flex flex-row justify-center mt-4">

@@ -5,16 +5,26 @@ export const useSynthEngine = (injectedContext = null) => {
         if (injectedContext) {
             return injectedContext;
         }
-        if (!defaultAudioContext) {
-            defaultAudioContext = new (window.AudioContext ||
-                window.webkitAudioContext)();
+
+        if (typeof window === 'undefined') {
+            return null;
         }
+
+        if (!defaultAudioContext) {
+            const AudioContextCtor =
+                window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextCtor) {
+                return null;
+            }
+            defaultAudioContext = new AudioContextCtor();
+        }
+
         return defaultAudioContext;
     };
 
     const resume = async () => {
         const ctx = getContext();
-        if (ctx.state === 'suspended') {
+        if (ctx && ctx.state === 'suspended') {
             await ctx.resume();
         }
     };
@@ -26,6 +36,11 @@ export const useSynthEngine = (injectedContext = null) => {
         autoStart = true,
     } = {}) => {
         const ctx = getContext();
+
+        if (!ctx) {
+            return null;
+        }
+
         try {
             const osc = ctx.createOscillator();
             const gainNode = ctx.createGain();
@@ -62,6 +77,11 @@ export const useSynthEngine = (injectedContext = null) => {
         q = 1,
     } = {}) => {
         const ctx = getContext();
+
+        if (!ctx) {
+            return null;
+        }
+
         try {
             const filter = ctx.createBiquadFilter();
             const minFreq = 20;
@@ -80,6 +100,11 @@ export const useSynthEngine = (injectedContext = null) => {
 
     const createNoiseNode = () => {
         const ctx = getContext();
+
+        if (!ctx) {
+            return null;
+        }
+
         try {
             const bufferSize = ctx.sampleRate;
             const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -118,6 +143,11 @@ export const useSynthEngine = (injectedContext = null) => {
 
     const createEnvelopeGain = () => {
         const ctx = getContext();
+
+        if (!ctx) {
+            return null;
+        }
+
         const gainNode = ctx.createGain();
         gainNode.gain.setValueAtTime(0, ctx.currentTime);
 
