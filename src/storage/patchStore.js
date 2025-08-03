@@ -63,31 +63,41 @@ export const usePatchStore = defineStore('patch', () => {
         saveToStorage
     );
 
-    const connectNodes = (fromModule, fromIndex, toModule, toIndex) => {
+    const connectNodes = (fromModule, fromIndex, toModule, toIndex, {record = true} = {}) => {
         const output = fromModule.getOutputNode(fromIndex);
         const input = toModule.getInputNode(toIndex);
-        if (!output || !input) return false;
+
+        if (!output || !input) {
+            return false;
+        }
+
         const key = makeKey(
             {id: fromModule.id, index: fromIndex},
             {id: toModule.id, index: toIndex}
         );
-        if (activeConnections.has(key)) return true;
+
+        if (activeConnections.has(key)) {
+            return true;
+        }
+
         try {
             output.connect(input);
-            const patch = {
-                from: {id: fromModule.id, index: fromIndex},
-                to: {id: toModule.id, index: toIndex},
-                colour: getNextColour(),
-                group: fromModule.type || 'ungrouped',
-            };
-            patches.value.push(patch);
+            if (record) {
+                const patch = {
+                    from: {id: fromModule.id, index: fromIndex},
+                    to: {id: toModule.id, index: toIndex},
+                    colour: getNextColour(),
+                    group: fromModule.type || 'ungrouped',
+                };
+                patches.value.push(patch);
+                pushUndo({type: 'connect', patch});
+                redoStack.value = [];
+            }
             activeConnections.set(key, {
                 output,
                 input,
                 isParam: input instanceof AudioParam,
             });
-            pushUndo({type: 'connect', patch});
-            redoStack.value = [];
             return true;
         } catch (e) {
             console.error('Patch failed:', e);
