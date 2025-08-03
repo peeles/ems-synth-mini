@@ -303,11 +303,10 @@ export const useSynthStore = defineStore('synth', () => {
     const FILTER_SMOOTH_TIME = 0.02;
 
     const setFilterCutoff = val => {
-        filterCutoff.value = val;
         const clamped = Math.max(FILTER_MIN_FREQ, val);
         filterCutoff.value = clamped;
         ensureVCF();
-        filterNode?.frequency.setValueAtTime(val, ctx.currentTime);
+        filterNode?.frequency.setValueAtTime(clamped, ctx.currentTime);
 
         if (!filterNode) {
             return;
@@ -319,11 +318,10 @@ export const useSynthStore = defineStore('synth', () => {
     };
 
     const setFilterResonance = val => {
-        filterResonance.value = val;
         const clamped = Math.min(FILTER_MAX_Q, Math.max(FILTER_MIN_Q, val));
         filterResonance.value = clamped;
         ensureVCF();
-        filterNode?.Q.setValueAtTime(val, ctx.currentTime);
+        filterNode?.Q.setValueAtTime(clamped, ctx.currentTime);
 
         if (!filterNode) {
             return;

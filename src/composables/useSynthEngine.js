@@ -1,12 +1,14 @@
-let audioContext = null;
+let defaultAudioContext = null;
 
-export const useSynthEngine = () => {
+export const useSynthEngine = (injectedContext = null) => {
     const getContext = () => {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext ||
-                window.webkitAudioContext)();
+        if (injectedContext) {
+            return injectedContext;
         }
-        return audioContext;
+        if (!defaultAudioContext) {
+            defaultAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return defaultAudioContext;
     };
 
     const resume = async () => {

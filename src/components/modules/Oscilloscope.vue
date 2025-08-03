@@ -179,15 +179,22 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    if (animationFrame) cancelAnimationFrame(animationFrame);
+    if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+    }
+
     window.removeEventListener('resize', resizeCanvas);
     analyser.disconnect();
 
-    if (masterGain) {
+    if (masterGain.value) {
         try {
-            masterGain.disconnect(analyser);
-        } catch {
+            masterGain.value.disconnect(analyser);
+        }
+        catch (e) {
             console.warn('Failed to disconnect master gain from analyser');
+        }
+        finally {
+            masterGain.value = null;
         }
     }
 });
