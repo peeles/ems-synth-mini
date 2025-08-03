@@ -9,14 +9,12 @@ export const useModuleLifecycle = (...nodes) => {
         nodes.forEach(node => {
             try {
                 node?.stop?.();
-            }
-            catch (e) {
+            } catch (e) {
                 console.warn('Module cleanup failed while stopping:', e);
             }
             try {
                 node?.disconnect?.();
-            }
-            catch (e) {
+            } catch (e) {
                 console.warn('Module cleanup failed while disconnecting:', e);
             }
         });

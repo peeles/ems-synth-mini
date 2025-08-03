@@ -189,11 +189,9 @@ onUnmounted(() => {
     if (masterGain.value) {
         try {
             masterGain.value.disconnect(analyser);
-        }
-        catch (e) {
+        } catch (e) {
             console.warn('Failed to disconnect master gain from analyser');
-        }
-        finally {
+        } finally {
             masterGain.value = null;
         }
     }

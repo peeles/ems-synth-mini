@@ -64,7 +64,7 @@ const getPosition = (moduleId, type, index) => {
 const lines = computed(() => {
     resizeTrigger.value;
 
-    return patchStore.patches.map((p) => {
+    return patchStore.patches.map(p => {
         const from = getPosition(p.from.id, 'output', p.from.index);
         const to = getPosition(p.to.id, 'input', p.to.index);
         const controlX = (from.x + to.x) / 2;

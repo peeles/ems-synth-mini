@@ -21,10 +21,7 @@
                     @click="handleClick(i - 1)"
                 />
             </div>
-            <p
-                v-if="type !== null"
-                class="mt-1 text-[8px] uppercase"
-            >
+            <p v-if="type !== null" class="mt-1 text-[8px] uppercase">
                 {{ type }}
             </p>
         </div>

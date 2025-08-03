@@ -6,7 +6,8 @@ export const useSynthEngine = (injectedContext = null) => {
             return injectedContext;
         }
         if (!defaultAudioContext) {
-            defaultAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            defaultAudioContext = new (window.AudioContext ||
+                window.webkitAudioContext)();
         }
         return defaultAudioContext;
     };

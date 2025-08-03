@@ -198,10 +198,10 @@ export const useModuleStore = defineStore('modules', () => {
         vcoOutGain = lfoOutGain = noiseOutGain = null;
         filterInputGain =
             filterNode =
-                mixerNode =
-                    vcaGainNode =
-                        inverterGain =
-                            null;
+            mixerNode =
+            vcaGainNode =
+            inverterGain =
+                null;
         envelopeTriggerGain = triggerEnvelope = null;
     };
 
