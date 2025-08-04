@@ -68,6 +68,7 @@ import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useSynthStore} from '@/storage/synthStore';
 import {useModuleConnections} from '@/composables/useModuleConnections';
 import {useSynthEngine} from '@/composables/useSynthEngine';
+import {useAnimationSchedule} from '@/composables/useAnimationSchedule';
 import SynthPanel from '@/components/SynthPanel.vue';
 import JackPanel from '@/components/JackPanel.vue';
 import RadioButtonGroup from '@/components/base/RadioButtonGroup.vue';
@@ -78,7 +79,7 @@ const engine = useSynthEngine();
 const context = engine.context;
 
 const level = ref(0);
-let analyser, buffer, rafId;
+let analyser, buffer, stop;
 
 const lfoHigh = computed(() => level.value > 0);
 
@@ -103,17 +104,14 @@ onMounted(() => {
         const update = () => {
             analyser.getByteTimeDomainData(buffer);
             level.value = (buffer[0] - 128) / 128;
-            rafId = requestAnimationFrame(update);
         };
-        update();
+        stop = useAnimationSchedule(update);
     }
 });
 
 onUnmounted(() => {
-    if (rafId) {
-        cancelAnimationFrame(rafId);
-        analyser?.disconnect();
-    }
+    stop?.();
+    analyser?.disconnect();
 });
 
 const lfoFrequency = computed({

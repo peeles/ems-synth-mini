@@ -17,7 +17,9 @@
                     @patch="handlePatch"
                 />
             </section>
-            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
+            <h3
+                class="text-center text-wrap text-xl font-medium mb-8 uppercase"
+            >
                 VCA
             </h3>
         </template>

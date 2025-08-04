@@ -46,7 +46,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['update:modelValue', 'dblclick']);
+defineEmits(['update:modelValue', 'dblclick']);
 const value = ref(props.modelValue);
 
 watch(

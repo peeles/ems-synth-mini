@@ -1,6 +1,7 @@
 import {defineStore, storeToRefs} from 'pinia';
 import {useSynthStore} from './synthStore';
-import {useSynthEngine} from '../composables/useSynthEngine';
+import {useSynthEngine} from '@/composables/useSynthEngine';
+import {useAnimationSchedule} from '@/composables/useAnimationSchedule';
 
 export const useModuleStore = defineStore('modules', () => {
     const synth = useSynthStore();
@@ -27,7 +28,7 @@ export const useModuleStore = defineStore('modules', () => {
     let inverterGain;
     let triggerEnvelope;
     let envelopeTriggerGain;
-    let triggerPollId;
+    let stopTriggerPoll;
     let prevTrigger = 0;
 
     const initMixer = () => {
@@ -101,6 +102,8 @@ export const useModuleStore = defineStore('modules', () => {
         noiseOutGain.connect(mixerNode);
     };
 
+    const scheduler = useAnimationSchedule();
+
     const initEnvelopeTrigger = () => {
         envelopeTriggerGain = ctx.createGain();
         envelopeTriggerGain.gain.value = 0;
@@ -109,12 +112,11 @@ export const useModuleStore = defineStore('modules', () => {
                 triggerEnvelope?.();
             }
             prevTrigger = envelopeTriggerGain.gain.value;
-            triggerPollId = requestAnimationFrame(poll);
         };
-        triggerPollId = requestAnimationFrame(poll);
+        stopTriggerPoll = scheduler.subscribe(poll);
     };
 
-    // === Lazy Initialisers ===
+    // === Lazy Initialise ===
 
     const ensureVCF = () => {
         if (!filterNode || !filterInputGain) initVCF();
@@ -189,10 +191,8 @@ export const useModuleStore = defineStore('modules', () => {
             }
         });
 
-        if (triggerPollId) {
-            cancelAnimationFrame(triggerPollId);
-            triggerPollId = null;
-        }
+        stopTriggerPoll?.();
+        stopTriggerPoll = null;
 
         vcoOsc = lfoOsc = noiseSrc = null;
         vcoOutGain = lfoOutGain = noiseOutGain = null;

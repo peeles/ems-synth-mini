@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import {ref} from 'vue';
-import {useSynthEngine} from '../composables/useSynthEngine';
-import {useModuleStore} from './moduleStore';
+import {resetDefaultAudioContext} from '@/composables/useSynthEngine';
+import {AudioEngine} from '@/audio/AudioEngine';
 
 export const DEFAULTS = {
     vcoFrequency: 440,
@@ -17,9 +17,8 @@ export const DEFAULTS = {
 
 export const useSynthStore = defineStore('synth', () => {
     const audioReady = ref(false);
-    const engine = useSynthEngine();
-    const ctx = engine.context;
-    const modules = useModuleStore();
+    const audioEngine = new AudioEngine();
+    const ctx = audioEngine.context;
 
     // === Synth Parameter State ===
     const vcoFrequency = ref(440);
@@ -37,7 +36,7 @@ export const useSynthStore = defineStore('synth', () => {
     const masterOutputNode = ref(null);
 
     async function resume() {
-        await ctx.resume();
+        await audioEngine.resume();
         if (ctx.state === 'running') {
             audioReady.value = true;
         }
@@ -45,28 +44,28 @@ export const useSynthStore = defineStore('synth', () => {
 
     // === Module Node Accessors ===
     const getVCAOutputNode = () => {
-        modules.ensureVCA();
-        return modules.getNodes().vcaGainNode;
+        audioEngine.ensureVCA();
+        return audioEngine.getNodes().vcaGainNode;
     };
 
     const getVCAInputNode = () => {
-        modules.ensureVCA();
-        return modules.getNodes().vcaGainNode?.gain;
+        audioEngine.ensureVCA();
+        return audioEngine.getNodes().vcaGainNode?.gain;
     };
 
     const getVCOOutputNode = () => {
-        modules.ensureVCO();
-        return modules.getNodes().vcoOutGain;
+        audioEngine.ensureVCO();
+        return audioEngine.getNodes().vcoOutGain;
     };
 
     const getVCOInputNode = () => {
-        modules.ensureVCO();
-        return modules.getNodes().vcoOsc?.frequency || null;
+        audioEngine.ensureVCO();
+        return audioEngine.getNodes().vcoOsc?.frequency || null;
     };
 
     const getVCFInputNode = index => {
-        modules.ensureVCF();
-        const {filterInputGain, filterNode} = modules.getNodes();
+        audioEngine.ensureVCF();
+        const {filterInputGain, filterNode} = audioEngine.getNodes();
 
         if (index === 0) {
             return filterInputGain;
@@ -82,18 +81,18 @@ export const useSynthStore = defineStore('synth', () => {
     };
 
     const getVCFOutputNode = () => {
-        modules.ensureVCF();
-        return modules.getNodes().filterNode;
+        audioEngine.ensureVCF();
+        return audioEngine.getNodes().filterNode;
     };
 
     const getNoiseOutputNode = () => {
-        modules.ensureNoise();
-        return modules.getNodes().noiseOutGain;
+        audioEngine.ensureNoise();
+        return audioEngine.getNodes().noiseOutGain;
     };
 
     const getMixerOutputNode = () => {
-        modules.ensureMixer();
-        return modules.getNodes().mixerNode;
+        audioEngine.ensureMixer();
+        return audioEngine.getNodes().mixerNode;
     };
 
     const setMasterOutputNode = node => {
@@ -103,59 +102,59 @@ export const useSynthStore = defineStore('synth', () => {
     const getMasterOutputNode = () => masterOutputNode.value;
 
     const getLFOOutputNode = () => {
-        modules.ensureLFO();
-        return modules.getNodes().lfoOutGain;
+        audioEngine.ensureLFO();
+        return audioEngine.getNodes().lfoOutGain;
     };
 
     const getLFOInputNode = () => {
-        modules.ensureLFO();
-        return modules.getNodes().lfoOsc?.frequency || null;
+        audioEngine.ensureLFO();
+        return audioEngine.getNodes().lfoOsc?.frequency || null;
     };
 
     const getInverterInputNode = () => {
-        modules.ensureInverter();
-        return modules.getNodes().inverterGain;
+        audioEngine.ensureInverter();
+        return audioEngine.getNodes().inverterGain;
     };
 
     const getInverterOutputNode = () => {
-        modules.ensureInverter();
-        return modules.getNodes().inverterGain;
+        audioEngine.ensureInverter();
+        return audioEngine.getNodes().inverterGain;
     };
 
     const getEnvelopeTriggerInputNode = () => {
-        modules.ensureEnvelopeTrigger();
-        return modules.getNodes().envelopeTriggerGain?.gain || null;
+        audioEngine.ensureEnvelopeTrigger();
+        return audioEngine.getNodes().envelopeTriggerGain?.gain || null;
     };
 
     // === Parameter Actions ===
 
     const setVcoFrequency = val => {
         vcoFrequency.value = val;
-        modules.ensureVCO();
-        modules
+        audioEngine.ensureVCO();
+        audioEngine
             .getNodes()
             .vcoOsc?.frequency.setValueAtTime(val, ctx.currentTime);
     };
 
     const setVcoWaveform = val => {
         vcoWaveform.value = val;
-        modules.ensureVCO();
-        const {vcoOsc} = modules.getNodes();
+        audioEngine.ensureVCO();
+        const {vcoOsc} = audioEngine.getNodes();
         if (vcoOsc) vcoOsc.type = val;
     };
 
     const setLfoFrequency = val => {
         lfoFrequency.value = val;
-        modules.ensureLFO();
-        modules
+        audioEngine.ensureLFO();
+        audioEngine
             .getNodes()
             .lfoOsc?.frequency.setValueAtTime(val, ctx.currentTime);
     };
 
     const setLfoWaveform = val => {
         lfoWaveform.value = val;
-        modules.ensureLFO();
-        const {lfoOsc} = modules.getNodes();
+        audioEngine.ensureLFO();
+        const {lfoOsc} = audioEngine.getNodes();
         if (lfoOsc) lfoOsc.type = val;
     };
 
@@ -167,8 +166,8 @@ export const useSynthStore = defineStore('synth', () => {
     const setFilterCutoff = val => {
         const clamped = Math.max(FILTER_MIN_FREQ, val);
         filterCutoff.value = clamped;
-        modules.ensureVCF();
-        const {filterNode} = modules.getNodes();
+        audioEngine.ensureVCF();
+        const {filterNode} = audioEngine.getNodes();
         filterNode?.frequency.setValueAtTime(clamped, ctx.currentTime);
         if (!filterNode) {
             return;
@@ -182,8 +181,8 @@ export const useSynthStore = defineStore('synth', () => {
     const setFilterResonance = val => {
         const clamped = Math.min(FILTER_MAX_Q, Math.max(FILTER_MIN_Q, val));
         filterResonance.value = clamped;
-        modules.ensureVCF();
-        const {filterNode} = modules.getNodes();
+        audioEngine.ensureVCF();
+        const {filterNode} = audioEngine.getNodes();
         filterNode?.Q.setValueAtTime(clamped, ctx.currentTime);
         if (!filterNode) {
             return;
@@ -196,8 +195,8 @@ export const useSynthStore = defineStore('synth', () => {
 
     const setFilterType = val => {
         filterType.value = val;
-        modules.ensureVCF();
-        const {filterNode} = modules.getNodes();
+        audioEngine.ensureVCF();
+        const {filterNode} = audioEngine.getNodes();
         if (filterNode) {
             filterNode.type = val;
         }
@@ -206,17 +205,17 @@ export const useSynthStore = defineStore('synth', () => {
     const setMixerLevels = (vcoLvl, noiseLvl) => {
         vcoLevel.value = vcoLvl;
         noiseLevel.value = noiseLvl;
-        modules.ensureVCO();
-        modules.ensureNoise();
-        const nodes = modules.getNodes();
+        audioEngine.ensureVCO();
+        audioEngine.ensureNoise();
+        const nodes = audioEngine.getNodes();
         nodes.vcoOutGain?.gain.setValueAtTime(vcoLvl, ctx.currentTime);
         nodes.noiseOutGain?.gain.setValueAtTime(noiseLvl, ctx.currentTime);
     };
 
     const setVcaMode = mode => {
         vcaMode.value = mode;
-        modules.ensureLFO();
-        modules
+        audioEngine.ensureLFO();
+        audioEngine
             .getNodes()
             .lfoOutGain?.gain.setValueAtTime(mode, ctx.currentTime);
     };
@@ -265,8 +264,8 @@ export const useSynthStore = defineStore('synth', () => {
 
     // === Envelope Action ===
     const triggerVCAEnvelope = () => {
-        modules.ensureVCA();
-        const {triggerEnvelope} = modules.getNodes();
+        audioEngine.ensureVCA();
+        const {triggerEnvelope} = audioEngine.getNodes();
         if (!triggerEnvelope) return;
 
         const peak = 1 - vcaMode.value;
@@ -277,8 +276,10 @@ export const useSynthStore = defineStore('synth', () => {
         });
     };
 
-    const destroySynth = () => {
-        modules.destroyAll();
+    const destroySynth = async () => {
+        audioEngine.destroyAll();
+        await ctx.close();
+        resetDefaultAudioContext();
     };
 
     return {

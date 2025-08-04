@@ -35,6 +35,7 @@ import {ref, onMounted, onUnmounted, watch} from 'vue';
 import {useSynthEngine} from '@/composables/useSynthEngine';
 import {useModuleLifecycle} from '@/composables/useModuleLifecycle';
 import {useSynthStore} from '@/storage/synthStore';
+import {useAnimationSchedule} from '@/composables/useAnimationSchedule';
 import SynthPanel from '@/components/SynthPanel.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 
@@ -51,7 +52,7 @@ useModuleLifecycle(analyser);
 const scopeContainer = ref(null);
 const scopeCanvas = ref(null);
 let ctx = null;
-let animationFrame = null;
+let stopRender;
 let bufferLength = analyser.fftSize;
 let dataArray = new Uint8Array(bufferLength);
 const masterGain = ref(null);
@@ -133,7 +134,6 @@ const drawCurve = points => {
 
 // Render loop
 const render = time => {
-    animationFrame = requestAnimationFrame(render);
     const delta = time - lastFrameTime;
     if (delta < frameInterval) {
         return;
@@ -188,13 +188,11 @@ onMounted(() => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    animationFrame = requestAnimationFrame(render);
+    stopRender = useAnimationSchedule(render);
 });
 
 onUnmounted(() => {
-    if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-    }
+    stopRender?.();
 
     window.removeEventListener('resize', resizeCanvas);
     analyser.disconnect();
