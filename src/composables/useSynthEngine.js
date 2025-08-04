@@ -1,5 +1,9 @@
 let defaultAudioContext = null;
 
+export const resetDefaultAudioContext = () => {
+    defaultAudioContext = null;
+};
+
 export const useSynthEngine = (injectedContext = null) => {
     const getContext = () => {
         if (injectedContext) {

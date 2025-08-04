@@ -104,9 +104,10 @@
 </template>
 
 <script setup>
-import {computed, onMounted, onUnmounted, ref} from 'vue';
+import {computed, ref} from 'vue';
 import {useModuleConnections} from '@/composables/useModuleConnections';
 import {useSynthStore} from '@/storage/synthStore';
+import {useAnimationSchedule} from '@/composables/useAnimationSchedule';
 import SynthPanel from '@/components/SynthPanel.vue';
 import VerticalSlider from '@/components/VerticalSlider.vue';
 import JackPanel from '@/components/JackPanel.vue';
@@ -114,29 +115,15 @@ import BaseButton from '@/components/base/BaseButton.vue';
 
 const synth = useSynthStore();
 const id = 'envelope-generator';
-
 const level = ref(0);
-let rafId;
-
 const envelopeActive = computed(() => level.value > 0.01);
-
 const getInputNode = index => synth.getEnvelopeTriggerInputNode?.(index);
 
 const {connectedInputs, handlePatch} = useModuleConnections(id, {getInputNode});
 
-onMounted(() => {
-    const update = () => {
-        const gain = synth.getVCAInputNode?.();
-        level.value = gain ? gain.value : 0;
-        rafId = requestAnimationFrame(update);
-    };
-    update();
-});
-
-onUnmounted(() => {
-    if (rafId) {
-        cancelAnimationFrame(rafId);
-    }
+useAnimationSchedule(() => {
+    const gain = synth.getVCAInputNode?.();
+    level.value = gain ? gain.value : 0;
 });
 
 const envelopeAttack = computed({

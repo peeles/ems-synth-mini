@@ -8,6 +8,7 @@ const ctx = {
         ctx.state = 'running';
         return Promise.resolve();
     }),
+    close: vi.fn(() => Promise.resolve()),
 };
 
 const createNodes = () => ({
@@ -31,25 +32,26 @@ const createNodes = () => ({
 });
 
 let nodes;
-const modules = {
+const audioEngine = {
+    context: ctx,
+    resume: vi.fn(() => ctx.resume()),
     ensureVCO: vi.fn(),
     ensureVCF: vi.fn(),
     ensureVCA: vi.fn(),
     ensureNoise: vi.fn(),
     ensureLFO: vi.fn(),
+    ensureMixer: vi.fn(),
+    ensureInverter: vi.fn(),
+    ensureEnvelopeTrigger: vi.fn(),
     getNodes: () => nodes,
     destroyAll: vi.fn(),
 };
 
-vi.mock('../../src/composables/useSynthEngine.js', () => ({
-    useSynthEngine: () => ({context: ctx}),
+vi.mock('../../src/audio/AudioEngine.js', () => ({
+    AudioEngine: vi.fn(() => audioEngine),
 }));
 
-vi.mock('../../src/storage/moduleStore.js', () => ({
-    useModuleStore: () => modules,
-}));
-
-import {useSynthStore, DEFAULTS} from '../../src/storage/synthStore.js';
+import {useSynthStore, DEFAULTS} from '@/storage/synthStore';
 
 describe('synthStore', () => {
     let synth;
@@ -70,7 +72,7 @@ describe('synthStore', () => {
     it('sets VCO frequency', () => {
         synth.setVcoFrequency(880);
         expect(synth.vcoFrequency).toBe(880);
-        expect(modules.ensureVCO).toHaveBeenCalled();
+        expect(audioEngine.ensureVCO).toHaveBeenCalled();
         expect(nodes.vcoOsc.frequency.setValueAtTime).toHaveBeenCalledWith(
             880,
             ctx.currentTime
@@ -80,7 +82,7 @@ describe('synthStore', () => {
     it('clamps filter cutoff and schedules changes', () => {
         synth.setFilterCutoff(10);
         expect(synth.filterCutoff).toBe(20);
-        expect(modules.ensureVCF).toHaveBeenCalled();
+        expect(audioEngine.ensureVCF).toHaveBeenCalled();
         expect(nodes.filterNode.frequency.setValueAtTime).toHaveBeenCalledWith(
             20,
             ctx.currentTime
@@ -96,8 +98,8 @@ describe('synthStore', () => {
         synth.setMixerLevels(0.5, 0.3);
         expect(synth.vcoLevel).toBe(0.5);
         expect(synth.noiseLevel).toBe(0.3);
-        expect(modules.ensureVCO).toHaveBeenCalled();
-        expect(modules.ensureNoise).toHaveBeenCalled();
+        expect(audioEngine.ensureVCO).toHaveBeenCalled();
+        expect(audioEngine.ensureNoise).toHaveBeenCalled();
         expect(nodes.vcoOutGain.gain.setValueAtTime).toHaveBeenCalledWith(
             0.5,
             ctx.currentTime
@@ -117,7 +119,7 @@ describe('synthStore', () => {
 
     it('triggers envelope', () => {
         synth.triggerEnvelope();
-        expect(modules.ensureVCA).toHaveBeenCalled();
+        expect(audioEngine.ensureVCA).toHaveBeenCalled();
         expect(nodes.triggerEnvelope).toHaveBeenCalledWith({
             attack: synth.envelopeAttack,
             decay: synth.envelopeDecay,
@@ -125,8 +127,8 @@ describe('synthStore', () => {
         });
     });
 
-    it('destroys synth', () => {
-        synth.destroySynth();
-        expect(modules.destroyAll).toHaveBeenCalled();
+    it('destroys synth', async () => {
+        await synth.destroySynth();
+        expect(audioEngine.destroyAll).toHaveBeenCalled();
     });
 });

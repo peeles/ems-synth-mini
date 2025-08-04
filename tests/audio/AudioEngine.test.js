@@ -1,6 +1,5 @@
-import {describe, it, expect, beforeEach, vi} from 'vitest';
-import {setActivePinia, createPinia} from 'pinia';
-import {ref} from 'vue';
+import {describe, it, expect, beforeEach, afterEach, vi} from 'vitest';
+import {AudioEngine} from '/src/audio/AudioEngine';
 
 globalThis.requestAnimationFrame = vi.fn(() => 1);
 globalThis.cancelAnimationFrame = vi.fn();
@@ -20,6 +19,7 @@ const ctx = {
 
 const engine = {
     context: ctx,
+    resume: vi.fn(),
     createFilterNode: vi.fn(() => ({
         connect: vi.fn(),
         disconnect: vi.fn(),
@@ -40,36 +40,21 @@ const engine = {
     })),
 };
 
-vi.mock('../../src/composables/useSynthEngine.js', () => ({
-    useSynthEngine: () => engine,
-}));
-
-vi.mock('../../src/storage/synthStore.js', () => ({
-    useSynthStore: () => ({
-        filterType: ref('lowpass'),
-        filterCutoff: ref(800),
-        filterResonance: ref(1),
-        vcoFrequency: ref(440),
-        vcoWaveform: ref('sawtooth'),
-        lfoFrequency: ref(5),
-        lfoWaveform: ref('sine'),
-    }),
-}));
-
-import {useModuleStore} from '../../src/storage/moduleStore.js';
-
-describe('moduleStore', () => {
-    let modules;
+describe('AudioEngine', () => {
+    let audio;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
-        modules = useModuleStore();
         vi.clearAllMocks();
+        audio = new AudioEngine({}, engine);
+    });
+
+    afterEach(() => {
+        audio.destroyAll();
     });
 
     it('creates nodes lazily', () => {
-        modules.ensureVCO();
-        modules.ensureVCO();
+        audio.ensureVCO();
+        audio.ensureVCO();
 
         expect(engine.createOscillatorNode).toHaveBeenCalledTimes(1);
         expect(engine.createEnvelopeGain).toHaveBeenCalledTimes(1);
@@ -77,11 +62,11 @@ describe('moduleStore', () => {
     });
 
     it('destroys nodes and allows reinitialisation', () => {
-        modules.ensureVCO();
-        modules.ensureLFO();
-        const nodes = modules.getNodes();
+        audio.ensureVCO();
+        audio.ensureLFO();
+        const nodes = audio.getNodes();
 
-        modules.destroyAll();
+        audio.destroyAll();
 
         expect(nodes.vcoOsc.stop).toHaveBeenCalled();
         expect(nodes.vcoOsc.disconnect).toHaveBeenCalled();
@@ -89,13 +74,12 @@ describe('moduleStore', () => {
         expect(nodes.lfoOsc.disconnect).toHaveBeenCalled();
         expect(nodes.vcoOutGain.disconnect).toHaveBeenCalled();
         expect(nodes.lfoOutGain.disconnect).toHaveBeenCalled();
-        expect(globalThis.cancelAnimationFrame).toHaveBeenCalled();
-        const cleared = modules.getNodes();
+        const cleared = audio.getNodes();
         expect(cleared.vcoOsc).toBeNull();
         expect(cleared.lfoOsc).toBeNull();
 
         engine.createOscillatorNode.mockClear();
-        modules.ensureVCO();
+        audio.ensureVCO();
         expect(engine.createOscillatorNode).toHaveBeenCalledTimes(1);
     });
 });

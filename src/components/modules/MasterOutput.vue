@@ -135,6 +135,7 @@ import {useSynthEngine} from '@/composables/useSynthEngine';
 import {useModuleConnections} from '@/composables/useModuleConnections';
 import {useModuleLifecycle} from '@/composables/useModuleLifecycle';
 import {useSynthStore} from '@/storage/synthStore';
+import {useAnimationSchedule} from '@/composables/useAnimationSchedule';
 import SynthPanel from '@/components/SynthPanel.vue';
 import JackPanel from '@/components/JackPanel.vue';
 import VerticalSlider from '@/components/VerticalSlider.vue';
@@ -144,6 +145,7 @@ const engine = useSynthEngine();
 const synth = useSynthStore();
 const id = 'master-output';
 const context = engine.context;
+const scheduler = useAnimationSchedule();
 
 // Nodes
 const inputGain = context.createGain();
