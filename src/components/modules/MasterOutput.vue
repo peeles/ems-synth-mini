@@ -131,14 +131,14 @@
 
 <script setup>
 import {ref, onMounted, onUnmounted, computed} from 'vue';
-import {useSynthEngine} from '../../composables/useSynthEngine';
-import SynthPanel from './SynthPanel.vue';
-import JackPanel from '../JackPanel.vue';
-import {useModuleConnections} from '../../composables/useModuleConnections';
-import {useModuleLifecycle} from '../../composables/useModuleLifecycle';
-import {useSynthStore} from '../../storage/synthStore';
-import VerticalSlider from '../VerticalSlider.vue';
-import BaseButton from '../base/BaseButton.vue';
+import {useSynthEngine} from '@/composables/useSynthEngine';
+import {useModuleConnections} from '@/composables/useModuleConnections';
+import {useModuleLifecycle} from '@/composables/useModuleLifecycle';
+import {useSynthStore} from '@/storage/synthStore';
+import SynthPanel from '@/components/SynthPanel.vue';
+import JackPanel from '@/components/JackPanel.vue';
+import VerticalSlider from '@/components/VerticalSlider.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
 
 const engine = useSynthEngine();
 const synth = useSynthStore();

@@ -105,12 +105,12 @@
 
 <script setup>
 import {computed, onMounted, onUnmounted, ref} from 'vue';
-import {useSynthStore} from '../../storage/synthStore';
-import SynthPanel from './SynthPanel.vue';
-import VerticalSlider from '../VerticalSlider.vue';
-import {useModuleConnections} from '../../composables/useModuleConnections';
-import JackPanel from '../JackPanel.vue';
-import BaseButton from '../base/BaseButton.vue';
+import {useModuleConnections} from '@/composables/useModuleConnections';
+import {useSynthStore} from '@/storage/synthStore';
+import SynthPanel from '@/components/SynthPanel.vue';
+import VerticalSlider from '@/components/VerticalSlider.vue';
+import JackPanel from '@/components/JackPanel.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
 
 const synth = useSynthStore();
 const id = 'envelope-generator';

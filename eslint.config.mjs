@@ -5,14 +5,12 @@ import pluginPrettier from "eslint-plugin-prettier";
 
 /** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
-    // 1. Base JS config
     {
         files: ["**/*.{js,mjs,cjs,vue}"],
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: "module",
             globals: {
-                // ✅ Add browser globals to avoid no-undef
                 window: "readonly",
                 document: "readonly",
                 console: "readonly",
@@ -22,12 +20,11 @@ export default [
         },
         ...pluginJs.configs.recommended,
         rules: {
-            "no-console": "off", // Optional: allow console in dev
+            "no-console": "off",
             "no-debugger": "error",
         },
     },
 
-    // 2. Vue SFC support
     {
         files: ["**/*.vue"],
         languageOptions: {
@@ -42,7 +39,6 @@ export default [
                 },
             },
             globals: {
-                // ✅ Browser globals available in Vue SFCs too
                 window: "readonly",
                 document: "readonly",
                 console: "readonly",
@@ -61,10 +57,9 @@ export default [
     },
 
     {
-        ignores: ["README.md", "package.json"],
+        ignores: ["README.md", "package.json", "jsconfig.json"],
     },
 
-    // 3. Global Prettier formatting
     {
         files: ["**/*.{js,vue,json,md}"],
         plugins: {

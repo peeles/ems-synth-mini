@@ -45,19 +45,19 @@
 </template>
 
 <script setup>
-import {useSynthStore} from '../storage/synthStore';
+import {useSynthStore} from '@/storage/synthStore';
 import {onMounted, onUnmounted, ref} from 'vue';
-import EnvelopeGenerator from './modules/EnvelopeGenerator.vue';
-import LFOModule from './modules/LFOModule.vue';
-import VCOModule from './modules/VCOModule.vue';
-import VCFModule from './modules/VCFModule.vue';
-import InverterModule from './modules/InverterModule.vue';
-import VCAModule from './modules/VCAModule.vue';
-import MixerModule from './modules/MixerModule.vue';
-import SynthPanel from './modules/SynthPanel.vue';
-import PatchCables from './PatchCables.vue';
-import MasterOutput from './modules/MasterOutput.vue';
-import Oscilloscope from './modules/Oscilloscope.vue';
+import EnvelopeGenerator from '@/components/modules/EnvelopeGenerator.vue';
+import LFOModule from '@/components/modules/LFOModule.vue';
+import VCOModule from '@/components/modules/VCOModule.vue';
+import VCFModule from '@/components/modules/VCFModule.vue';
+import InverterModule from '@/components/modules/InverterModule.vue';
+import VCAModule from '@/components/modules/VCAModule.vue';
+import MixerModule from '@/components/modules/MixerModule.vue';
+import SynthPanel from '@/components/SynthPanel.vue';
+import PatchCables from '@/components/PatchCables.vue';
+import MasterOutput from '@/components/modules/MasterOutput.vue';
+import Oscilloscope from '@/components/modules/Oscilloscope.vue';
 
 const audioReady = ref(false);
 const synth = useSynthStore();
