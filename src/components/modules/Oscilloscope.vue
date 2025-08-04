@@ -1,29 +1,42 @@
 <template>
-    <div
-        ref="scopeContainer"
-        class="relative w-full aspect-square bg-black overflow-hidden rounded-lg"
-    >
-        <canvas
-            ref="scopeCanvas"
-            class="absolute left-0 top-0 right-0 bottom-0 inset-0"
-        ></canvas>
-
-        <div class="absolute top-2 left-2 flex gap-2 text-xs text-green-400">
-            <button
-                @click="phaseLocked = !phaseLocked"
-                class="px-2 py-1 bg-green-900/30 rounded"
+    <SynthPanel :class="'!p-4'">
+        <div
+            class="relative flex w-full items-center justify-center overflow-hidden rounded-2xl border-3 border-stone-900 bg-stone-800 shadow-xl group aspect-[4/3]"
+        >
+            <div
+                ref="scopeContainer"
+                class="relative w-[95%] h-[95%] bg-gradient-to-b from-stone-600 to-stone-900 rounded-2xl shadow-inner shadow-black/70 overflow-hidden flex items-center justify-center"
             >
-                Phase Lock: {{ phaseLocked ? 'On' : 'Off' }}
-            </button>
+                <canvas
+                    ref="scopeCanvas"
+                    class="absolute inset-0 top-0 w-full h-full left-0 z-[1]"
+                ></canvas>
+                <div
+                    class="absolute top-0 left-0 w-full h-full z-[2] bg-gradient-to-br from-white/10 to-transparent pointer-events-none"
+                ></div>
+            </div>
         </div>
-    </div>
+        <div class="flex gap-6 pt-3">
+            <BaseButton
+                id="phase-button"
+                :active="phaseLocked"
+                :label="phaseLocked ? 'Phase On' : 'Phase Off'"
+                class="flex-1 text-xs justify-center font-semibold"
+                name="phase"
+                title="Toggle Phase Lock"
+                @click="phaseLocked = !phaseLocked"
+            />
+        </div>
+    </SynthPanel>
 </template>
 
 <script setup>
 import {ref, onMounted, onUnmounted, watch} from 'vue';
-import {useSynthEngine} from '../../composables/useSynthEngine';
-import {useSynthStore} from '../../storage/synthStore';
-import {useModuleLifecycle} from '../../composables/useModuleLifecycle';
+import {useSynthEngine} from '@/composables/useSynthEngine';
+import {useModuleLifecycle} from '@/composables/useModuleLifecycle';
+import {useSynthStore} from '@/storage/synthStore';
+import SynthPanel from '@/components/SynthPanel.vue';
+import BaseButton from '@/components/base/BaseButton.vue';
 
 const engine = useSynthEngine();
 const synthStore = useSynthStore();

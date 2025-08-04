@@ -37,7 +37,7 @@
 
 <script setup>
 import {computed, nextTick, onMounted, onUnmounted, ref} from 'vue';
-import {usePatchStore} from '../storage/patchStore';
+import {usePatchStore} from '@/storage/patchStore';
 
 const patchStore = usePatchStore();
 const svg = ref(null);

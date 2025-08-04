@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import WorkspacePanel from './components/WorkspacePanel.vue';
+import WorkspacePanel from '@/components/WorkspacePanel.vue';
 </script>

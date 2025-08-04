@@ -78,11 +78,11 @@
 
 <script setup>
 import {computed, onMounted} from 'vue';
-import {useSynthStore} from '../../storage/synthStore';
-import {useModuleConnections} from '../../composables/useModuleConnections';
-import SynthPanel from './SynthPanel.vue';
-import JackPanel from '../JackPanel.vue';
-import RadioButtonGroup from '../base/RadioButtonGroup.vue';
+import {useSynthStore} from '@/storage/synthStore';
+import {useModuleConnections} from '@/composables/useModuleConnections';
+import SynthPanel from '@/components/SynthPanel.vue';
+import JackPanel from '@/components/JackPanel.vue';
+import RadioButtonGroup from '@/components/base/RadioButtonGroup.vue';
 
 const synth = useSynthStore();
 const id = 'vcf-module';

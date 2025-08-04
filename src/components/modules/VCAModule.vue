@@ -1,7 +1,7 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <section class="flex flex-row items-center justify-between mb-8">
+            <section class="flex flex-row items-center justify-between">
                 <JackPanel
                     :count="1"
                     :type="'input'"
@@ -17,9 +17,7 @@
                     @patch="handlePatch"
                 />
             </section>
-            <h3
-                class="text-center text-wrap text-xl font-medium mb-8 uppercase"
-            >
+            <h3 class="text-center text-wrap text-xl font-medium mb-8 uppercase">
                 VCA
             </h3>
         </template>
@@ -46,11 +44,11 @@
 
 <script setup>
 import {computed} from 'vue';
-import {useSynthStore} from '../../storage/synthStore';
-import SynthPanel from './SynthPanel.vue';
-import VerticalSlider from '../VerticalSlider.vue';
-import JackPanel from '../JackPanel.vue';
-import {useModuleConnections} from '../../composables/useModuleConnections';
+import {useModuleConnections} from '@/composables/useModuleConnections';
+import {useSynthStore} from '@/storage/synthStore';
+import SynthPanel from '@/components/SynthPanel.vue';
+import VerticalSlider from '@/components/VerticalSlider.vue';
+import JackPanel from '@/components/JackPanel.vue';
 
 const synth = useSynthStore();
 const id = 'vca-module';

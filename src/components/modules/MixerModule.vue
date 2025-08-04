@@ -79,12 +79,12 @@
 </template>
 
 <script setup>
-import SynthPanel from './SynthPanel.vue';
-import JackPanel from '../JackPanel.vue';
 import {computed} from 'vue';
-import {useSynthStore} from '../../storage/synthStore';
-import {useModuleConnections} from '../../composables/useModuleConnections';
-import VerticalSlider from '../VerticalSlider.vue';
+import {useSynthStore} from '@/storage/synthStore';
+import {useModuleConnections} from '@/composables/useModuleConnections';
+import VerticalSlider from '@/components/VerticalSlider.vue';
+import SynthPanel from '@/components/SynthPanel.vue';
+import JackPanel from '@/components/JackPanel.vue';
 
 const synth = useSynthStore();
 const id = 'mixer-module';

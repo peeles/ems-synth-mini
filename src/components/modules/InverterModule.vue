@@ -32,10 +32,10 @@
 </template>
 
 <script setup>
-import SynthPanel from './SynthPanel.vue';
-import JackPanel from '../JackPanel.vue';
-import {useSynthStore} from '../../storage/synthStore';
-import {useModuleConnections} from '../../composables/useModuleConnections';
+import {useModuleConnections} from '@/composables/useModuleConnections';
+import {useSynthStore} from '@/storage/synthStore';
+import SynthPanel from '@/components/SynthPanel.vue';
+import JackPanel from '@/components/JackPanel.vue';
 
 const synth = useSynthStore();
 const id = 'inverter-module';
