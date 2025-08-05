@@ -110,34 +110,41 @@ export const useSynthEngine = (injectedContext = null) => {
         }
 
         try {
-            const bufferSize = ctx.sampleRate;
+            // Use a short buffer to minimise memory usage.
+            const bufferSize = Math.floor(ctx.sampleRate / 10);
             const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
             const data = buffer.getChannelData(0);
 
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+            const fillBuffer = () => {
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+            };
+            fillBuffer();
 
             const source = ctx.createBufferSource();
             source.buffer = buffer;
             source.loop = true;
 
+            // Refresh the buffer at the buffer's duration to avoid repeating
+            // noise patterns while keeping allocations small.
+            const updateIntervalMs = (bufferSize / ctx.sampleRate) * 1000;
+            const intervalId = setInterval(fillBuffer, updateIntervalMs);
+
             const gainNode = ctx.createGain();
             source.connect(gainNode);
             source.start();
 
+            // Ensure interval is cleared when the source is stopped.
+            const originalStop = source.stop.bind(source);
+            source.stop = (...args) => {
+                clearInterval(intervalId);
+                originalStop(...args);
+            };
+
             return {
                 source,
                 gain: gainNode,
-                stop: () => {
-                    try {
-                        source.stop();
-                        source.disconnect();
-                        gainNode.disconnect();
-                    } catch (e) {
-                        console.warn('noise cleanup failed', e);
-                    }
-                },
             };
         } catch (e) {
             console.error('createNoiseNode error:', e);
