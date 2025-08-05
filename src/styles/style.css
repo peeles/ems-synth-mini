@@ -20,4 +20,8 @@
         background-repeat: no-repeat;
         background-size: cover;
     }
+
+    .bg-grid {
+        @apply -inset-0.5 bg-[linear-gradient(to_right,#ececec25_1px,transparent_1px),linear-gradient(to_bottom,#ececec25_1px,transparent_1px)] bg-[size:20px_20px]
+    }
 }

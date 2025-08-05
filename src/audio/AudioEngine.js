@@ -38,9 +38,6 @@ export class AudioEngine {
         this.vcaGainNode = null;
         this.inverterGain = null;
         this.triggerEnvelope = null;
-        this.envelopeTriggerGain = null;
-        this.triggerPollId = null;
-        this.prevTrigger = 0;
     }
 
     async resume() {
@@ -78,7 +75,6 @@ export class AudioEngine {
         const envelope = this.engine.createEnvelopeGain();
         this.vcaGainNode = envelope.gainNode;
         this.triggerEnvelope = envelope.triggerEnvelope;
-        this.ensureEnvelopeTrigger();
 
         this.filterNode?.connect(this.vcaGainNode);
         this.vcaGainNode.connect(this.ctx.destination);
@@ -126,23 +122,7 @@ export class AudioEngine {
         this.noiseOutGain.connect(this.mixerNode);
     }
 
-    initEnvelopeTrigger() {
-        this.envelopeTriggerGain = this.ctx.createGain();
-        this.envelopeTriggerGain.gain.value = 0;
-        const poll = () => {
-            if (
-                this.envelopeTriggerGain.gain.value > 0.5 &&
-                this.prevTrigger <= 0.5
-            ) {
-                this.triggerEnvelope?.();
-            }
-            this.prevTrigger = this.envelopeTriggerGain.gain.value;
-            this.triggerPollId = requestAnimationFrame(poll);
-        };
-        this.triggerPollId = requestAnimationFrame(poll);
-    }
-
-    // === Lazy initialise ===
+    // Lazy Module Loaders
     ensureVCF() {
         if (!this.filterNode || !this.filterInputGain) this.initVCF();
         if (!this.mixerNode) this.initMixer();
@@ -176,10 +156,6 @@ export class AudioEngine {
         if (!this.inverterGain) this.initInverter();
     }
 
-    ensureEnvelopeTrigger() {
-        if (!this.envelopeTriggerGain) this.initEnvelopeTrigger();
-    }
-
     getNodes() {
         return {
             vcoOsc: this.vcoOsc,
@@ -193,7 +169,6 @@ export class AudioEngine {
             mixerNode: this.mixerNode,
             vcaGainNode: this.vcaGainNode,
             inverterGain: this.inverterGain,
-            envelopeTriggerGain: this.envelopeTriggerGain,
             triggerEnvelope: this.triggerEnvelope,
         };
     }
@@ -225,7 +200,6 @@ export class AudioEngine {
             this.filterNode,
             this.vcaGainNode,
             this.inverterGain,
-            this.envelopeTriggerGain,
         ].forEach(n => {
             try {
                 n?.disconnect();
@@ -233,11 +207,6 @@ export class AudioEngine {
                 console.warn('Error disconnecting node:', e);
             }
         });
-
-        if (this.triggerPollId) {
-            cancelAnimationFrame(this.triggerPollId);
-            this.triggerPollId = null;
-        }
 
         this.vcoOsc = this.lfoOsc = this.noiseSrc = null;
         this.vcoOutGain = this.lfoOutGain = this.noiseOutGain = null;
@@ -247,7 +216,7 @@ export class AudioEngine {
             this.vcaGainNode =
             this.inverterGain =
                 null;
-        this.envelopeTriggerGain = this.triggerEnvelope = null;
+        this.triggerEnvelope = null;
     }
 }
 

@@ -5,13 +5,6 @@
                 <h3 class="w-1/2 text-wrap text-xl font-medium uppercase">
                     Envelope Generator
                 </h3>
-                <JackPanel
-                    :count="1"
-                    type="input"
-                    :module-id="id"
-                    :connected="connectedInputs"
-                    @patch="handlePatch"
-                />
             </section>
         </template>
 
@@ -105,21 +98,15 @@
 
 <script setup>
 import {computed, ref} from 'vue';
-import {useModuleConnections} from '@/composables/useModuleConnections';
 import {useSynthStore} from '@/storage/synthStore';
 import {useAnimationSchedule} from '@/composables/useAnimationSchedule';
 import SynthPanel from '@/components/SynthPanel.vue';
 import VerticalSlider from '@/components/VerticalSlider.vue';
-import JackPanel from '@/components/JackPanel.vue';
 import BaseButton from '@/components/base/BaseButton.vue';
 
 const synth = useSynthStore();
-const id = 'envelope-generator';
 const level = ref(0);
 const envelopeActive = computed(() => level.value > 0.01);
-const getInputNode = index => synth.getEnvelopeTriggerInputNode?.(index);
-
-const {connectedInputs, handlePatch} = useModuleConnections(id, {getInputNode});
 
 useAnimationSchedule(() => {
     const gain = synth.getVCAInputNode?.();

@@ -121,11 +121,6 @@ export const useSynthStore = defineStore('synth', () => {
         return audioEngine.getNodes().inverterGain;
     };
 
-    const getEnvelopeTriggerInputNode = () => {
-        audioEngine.ensureEnvelopeTrigger();
-        return audioEngine.getNodes().envelopeTriggerGain?.gain || null;
-    };
-
     // === Parameter Actions ===
 
     const setVcoFrequency = val => {
@@ -326,7 +321,6 @@ export const useSynthStore = defineStore('synth', () => {
         getLFOOutputNode,
         getInverterInputNode,
         getInverterOutputNode,
-        getEnvelopeTriggerInputNode,
 
         // Lifecycle
         resume,
