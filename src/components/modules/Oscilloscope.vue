@@ -7,16 +7,21 @@
                 ref="scopeContainer"
                 class="relative w-[95%] h-[95%] bg-gradient-to-b from-stone-600 to-stone-900 rounded-2xl shadow-inner shadow-black/70 overflow-hidden flex items-center justify-center"
             >
+                <div
+                    class="absolute top-0 left-0 w-full h-full z-[2] bg-gradient-to-br from-white/10 to-transparent pointer-events-none"
+                ></div>
+                <div
+                    v-if="showGrid"
+                    class="absolute z-10 inset-0 h-full w-full bg-grid pointer-events-none"
+                ></div>
                 <canvas
                     ref="scopeCanvas"
                     class="absolute inset-0 top-0 w-full h-full left-0 z-[1]"
                 ></canvas>
-                <div
-                    class="absolute top-0 left-0 w-full h-full z-[2] bg-gradient-to-br from-white/10 to-transparent pointer-events-none"
-                ></div>
+
             </div>
         </div>
-        <div class="flex gap-6 pt-3">
+        <div class="flex gap-4 pt-3">
             <BaseButton
                 id="phase-button"
                 :active="phaseLocked"
@@ -26,12 +31,30 @@
                 title="Toggle Phase Lock"
                 @click="phaseLocked = !phaseLocked"
             />
+            <BaseButton
+                id="grid-button"
+                :active="showGrid"
+                :label="showGrid ? 'Grid On' : 'Grid Off'"
+                class="flex-1 text-xs justify-center font-semibold"
+                name="grid"
+                title="Toggle Grid"
+                @click="showGrid = !showGrid"
+            />
+            <BaseButton
+                id="bright-button"
+                :active="bright"
+                :label="bright ? 'Bright' : 'Dim'"
+                class="flex-1 text-xs justify-center font-semibold"
+                name="brightness"
+                title="Toggle Brightness"
+                @click="bright = !bright"
+            />
         </div>
     </SynthPanel>
 </template>
 
 <script setup>
-import {ref, onMounted, onUnmounted, watch} from 'vue';
+import {ref, onMounted, onUnmounted, watch, computed} from 'vue';
 import {useSynthEngine} from '@/composables/useSynthEngine';
 import {useModuleLifecycle} from '@/composables/useModuleLifecycle';
 import {useSynthStore} from '@/storage/synthStore';
@@ -43,7 +66,6 @@ const engine = useSynthEngine();
 const synthStore = useSynthStore();
 const context = engine.context;
 
-// ---- ANALYSER ----
 const analyser = context.createAnalyser();
 analyser.fftSize = 2048;
 analyser.smoothingTimeConstant = 0.8;
@@ -57,18 +79,19 @@ let bufferLength = analyser.fftSize;
 let dataArray = new Uint8Array(bufferLength);
 const masterGain = ref(null);
 const phaseLocked = ref(true);
+const showGrid = ref(false);
+const bright = ref(true);
 
-// ---- VISUAL SETTINGS ----
 const MAX_POINTS = 512;
-const lineColor = '#4ade80';
-const bgFade = 'rgba(0, 0, 0, 0.25)';
+const lineColor = computed(() => bright.value ? '#4ade80' : '#14532d');
+const bgFade = computed(() => bright.value ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.4)');
 
-// ---- PERFORMANCE ----
-const FPS = 60;
+
+const FPS = 30;
 const frameInterval = 1000 / FPS;
 let lastFrameTime = 0;
 
-// Resize canvas to device pixel ratio for crisp lines
+
 const resizeCanvas = () => {
     const canvas = scopeCanvas.value;
     const container = scopeContainer.value;
@@ -147,12 +170,12 @@ const render = time => {
         return;
     }
 
-    ctx.fillStyle = bgFade;
+    ctx.fillStyle = bgFade.value;
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
 
-    ctx.strokeStyle = lineColor;
+    ctx.strokeStyle = lineColor.value;
     ctx.lineWidth = 1.5;
-    ctx.shadowColor = lineColor;
+    ctx.shadowColor = lineColor.value;
     ctx.shadowBlur = 1;
 
     const points = processPoints(canvas);
