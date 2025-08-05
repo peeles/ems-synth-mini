@@ -47,7 +47,7 @@ export class AudioEngine {
         return this.engine.resume ? this.engine.resume() : Promise.resolve();
     }
 
-    // === Node initialisers ===
+    // === Node initialise===
     initMixer() {
         this.mixerNode = this.ctx.createGain();
         if (this.filterInputGain) {
@@ -56,14 +56,21 @@ export class AudioEngine {
     }
 
     initVCF() {
+        const prevFilterInputGain = this.filterInputGain;
+
         this.filterInputGain = this.ctx.createGain();
         this.filterNode = this.engine.createFilterNode({
             type: this.filterType,
             frequency: this.filterCutoff,
             q: this.filterResonance,
         });
+
         this.filterInputGain.connect(this.filterNode);
-        this.mixerNode?.disconnect();
+
+        if (prevFilterInputGain) {
+            this.mixerNode?.disconnect(prevFilterInputGain);
+        }
+
         this.mixerNode?.connect(this.filterInputGain);
     }
 
@@ -135,7 +142,7 @@ export class AudioEngine {
         this.triggerPollId = requestAnimationFrame(poll);
     }
 
-    // === Lazy initialisers ===
+    // === Lazy initialise ===
     ensureVCF() {
         if (!this.filterNode || !this.filterInputGain) this.initVCF();
         if (!this.mixerNode) this.initMixer();
