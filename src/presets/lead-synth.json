@@ -1,0 +1,17 @@
+{
+  "name": "Lead Synth",
+  "params": {
+    "vcoFrequency": 660,
+    "lfoFrequency": 5,
+    "filterCutoff": 1200,
+    "filterResonance": 2,
+    "envelopeAttack": 0.1,
+    "envelopeDecay": 0.2,
+    "vcoLevel": 1,
+    "noiseLevel": 0,
+    "vcaMode": 0
+  },
+  "patches": [
+    {"from": {"id": "lfo-module", "index": 0}, "to": {"id": "vco-module", "index": 0}}
+  ]
+}

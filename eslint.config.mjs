@@ -57,7 +57,7 @@ export default [
     },
 
     {
-        ignores: ["README.md", "package.json", "jsconfig.json"],
+        ignores: ["README.md", "package.json", "jsconfig.json", "src/presets/*.json"],
     },
 
     {

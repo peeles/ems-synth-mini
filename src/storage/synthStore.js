@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia';
+import {acceptHMRUpdate, defineStore} from 'pinia';
 import {ref} from 'vue';
 import {resetDefaultAudioContext} from '@/composables/useSynthEngine';
 import {AudioEngine} from '@/audio/AudioEngine';
@@ -327,3 +327,7 @@ export const useSynthStore = defineStore('synth', () => {
         destroySynth,
     };
 });
+
+if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(useSynthStore, import.meta.hot));
+}

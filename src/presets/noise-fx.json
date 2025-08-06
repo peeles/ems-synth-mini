@@ -1,0 +1,17 @@
+{
+  "name": "Noise FX",
+  "params": {
+    "vcoFrequency": 440,
+    "lfoFrequency": 8,
+    "filterCutoff": 5000,
+    "filterResonance": 0.5,
+    "envelopeAttack": 0.05,
+    "envelopeDecay": 0.3,
+    "vcoLevel": 0,
+    "noiseLevel": 1,
+    "vcaMode": 0.9
+  },
+  "patches": [
+    {"from": {"id": "lfo-module", "index": 0}, "to": {"id": "vca-module", "index": 0}}
+  ]
+}

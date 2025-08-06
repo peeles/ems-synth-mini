@@ -1,0 +1,17 @@
+{
+  "name": "Bass Drone",
+  "params": {
+    "vcoFrequency": 55,
+    "lfoFrequency": 0.5,
+    "filterCutoff": 200,
+    "filterResonance": 6,
+    "envelopeAttack": 0.5,
+    "envelopeDecay": 1,
+    "vcoLevel": 1,
+    "noiseLevel": 0,
+    "vcaMode": 0.1
+  },
+  "patches": [
+    {"from": {"id": "lfo-module", "index": 0}, "to": {"id": "vcf-module", "index": 1}}
+  ]
+}
