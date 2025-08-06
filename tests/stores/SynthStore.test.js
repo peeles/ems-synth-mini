@@ -29,6 +29,7 @@ const createNodes = () => ({
     noiseOutGain: {gain: {setValueAtTime: vi.fn()}},
     lfoOutGain: {gain: {setValueAtTime: vi.fn()}},
     triggerEnvelope: vi.fn(),
+    colourMix: {},
 });
 
 let nodes;
@@ -41,8 +42,10 @@ const audioEngine = {
     ensureNoise: vi.fn(),
     ensureLFO: vi.fn(),
     ensureMixer: vi.fn(),
+    ensureColour: vi.fn(),
     ensureInverter: vi.fn(),
     ensureEnvelopeTrigger: vi.fn(),
+    setColourAmount: vi.fn(),
     getNodes: () => nodes,
     destroyAll: vi.fn(),
 };
@@ -108,6 +111,12 @@ describe('synthStore', () => {
             0.3,
             ctx.currentTime
         );
+    });
+
+    it('sets color amount', () => {
+        synth.setColourAmount(0.7);
+        expect(synth.colourAmount).toBe(0.7);
+        expect(audioEngine.setColourAmount).toHaveBeenCalledWith(0.7);
     });
 
     it('resets parameters to defaults', () => {

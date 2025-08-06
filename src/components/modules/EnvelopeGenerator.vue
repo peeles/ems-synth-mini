@@ -8,7 +8,7 @@
             </section>
         </template>
 
-        <div class="flex flex-row">
+        <div class="flex flex-row mb-4">
             <div class="mb-3 w-10 text-center">
                 <label class="block text-xs font-semibold mb-2">
                     Rise Time

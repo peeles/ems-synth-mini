@@ -13,6 +13,7 @@ const createMockNode = () => ({
 
 const ctx = {
     createGain: vi.fn(() => createMockNode()),
+    createWaveShaper: vi.fn(() => createMockNode()),
     destination: createMockNode(),
     currentTime: 0,
 };
