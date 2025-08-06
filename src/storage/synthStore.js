@@ -10,8 +10,9 @@ export const DEFAULTS = {
     filterResonance: 1,
     envelopeAttack: 0.2,
     envelopeDecay: 0.5,
-    vcoLevel: 1,
-    noiseLevel: 1,
+    vcoLevel: 0.5,
+    noiseLevel: 0,
+    colourAmount: 0,
     vcaMode: 0,
 };
 
@@ -29,10 +30,11 @@ export const useSynthStore = defineStore('synth', () => {
     const filterResonance = ref(1);
     const filterType = ref('lowpass');
     const envelopeAttack = ref(0.2);
-    const envelopeDecay = ref(0.5);
-    const vcoLevel = ref(1);
-    const noiseLevel = ref(1);
-    const vcaMode = ref(0);
+    const envelopeDecay = ref(0.2);
+    const vcoLevel = ref(0.5);
+    const colourAmount = ref(0);
+    const noiseLevel = ref(0);
+    const vcaMode = ref(0.5);
     const masterOutputNode = ref(null);
 
     async function resume() {
@@ -92,7 +94,8 @@ export const useSynthStore = defineStore('synth', () => {
 
     const getMixerOutputNode = () => {
         audioEngine.ensureMixer();
-        return audioEngine.getNodes().mixerNode;
+        audioEngine.ensureColour();
+        return audioEngine.getNodes().colourMix;
     };
 
     const setMasterOutputNode = node => {
@@ -207,6 +210,11 @@ export const useSynthStore = defineStore('synth', () => {
         nodes.noiseOutGain?.gain.setValueAtTime(noiseLvl, ctx.currentTime);
     };
 
+    const setColourAmount = val => {
+        colourAmount.value = val;
+        audioEngine.setColourAmount(val);
+    };
+
     const setVcaMode = mode => {
         vcaMode.value = mode;
         audioEngine.ensureLFO();
@@ -251,6 +259,9 @@ export const useSynthStore = defineStore('synth', () => {
             case 'noiseLevel':
                 setMixerLevels(vcoLevel.value, val);
                 break;
+            case 'colorAmount':
+                setColourAmount(val);
+                break;
             case 'vcaMode':
                 setVcaMode(val);
                 break;
@@ -290,6 +301,7 @@ export const useSynthStore = defineStore('synth', () => {
         envelopeAttack,
         envelopeDecay,
         vcoLevel,
+        colourAmount,
         noiseLevel,
         vcaMode,
 
@@ -305,6 +317,7 @@ export const useSynthStore = defineStore('synth', () => {
         setVcaMode,
         setEnvelopeAttack,
         setEnvelopeDecay,
+        setColourAmount,
         resetParam,
         triggerEnvelope: triggerVCAEnvelope,
         setMasterOutputNode,

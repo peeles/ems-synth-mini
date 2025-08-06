@@ -15,7 +15,7 @@
             </section>
         </template>
 
-        <div class="flex flex-row justify-center-safe">
+        <div class="flex flex-row justify-between items-center">
             <div class="mb-3 w-10 text-center">
                 <label class="block text-xs font-semibold mb-2">
                     VCO Level
@@ -74,6 +74,46 @@
                     {{ (noiseLevel * 10).toFixed(1) }}
                 </label>
             </div>
+
+            <div class="mx-1">
+                <div
+                    class="flex flex-col items-center justify-center h-full -mt-0.5"
+                >
+                    <div
+                        class="relative flex flex-col items-center h-52 justify-between"
+                    >
+                        <template v-for="n in 11" :key="n">
+                            <div class="flex items-center w-14">
+                                <div
+                                    class="flex-1 border-t border-gray-800 mx-1"
+                                ></div>
+                                <span
+                                    class="w-6 text-center text-xs font-bold"
+                                >{{ 10 - (n - 1) }}</span
+                                >
+                                <div
+                                    class="flex-1 border-t border-gray-800 mx-1"
+                                ></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 w-10 text-center">
+                <label class="block text-xs font-semibold mb-2">Colour Level</label>
+                <VerticalSlider
+                    v-model.number="colourAmount"
+                    :min="0"
+                    :max="1"
+                    :step="0.05"
+                    :show-labels="false"
+                    @dblclick="synth.resetParam('colourAmount')"
+                />
+                <label class="block text-xs font-semibold mb-1 mt-3">
+                    {{ (colourAmount * 10).toFixed(1) }}
+                </label>
+            </div>
         </div>
     </SynthPanel>
 </template>
@@ -103,5 +143,10 @@ const vcoLevel = computed({
 const noiseLevel = computed({
     get: () => synth.noiseLevel,
     set: val => synth.setMixerLevels(synth.vcoLevel, val),
+});
+
+const colourAmount = computed({
+    get: () => synth.colourAmount,
+    set: val => synth.setColourAmount(val),
 });
 </script>

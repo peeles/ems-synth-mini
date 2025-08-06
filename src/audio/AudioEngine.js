@@ -38,6 +38,15 @@ export class AudioEngine {
         this.vcaGainNode = null;
         this.inverterGain = null;
         this.triggerEnvelope = null;
+
+        // Colour stage
+        this.colourNode = null;
+        this.colourDry = null;
+        this.colourWet = null;
+        this.colourMix = null;
+        this.colourAmount = 0;
+        this._colourConnectedToMixer = false;
+        this._colourConnectedToFilter = false;
     }
 
     async resume() {
@@ -50,6 +59,9 @@ export class AudioEngine {
         if (this.filterInputGain) {
             this.mixerNode.connect(this.filterInputGain);
         }
+
+        this._colourConnectedToMixer = false;
+        this.ensureColour();
     }
 
     initVCF() {
@@ -65,10 +77,11 @@ export class AudioEngine {
         this.filterInputGain.connect(this.filterNode);
 
         if (prevFilterInputGain) {
-            this.mixerNode?.disconnect(prevFilterInputGain);
+            this.colourMix?.disconnect(prevFilterInputGain);
         }
 
-        this.mixerNode?.connect(this.filterInputGain);
+        this._colourConnectedToFilter = false;
+        this.ensureColour();
     }
 
     initVCA() {
@@ -91,7 +104,9 @@ export class AudioEngine {
             type: this.vcoWaveform,
             gain: 1.0,
         });
-        if (!result) return;
+        if (!result) {
+            return;
+        }
         this.vcoOsc = result.osc;
         this.vcoOutGain = result.gain;
         this.ensureVCF();
@@ -105,7 +120,9 @@ export class AudioEngine {
             type: this.lfoWaveform,
             gain: 1.0,
         });
-        if (!result) return;
+        if (!result) {
+            return;
+        }
         this.lfoOsc = result.osc;
         this.lfoOutGain = result.gain;
         this.ensureVCA();
@@ -114,7 +131,9 @@ export class AudioEngine {
 
     initNoise() {
         const result = this.engine.createNoiseNode();
-        if (!result) return;
+        if (!result) {
+            return;
+        }
         this.noiseSrc = result.source;
         this.noiseOutGain = result.gain;
         this.ensureVCF();
@@ -122,38 +141,111 @@ export class AudioEngine {
         this.noiseOutGain.connect(this.mixerNode);
     }
 
+    initColour() {
+        this.colourNode = this.ctx.createWaveShaper();
+        const n = 44100;
+        const curve = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+            const x = (i * 2) / n - 1;
+            curve[i] = Math.tanh(x * 2);
+        }
+        this.colourNode.curve = curve;
+        this.colourDry = this.ctx.createGain();
+        this.colourWet = this.ctx.createGain();
+        this.colourMix = this.ctx.createGain();
+        this.colourDry.gain.value = 1 - this.colourAmount;
+        this.colourWet.gain.value = this.colourAmount;
+        this.colourNode.connect(this.colourWet);
+        this.colourDry.connect(this.colourMix);
+        this.colourWet.connect(this.colourMix);
+        this._colourConnectedToMixer = false;
+        this._colourConnectedToFilter = false;
+    }
+
+    ensureColour() {
+        if (
+            !this.colourNode ||
+            !this.colourDry ||
+            !this.colourWet ||
+            !this.colourMix
+        ) {
+            this.initColour();
+        }
+
+        if (this.mixerNode && !this._colourConnectedToMixer) {
+            this.mixerNode.connect(this.colourDry);
+            this.mixerNode.connect(this.colourNode);
+            this._colourConnectedToMixer = true;
+        }
+
+        if (this.filterInputGain && !this._colourConnectedToFilter) {
+            this.colourMix.connect(this.filterInputGain);
+            this._colourConnectedToFilter = true;
+        }
+    }
+
+    setColourAmount(amount) {
+        this.colourAmount = amount;
+        this.ensureColour();
+        this.colourDry.gain.setValueAtTime(1 - amount, this.ctx.currentTime);
+        this.colourWet.gain.setValueAtTime(amount, this.ctx.currentTime);
+    }
+
+
     // Lazy Module Loaders
     ensureVCF() {
-        if (!this.filterNode || !this.filterInputGain) this.initVCF();
-        if (!this.mixerNode) this.initMixer();
+        if (!this.filterNode || !this.filterInputGain) {
+            this.initVCF();
+        }
+
+        if (!this.mixerNode) {
+            this.initMixer();
+        }
+
+        this.ensureColour();
     }
 
     ensureVCA() {
         this.ensureVCF();
-        if (!this.vcaGainNode) this.initVCA();
+
+        if (!this.vcaGainNode) {
+            this.initVCA();
+        }
     }
 
     ensureVCO() {
         this.ensureVCA();
-        if (!this.vcoOsc) this.initVCO();
+
+        if (!this.vcoOsc) {
+            this.initVCO();
+        }
     }
 
     ensureLFO() {
         this.ensureVCA();
-        if (!this.lfoOsc) this.initLFO();
+        if (!this.lfoOsc) {
+            this.initLFO();
+        }
     }
 
     ensureNoise() {
         this.ensureVCF();
-        if (!this.noiseSrc) this.initNoise();
+        if (!this.noiseSrc) {
+            this.initNoise();
+        }
     }
 
     ensureMixer() {
-        if (!this.mixerNode) this.initMixer();
+        if (!this.mixerNode) {
+            this.initMixer();
+        }
+        this.ensureColour();
     }
 
     ensureInverter() {
-        if (!this.inverterGain) this.initInverter();
+        if (!this.inverterGain) {
+            this.initInverter();
+        }
     }
 
     getNodes() {
@@ -167,6 +259,10 @@ export class AudioEngine {
             filterNode: this.filterNode,
             filterInputGain: this.filterInputGain,
             mixerNode: this.mixerNode,
+            colourNode: this.colourNode,
+            colourDry: this.colourDry,
+            colourWet: this.colourWet,
+            colourMix: this.colourMix,
             vcaGainNode: this.vcaGainNode,
             inverterGain: this.inverterGain,
             triggerEnvelope: this.triggerEnvelope,
@@ -196,6 +292,10 @@ export class AudioEngine {
             this.lfoOutGain,
             this.noiseOutGain,
             this.mixerNode,
+            this.colourNode,
+            this.colourDry,
+            this.colourWet,
+            this.colourMix,
             this.filterInputGain,
             this.filterNode,
             this.vcaGainNode,
@@ -210,12 +310,11 @@ export class AudioEngine {
 
         this.vcoOsc = this.lfoOsc = this.noiseSrc = null;
         this.vcoOutGain = this.lfoOutGain = this.noiseOutGain = null;
-        this.filterInputGain =
-            this.filterNode =
-            this.mixerNode =
-            this.vcaGainNode =
-            this.inverterGain =
-                null;
+        this.filterInputGain = this.filterNode = this.mixerNode = null;
+        this.colourNode = this.colourDry = this.colourWet = this.colourMix = null;
+        this.vcaGainNode = this.inverterGain = null;
+        this._colourConnectedToMixer = false;
+        this._colourConnectedToFilter = false;
         this.triggerEnvelope = null;
     }
 }
