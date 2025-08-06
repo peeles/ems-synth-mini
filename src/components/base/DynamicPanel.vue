@@ -12,9 +12,7 @@
             v-if="asideStore.isOpen"
             class="fixed top-0 right-0 w-96 max-w-full h-full bg-white shadow-xl rounded-l-lg border-l border-gray-200 z-50 flex flex-col"
         >
-            <header
-                class="p-4 flex justify-between items-center"
-            >
+            <header class="p-4 flex justify-between items-center">
                 <h2 class="text-lg text-stone-700 font-medium">
                     {{ asideStore.contentProps.title }}
                 </h2>
@@ -26,7 +24,9 @@
                 </button>
             </header>
 
-            <section class="flex flex-col flex-1 overflow-y-auto justify-between p-4">
+            <section
+                class="flex flex-col flex-1 overflow-y-auto justify-between p-4"
+            >
                 <component
                     :is="asideStore.content"
                     v-bind="asideStore.contentProps"

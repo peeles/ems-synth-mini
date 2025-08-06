@@ -60,7 +60,7 @@ import SynthPanel from '@/components/SynthPanel.vue';
 import PatchCables from '@/components/PatchCables.vue';
 import MasterOutput from '@/components/modules/MasterOutput.vue';
 import Oscilloscope from '@/components/modules/Oscilloscope.vue';
-import PatchPanelButton from "@/components/patches/PatchPanelButton.vue";
+import PatchPanelButton from '@/components/patches/PatchPanelButton.vue';
 
 const audioReady = ref(false);
 const synth = useSynthStore();

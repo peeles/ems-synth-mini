@@ -1,6 +1,6 @@
-import {defineStore} from 'pinia';
+import {acceptHMRUpdate, defineStore} from 'pinia';
 import {ref, watch} from 'vue';
-import {useModuleRegistry} from '../composables/useModuleRegistry';
+import {useModuleRegistry} from '@/composables/useModuleRegistry';
 
 export const usePatchStore = defineStore('patch', () => {
     const registry = useModuleRegistry();
@@ -335,3 +335,9 @@ export const usePatchStore = defineStore('patch', () => {
         redoStack,
     };
 });
+
+export default usePatchStore;
+
+if (import.meta.hot) {
+    import.meta.hot.accept(acceptHMRUpdate(usePatchStore, import.meta.hot));
+}
