@@ -18,7 +18,6 @@
                     ref="scopeCanvas"
                     class="absolute inset-0 top-0 w-full h-full left-0 z-[1]"
                 ></canvas>
-
             </div>
         </div>
         <div class="flex gap-4 pt-3">
@@ -83,14 +82,14 @@ const showGrid = ref(false);
 const bright = ref(true);
 
 const MAX_POINTS = 512;
-const lineColor = computed(() => bright.value ? '#4ade80' : '#14532d');
-const bgFade = computed(() => bright.value ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.4)');
-
+const lineColor = computed(() => (bright.value ? '#4ade80' : '#14532d'));
+const bgFade = computed(() =>
+    bright.value ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.4)'
+);
 
 const FPS = 30;
 const frameInterval = 1000 / FPS;
 let lastFrameTime = 0;
-
 
 const resizeCanvas = () => {
     const canvas = scopeCanvas.value;

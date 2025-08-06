@@ -1,33 +1,33 @@
 <template>
     <div
         v-if="!audioReady"
-        class="transition-opacity duration-700 opacity-100 absolute inset-0 z-50 bg-black bg-opacity-80 flex flex-col items-center justify-center text-center p-6"
+        class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80 p-6 text-center opacity-100 transition-opacity duration-700"
     >
-        <div class="text-3xl font-bold mb-8">EMS Synth 100</div>
+        <div class="mb-8 text-3xl font-bold">EMS Synth 100</div>
         <button
             ref="startButton"
             @click="unlock"
             @keydown.enter.prevent="unlock"
             @keydown.space.prevent="unlock"
-            class="px-6 py-2 bg-white text-black font-bold rounded focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+            class="rounded bg-white px-6 py-2 font-bold text-black focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
         >
             Start Audio
         </button>
     </div>
     <div
         v-else
-        class="relative w-full max-w-full h-screen flex flex-col mx-auto p-4"
+        class="relative mx-auto flex h-screen w-full max-w-full flex-col p-4"
     >
         <div class="flex flex-1 flex-col gap-4">
             <div
-                class="grid grid-cols-2 sm:grid-cols-4 gap-4 mx-16 grid-flow-dense"
+                class="mx-16 grid grid-flow-dense grid-cols-2 gap-4 sm:grid-cols-4"
             >
                 <div class=""><LFOModule /></div>
                 <div class=""><VCOModule /></div>
                 <div class=""><VCFModule /></div>
                 <div class=""><SynthPanel /></div>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mx-4">
+            <div class="mx-4 grid grid-cols-2 gap-4 sm:grid-cols-5">
                 <div class=""><MixerModule /></div>
                 <div class=""><EnvelopeGenerator /></div>
                 <div class="flex flex-col gap-4">
@@ -41,6 +41,8 @@
 
         <div class="flex flex-col gap-6 py-6"></div>
         <PatchCables />
+
+        <PatchPanelButton />
     </div>
 </template>
 
@@ -58,6 +60,7 @@ import SynthPanel from '@/components/SynthPanel.vue';
 import PatchCables from '@/components/PatchCables.vue';
 import MasterOutput from '@/components/modules/MasterOutput.vue';
 import Oscilloscope from '@/components/modules/Oscilloscope.vue';
+import PatchPanelButton from "@/components/patches/PatchPanelButton.vue";
 
 const audioReady = ref(false);
 const synth = useSynthStore();
