@@ -14,6 +14,9 @@ export const DEFAULTS = {
     noiseLevel: 0,
     colourAmount: 0,
     vcaMode: 0,
+    vcaResponse: 'linear',
+    vcaDrive: 1,
+    vcaDriveEnabled: false,
 };
 
 export const useSynthStore = defineStore('synth', () => {
@@ -35,6 +38,9 @@ export const useSynthStore = defineStore('synth', () => {
     const colourAmount = ref(0);
     const noiseLevel = ref(0);
     const vcaMode = ref(0.5);
+    const vcaResponse = ref('linear');
+    const vcaDrive = ref(1);
+    const vcaDriveEnabled = ref(false);
     const masterOutputNode = ref(null);
 
     async function resume() {
@@ -224,6 +230,21 @@ export const useSynthStore = defineStore('synth', () => {
             .lfoOutGain?.gain.setValueAtTime(mode, ctx.currentTime);
     };
 
+    const setVcaResponse = response => {
+        vcaResponse.value = response;
+        audioEngine.setVcaResponse(response);
+    };
+
+    const setVcaDrive = val => {
+        vcaDrive.value = val;
+        audioEngine.setVcaDrive(val);
+    };
+
+    const setVcaDriveEnabled = enabled => {
+        vcaDriveEnabled.value = enabled;
+        audioEngine.setVcaDriveEnabled(enabled);
+    };
+
     const setEnvelopeAttack = val => {
         envelopeAttack.value = val;
     };
@@ -266,6 +287,15 @@ export const useSynthStore = defineStore('synth', () => {
             case 'vcaMode':
                 setVcaMode(val);
                 break;
+            case 'vcaResponse':
+                setVcaResponse(val);
+                break;
+            case 'vcaDrive':
+                setVcaDrive(val);
+                break;
+            case 'vcaDriveEnabled':
+                setVcaDriveEnabled(val);
+                break;
         }
     };
 
@@ -305,6 +335,9 @@ export const useSynthStore = defineStore('synth', () => {
         colourAmount,
         noiseLevel,
         vcaMode,
+        vcaResponse,
+        vcaDrive,
+        vcaDriveEnabled,
 
         // Actions
         setVcoFrequency,
@@ -316,6 +349,9 @@ export const useSynthStore = defineStore('synth', () => {
         setFilterType,
         setMixerLevels,
         setVcaMode,
+        setVcaResponse,
+        setVcaDrive,
+        setVcaDriveEnabled,
         setEnvelopeAttack,
         setEnvelopeDecay,
         setColourAmount,
