@@ -1,7 +1,7 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <section class="flex flex-row items-center justify-between mb-8">
+            <section class="flex flex-row items-center justify-between mb-6">
                 <h3 class="w-1/2 text-wrap text-xl font-medium uppercase">
                     Module Mixer
                 </h3>
@@ -15,7 +15,7 @@
             </section>
         </template>
 
-        <div class="flex flex-row justify-between items-center">
+        <section class="flex flex-row grow flex-1 justify-center items-center">
             <div class="mb-3 w-10 text-center">
                 <label class="block text-xs font-semibold mb-2">
                     VCO Level
@@ -43,14 +43,14 @@
                         <template v-for="n in 11" :key="n">
                             <div class="flex items-center w-14">
                                 <div
-                                    class="flex-1 border-t border-gray-800 mx-1"
+                                    class="flex-1 border-t border-stone-800 mx-1"
                                 ></div>
                                 <span
                                     class="w-6 text-center text-xs font-bold"
                                     >{{ 10 - (n - 1) }}</span
                                 >
                                 <div
-                                    class="flex-1 border-t border-gray-800 mx-1"
+                                    class="flex-1 border-t border-stone-800 mx-1"
                                 ></div>
                             </div>
                         </template>
@@ -85,14 +85,14 @@
                         <template v-for="n in 11" :key="n">
                             <div class="flex items-center w-14">
                                 <div
-                                    class="flex-1 border-t border-gray-800 mx-1"
+                                    class="flex-1 border-t border-stone-800 mx-1"
                                 ></div>
                                 <span
                                     class="w-6 text-center text-xs font-bold"
-                                >{{ 10 - (n - 1) }}</span
+                                    >{{ 10 - (n - 1) }}</span
                                 >
                                 <div
-                                    class="flex-1 border-t border-gray-800 mx-1"
+                                    class="flex-1 border-t border-stone-800 mx-1"
                                 ></div>
                             </div>
                         </template>
@@ -101,7 +101,9 @@
             </div>
 
             <div class="mb-3 w-10 text-center">
-                <label class="block text-xs font-semibold mb-2">Colour Level</label>
+                <label class="block text-xs font-semibold mb-2"
+                    >Colour Level</label
+                >
                 <VerticalSlider
                     v-model.number="colourAmount"
                     :min="0"
@@ -114,7 +116,7 @@
                     {{ (colourAmount * 10).toFixed(1) }}
                 </label>
             </div>
-        </div>
+        </section>
     </SynthPanel>
 </template>
 

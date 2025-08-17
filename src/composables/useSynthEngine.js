@@ -89,12 +89,12 @@ export const useSynthEngine = (injectedContext = null) => {
         try {
             const filter = ctx.createBiquadFilter();
             const minFreq = 20;
+            const maxFreq = ctx.sampleRate / 2;
+            const clampedFreq = Math.min(maxFreq, Math.max(minFreq, frequency));
             filter.type = type;
-            filter.frequency.setValueAtTime(
-                Math.max(minFreq, frequency),
-                ctx.currentTime
-            );
+            filter.frequency.setValueAtTime(clampedFreq, ctx.currentTime);
             filter.Q.setValueAtTime(q, ctx.currentTime);
+
             return filter;
         } catch (e) {
             console.error('createFilterNode error:', e);

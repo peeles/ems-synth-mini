@@ -1,9 +1,9 @@
 <template>
     <div class="flex flex-col grow">
-        <div class="p-4 border-b flex items-center gap-2">
+        <div class="border-b border-b-stone-500 flex flex-col mb-6 pb-6">
             <select
                 v-model="selectedPreset"
-                class="border rounded p-1 flex-1 text-sm"
+                class="border-2 rounded p-2 flex flex-1 text-sm border-stone-600 text-stone-700 mb-3"
             >
                 <option disabled value="">Select Preset</option>
                 <optgroup label="Built-in">
@@ -25,25 +25,21 @@
                     </option>
                 </optgroup>
             </select>
-            <button
-                class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-sm disabled:opacity-50"
-                :disabled="!selectedPreset"
-                @click="loadSelected"
-            >
-                Load
-            </button>
-            <button
-                class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm"
-                @click="saveCurrent"
-            >
-                Save
-            </button>
-            <button
-                class="bg-gray-600 hover:bg-gray-700 text-white px-2 py-1 rounded text-sm"
-                @click="presetStore.resetToDefault"
-            >
-                Default
-            </button>
+            <section class="flex justify-between items-center gap-2">
+                <BaseButton
+                    class="text-xs"
+                    :disabled="!selectedPreset"
+                    @click="loadSelected"
+                >
+                    Load
+                </BaseButton>
+                <BaseButton class="text-xs" @click="saveCurrent">
+                    Save
+                </BaseButton>
+                <BaseButton class="text-xs" @click="presetStore.resetToDefault">
+                    Default
+                </BaseButton>
+            </section>
         </div>
         <ul
             v-if="patchStore.patches.length"
@@ -58,33 +54,42 @@
                     {{ registry.get(patch.from.id)?.name || patch.from.id }} →
                     {{ registry.get(patch.to.id)?.name || patch.to.id }}
                 </p>
-                <button
-                    class="text-red-600 hover:underline"
+                <BaseButton
+                    class="text-xs !w-18 items-center justify-center !text-red-700 !border-red-600"
+                    :disabled="
+                        !registry.get(patch.from.id) ||
+                        !registry.get(patch.to.id)
+                    "
+                    :class="{
+                        'cursor-not-allowed':
+                            !registry.get(patch.from.id) ||
+                            !registry.get(patch.to.id),
+                    }"
                     @click="disconnect(patch)"
                 >
                     remove
-                </button>
+                </BaseButton>
             </li>
         </ul>
-        <p v-else class="text-gray-600 text-sm text-center">
+        <p v-else class="text-stone-600 text-sm text-center">
             No active patches
         </p>
     </div>
     <div class="flex shrink">
-        <button
-            class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded cursor-pointer"
+        <BaseButton
+            class="w-full !text-red-700 !text-center py-2 rounded cursor-pointer items-center justify-center"
             @click="clearAll"
         >
             Clear All Patches
-        </button>
+        </BaseButton>
     </div>
 </template>
 
 <script setup>
+import {ref} from 'vue';
 import {usePatchStore} from '@/storage/patchStore';
 import {usePresetStore} from '@/storage/presetStore';
 import {useModuleRegistry} from '@/composables/useModuleRegistry';
-import {ref} from 'vue';
 
 const emit = defineEmits(['close']);
 const patchStore = usePatchStore();
@@ -100,6 +105,7 @@ const loadSelected = () => {
 };
 
 const saveCurrent = () => {
+    // TODO: move to use modal or similar
     const name = window.prompt('Preset name?');
     if (name) {
         presetStore.savePreset(name);
@@ -110,6 +116,7 @@ const saveCurrent = () => {
 const disconnect = patch => {
     const fromModule = registry.get(patch.from.id);
     const toModule = registry.get(patch.to.id);
+
     if (fromModule && toModule) {
         patchStore.disconnectNodes(
             fromModule,

@@ -18,7 +18,7 @@ afterEach(() => {
 
 import {nextTick} from 'vue';
 import {usePatchStore} from '../../src/storage/patchStore.js';
-import PatchCables from '../../src/components/PatchCables.vue';
+import PatchCables from '@components/patches/PatchCables.vue';
 
 describe('PatchCables component', () => {
     let patchStore;

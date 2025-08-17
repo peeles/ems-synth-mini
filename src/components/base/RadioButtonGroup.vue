@@ -1,5 +1,5 @@
 <template>
-    <ul class="flex gap-1 my-3 text-xs mx-auto">
+    <ul class="flex flex-row gap-1 my-3 text-xs">
         <li
             v-for="option in options"
             :key="option.value"
