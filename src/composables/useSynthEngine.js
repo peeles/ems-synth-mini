@@ -152,7 +152,7 @@ export const useSynthEngine = (injectedContext = null) => {
         }
     };
 
-    const createEnvelopeGain = () => {
+    const createEnvelopeGain = ({getResponse} = {}) => {
         const ctx = getContext();
 
         if (!ctx) {
@@ -176,13 +176,34 @@ export const useSynthEngine = (injectedContext = null) => {
                 gainNode.gain.setValueAtTime(current, now);
             }
 
-            if (attack > 0) {
-                gainNode.gain.linearRampToValueAtTime(peak, now + attack);
-            } else {
-                gainNode.gain.setValueAtTime(peak, now);
-            }
+            const response =
+                (typeof getResponse === 'function' && getResponse()) || 'linear';
 
-            gainNode.gain.linearRampToValueAtTime(0, now + attack + decay);
+            if (response === 'exponential') {
+                const safePeak = Math.max(peak, 0.0001);
+                if (attack > 0) {
+                    gainNode.gain.exponentialRampToValueAtTime(
+                        safePeak,
+                        now + attack
+                    );
+                } else {
+                    gainNode.gain.setValueAtTime(safePeak, now);
+                }
+                const endVal = 0.0001;
+                gainNode.gain.exponentialRampToValueAtTime(
+                    endVal,
+                    now + attack + decay
+                );
+                gainNode.gain.setValueAtTime(0, now + attack + decay);
+            } else {
+                if (attack > 0) {
+                    gainNode.gain.linearRampToValueAtTime(peak, now + attack);
+                } else {
+                    gainNode.gain.setValueAtTime(peak, now);
+                }
+
+                gainNode.gain.linearRampToValueAtTime(0, now + attack + decay);
+            }
         };
 
         return {

@@ -46,6 +46,9 @@ const audioEngine = {
     ensureInverter: vi.fn(),
     ensureEnvelopeTrigger: vi.fn(),
     setColourAmount: vi.fn(),
+    setVcaResponse: vi.fn(),
+    setVcaDrive: vi.fn(),
+    setVcaDriveEnabled: vi.fn(),
     getNodes: () => nodes,
     destroyAll: vi.fn(),
 };
@@ -117,6 +120,21 @@ describe('synthStore', () => {
         synth.setColourAmount(0.7);
         expect(synth.colourAmount).toBe(0.7);
         expect(audioEngine.setColourAmount).toHaveBeenCalledWith(0.7);
+    });
+
+    it('sets VCA response', () => {
+        synth.setVcaResponse('exponential');
+        expect(synth.vcaResponse).toBe('exponential');
+        expect(audioEngine.setVcaResponse).toHaveBeenCalledWith('exponential');
+    });
+
+    it('sets VCA drive and toggle', () => {
+        synth.setVcaDrive(3);
+        expect(synth.vcaDrive).toBe(3);
+        expect(audioEngine.setVcaDrive).toHaveBeenCalledWith(3);
+        synth.setVcaDriveEnabled(true);
+        expect(synth.vcaDriveEnabled).toBe(true);
+        expect(audioEngine.setVcaDriveEnabled).toHaveBeenCalledWith(true);
     });
 
     it('resets parameters to defaults', () => {

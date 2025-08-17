@@ -36,8 +36,13 @@ export class AudioEngine {
         this.filterNode = null;
         this.mixerNode = null;
         this.vcaGainNode = null;
+        this.vcaPreDriveGain = null;
+        this.vcaDriveShaper = null;
         this.inverterGain = null;
         this.triggerEnvelope = null;
+        this.vcaResponse = 'linear';
+        this.vcaDriveAmount = 1;
+        this.vcaDriveEnabled = false;
 
         // Colour stage
         this.colourNode = null;
@@ -80,16 +85,28 @@ export class AudioEngine {
             this.colourMix?.disconnect(prevFilterInputGain);
         }
 
+        if (this.vcaPreDriveGain) {
+            this.filterNode.connect(this.vcaPreDriveGain);
+        }
+
         this._colourConnectedToFilter = false;
         this.ensureColour();
     }
 
     initVCA() {
-        const envelope = this.engine.createEnvelopeGain();
+        const envelope = this.engine.createEnvelopeGain({
+            getResponse: () => this.vcaResponse,
+        });
         this.vcaGainNode = envelope.gainNode;
         this.triggerEnvelope = envelope.triggerEnvelope;
 
-        this.filterNode?.connect(this.vcaGainNode);
+        this.vcaPreDriveGain = this.ctx.createGain();
+        this.vcaDriveShaper = this.ctx.createWaveShaper();
+        this._updateDrive();
+
+        this.filterNode?.connect(this.vcaPreDriveGain);
+        this.vcaPreDriveGain.connect(this.vcaDriveShaper);
+        this.vcaDriveShaper.connect(this.vcaGainNode);
         this.vcaGainNode.connect(this.ctx.destination);
     }
 
@@ -191,6 +208,40 @@ export class AudioEngine {
         this.colourWet.gain.setValueAtTime(amount, this.ctx.currentTime);
     }
 
+    _createDriveCurve(enabled) {
+        const n = 44100;
+        const curve = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+            const x = (i * 2) / n - 1;
+            curve[i] = enabled ? Math.tanh(x) : x;
+        }
+        return curve;
+    }
+
+    _updateDrive() {
+        if (!this.vcaPreDriveGain || !this.vcaDriveShaper) return;
+        this.vcaPreDriveGain.gain.value = this.vcaDriveEnabled
+            ? this.vcaDriveAmount
+            : 1;
+        this.vcaDriveShaper.curve = this._createDriveCurve(
+            this.vcaDriveEnabled
+        );
+    }
+
+    setVcaDrive(amount) {
+        this.vcaDriveAmount = amount;
+        this._updateDrive();
+    }
+
+    setVcaDriveEnabled(enabled) {
+        this.vcaDriveEnabled = enabled;
+        this._updateDrive();
+    }
+
+    setVcaResponse(response) {
+        this.vcaResponse = response;
+    }
+
     // Lazy Module Loaders
     ensureVCF() {
         if (!this.filterNode || !this.filterInputGain) {
@@ -263,6 +314,8 @@ export class AudioEngine {
             colourWet: this.colourWet,
             colourMix: this.colourMix,
             vcaGainNode: this.vcaGainNode,
+            vcaPreDriveGain: this.vcaPreDriveGain,
+            vcaDriveShaper: this.vcaDriveShaper,
             inverterGain: this.inverterGain,
             triggerEnvelope: this.triggerEnvelope,
         };
@@ -298,6 +351,8 @@ export class AudioEngine {
             this.filterInputGain,
             this.filterNode,
             this.vcaGainNode,
+            this.vcaPreDriveGain,
+            this.vcaDriveShaper,
             this.inverterGain,
         ].forEach(n => {
             try {
@@ -315,7 +370,7 @@ export class AudioEngine {
             this.colourWet =
             this.colourMix =
                 null;
-        this.vcaGainNode = this.inverterGain = null;
+        this.vcaGainNode = this.vcaPreDriveGain = this.vcaDriveShaper = this.inverterGain = null;
         this._colourConnectedToMixer = false;
         this._colourConnectedToFilter = false;
         this.triggerEnvelope = null;

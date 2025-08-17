@@ -24,7 +24,38 @@
             </section>
         </template>
 
-        <section class="flex flex-row grow justify-center items-center">
+        <section class="flex flex-row grow justify-center items-center gap-6">
+            <div class="relative group w-1/2 text-center space-y-6">
+                <BaseButton
+                    :active="vcaResponse === 'exponential'"
+                    class="text-xs justify-center font-semibold"
+                    :label="vcaResponse === 'exponential' ? 'Exponential' : 'Linear'"
+                    @click="toggleResponse"
+                />
+
+                <BaseButton
+                    :active="driveEnabled"
+                    class="text-xs justify-center font-semibold"
+                    label="Drive"
+                    @click="toggleDrive"
+                />
+
+                <div class="flex flex-col">
+                    <label class="block text-xs font-semibold mb-1">
+                        Drive
+                    </label>
+                    <input
+                        type="range"
+                        :min="1"
+                        :max="5"
+                        :step="0.1"
+                        v-model.number="driveAmount"
+                        @dblclick="synth.resetParam('vcaDrive')"
+                        class="w-full h-[8px] accent-black bg-black/10 rounded-full"
+                    />
+                </div>
+            </div>
+
             <div class="relative group w-1/2 text-center">
                 <label class="block text-xs font-semibold mb-2">
                     Mix Mode
@@ -39,14 +70,8 @@
                     class="mx-auto z-[1]"
                 />
                 <div class="absolute inset-0 pointer-events-none z-0">
-                    <!-- Top-left to bottom-right -->
-                    <div
-                        class="absolute w-[1px] h-full bg-black left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-30"
-                    ></div>
-                    <!-- Top-right to bottom-left -->
-                    <div
-                        class="absolute w-[1px] h-full bg-black left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-30"
-                    ></div>
+                    <div class="absolute w-[1px] h-full bg-black left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-30" />
+                    <div class="absolute w-[1px] h-full bg-black left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-30" />
                 </div>
                 <label class="block text-xs font-medium mb-1 mt-3">
                     {{ modeLabel }}
@@ -87,6 +112,30 @@ const vcaMode = computed({
     get: () => synth.vcaMode,
     set: val => synth.setVcaMode(val),
 });
+
+const vcaResponse = computed({
+    get: () => synth.vcaResponse,
+    set: val => synth.setVcaResponse(val),
+});
+
+const driveAmount = computed({
+    get: () => synth.vcaDrive,
+    set: val => synth.setVcaDrive(val),
+});
+
+const driveEnabled = computed({
+    get: () => synth.vcaDriveEnabled,
+    set: val => synth.setVcaDriveEnabled(val),
+});
+
+const toggleResponse = () => {
+    vcaResponse.value =
+        vcaResponse.value === 'linear' ? 'exponential' : 'linear';
+};
+
+const toggleDrive = () => {
+    driveEnabled.value = !driveEnabled.value;
+};
 
 const modeLabel = computed(() => {
     if (vcaMode.value <= 0.1) {
