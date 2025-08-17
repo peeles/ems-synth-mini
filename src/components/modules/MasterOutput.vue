@@ -1,15 +1,64 @@
 <template>
     <SynthPanel>
         <template #heading>
-            <section class="flex flex-row items-center justify-between mb-8">
+            <section class="flex flex-row items-center justify-between mb-6">
                 <h3 class="w-1/2 text-wrap text-xl font-medium uppercase">
                     Master Output
                 </h3>
+                <JackPanel
+                    :count="1"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
+                />
             </section>
         </template>
 
         <section class="flex justify-around items-end h-58 mb-8">
-            <div class="flex flex-col items-center justify-start h-full">
+            <div class="flex flex-row items-center justify-start h-full">
+                <div class="relative w-6 text-center mt-0.5">
+                    <VerticalSlider
+                        v-model.number="volume"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
+                        :show-labels="false"
+                        @input="updateVolume"
+                        @dblclick="
+                            volume = DEFAULT_VOLUME;
+                            updateVolume();
+                        "
+                        class="!w-6"
+                    />
+                    <label
+                        class="w-full block text-xs font-semibold mt-3 mx-auto"
+                    >
+                        {{ (volume * 10).toFixed(0) }}
+                    </label>
+                </div>
+
+                <div
+                    class="relative flex flex-col h-full items-center justify-between -mt-0.5"
+                >
+                    <template v-for="n in 11" :key="n">
+                        <div class="flex items-center w-14">
+                            <div
+                                class="flex-1 border-t border-stone-800 mx-1"
+                            />
+                            <span class="w-6 text-center text-xs font-bold">{{
+                                10 - (n - 1)
+                            }}</span>
+                            <div
+                                class="flex-1 border-t border-stone-800 mx-1"
+                            />
+                        </div>
+                    </template>
+                    <span
+                        class="w-full block text-xs font-semibold mt-5 mx-auto"
+                    ></span>
+                </div>
+
                 <div class="relative w-6 text-center mt-0.5">
                     <VerticalSlider
                         v-model.number="volume"
@@ -32,25 +81,9 @@
                 </div>
             </div>
 
-            <div class="flex flex-col items-center justify-start h-full">
-                <div
-                    class="relative flex flex-col items-center h-53 justify-between mt-0.5"
-                >
-                    <template v-for="n in 11" :key="n">
-                        <div class="flex items-center w-14">
-                            <div class="flex-1 border-t border-gray-800 mx-1" />
-                            <span class="w-6 text-center text-xs font-bold">{{
-                                10 - (n - 1)
-                            }}</span>
-                            <div class="flex-1 border-t border-gray-800 mx-1" />
-                        </div>
-                    </template>
-                </div>
-            </div>
-
             <div class="relative w-6 h-full">
                 <div
-                    class="relative w-full h-52 mt-0.5 bg-gray-300 border border-black rounded-sm overflow-hidden"
+                    class="relative w-full h-52 mt-0.5 bg-stone-300 border border-black rounded-sm overflow-hidden"
                 >
                     <div
                         v-for="tick in 20"
@@ -73,7 +106,7 @@
 
             <div class="relative w-6 h-full">
                 <div
-                    class="relative w-6 h-52 mt-0.5 bg-gray-300 border border-black rounded-sm overflow-hidden"
+                    class="relative w-6 h-52 mt-0.5 bg-stone-300 border border-black rounded-sm overflow-hidden"
                 >
                     <div
                         v-for="tick in 20"
@@ -116,16 +149,6 @@
                 :label="normalise ? 'Auto-Gain' : 'Manual Gain'"
             />
         </div>
-
-        <section class="flex flex-row justify-center mt-4">
-            <JackPanel
-                :count="1"
-                type="input"
-                :module-id="id"
-                :connected="connectedInputs"
-                @patch="handlePatch"
-            />
-        </section>
     </SynthPanel>
 </template>
 

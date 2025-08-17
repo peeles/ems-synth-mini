@@ -1,18 +1,6 @@
 <template>
     <SynthPanel>
-        <div class="text-xs text-center text-gray-700">
-            This utility inverts any signal connected to phase shift.
-        </div>
-
-        <div class="mt-3 text-center">
-            <span
-                class="inline-block px-2 py-1 bg-gray-200 text-[10px] font-mono rounded"
-            >
-                Gain = –1
-            </span>
-        </div>
-
-        <section class="flex flex-row items-center justify-between mt-4">
+        <section class="flex flex-row items-end justify-between">
             <JackPanel
                 :count="1"
                 type="input"
@@ -20,6 +8,15 @@
                 :connected="connectedInputs"
                 @patch="handlePatch"
             />
+            <div class="flex flex-col items-center justify-between space-y-2">
+                <p class="text-xs text-center text-stone-700 mb-2">
+                    This utility inverts any signal connected to phase shift.
+                </p>
+                <span
+                    class="inline-block px-2 py-1 bg-stone-200 text-xs mb-2 font-mono rounded"
+                    >Gain = –1</span
+                >
+            </div>
             <JackPanel
                 :count="1"
                 type="output"

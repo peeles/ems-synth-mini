@@ -9,7 +9,7 @@
             >
                 <div
                     class="absolute top-0 left-0 w-full h-full z-[2] bg-gradient-to-br from-white/10 to-transparent pointer-events-none"
-                ></div>
+                />
                 <div
                     v-if="showGrid"
                     class="absolute z-10 inset-0 h-full w-full bg-grid pointer-events-none"
@@ -20,7 +20,7 @@
                 ></canvas>
             </div>
         </div>
-        <div class="flex gap-4 pt-3">
+        <div class="flex gap-4 pt-2">
             <BaseButton
                 id="phase-button"
                 :active="phaseLocked"

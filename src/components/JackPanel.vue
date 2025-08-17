@@ -13,10 +13,10 @@
             >
                 <button
                     :class="[
-                        'w-3 h-3 rounded-full cursor-pointer border border-gray-600 focus:outline-none focus:ring-2 focus:ring-stone-700',
+                        'w-3 h-3 rounded-full cursor-pointer border border-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-700',
                         {
                             'bg-yellow-400': connected.includes(i - 1),
-                            'bg-gray-800': !connected.includes(i - 1),
+                            'bg-stone-800': !connected.includes(i - 1),
                         },
                     ]"
                     :id="`${moduleId}-${type}-${i - 1}`"
@@ -26,7 +26,7 @@
                     @click="handleClick(i - 1)"
                 />
             </div>
-            <p v-if="type !== null" class="mt-1 text-[8px] uppercase">
+            <p v-if="type !== null" class="mt-3 text-[8px] uppercase leading-0">
                 {{ type }}
             </p>
         </div>

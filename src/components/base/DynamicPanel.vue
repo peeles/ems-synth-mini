@@ -10,14 +10,11 @@
     >
         <aside
             v-if="asideStore.isOpen"
-            class="fixed top-0 right-0 w-96 max-w-full h-full bg-white shadow-xl rounded-l-lg border-l border-gray-200 z-50 flex flex-col"
+            class="fixed top-0 right-0 w-96 max-w-full h-full bg-white shadow-xl rounded-l-lg border-l border-stone-200 z-50 flex flex-col"
         >
             <header class="p-4 flex justify-between items-center">
-                <h2 class="text-lg text-stone-700 font-medium">
-                    {{ asideStore.contentProps.title }}
-                </h2>
                 <button
-                    class="text-gray-700 hover:text-gray-900 cursor-pointer focus:outline-none"
+                    class="text-stone-700 hover:text-stone-900 cursor-pointer focus:outline-none ml-auto"
                     @click="asideStore.close"
                 >
                     ✕
@@ -37,9 +34,7 @@
 </template>
 
 <script setup>
-import useAsideStore from '@/storage/asideStore';
-
-defineEmits(['close']);
+import {useAsideStore} from '@/storage/asideStore';
 
 const asideStore = useAsideStore();
 </script>

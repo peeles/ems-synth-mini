@@ -1,6 +1,6 @@
 <template>
     <BaseButton
-        class="w-full h-full flex items-center justify-center"
+        class="!self-end w-full flex items-center justify-center text-xs"
         @click="showPatchPanel"
     >
         Patch Panel
@@ -15,6 +15,6 @@ import PatchPanel from '@/components/patches/PatchPanel.vue';
 const asideStore = useAsideStore();
 
 const showPatchPanel = async () => {
-    await asideStore.open(PatchPanel, {title: 'Patch Panel'});
+    await asideStore.open(PatchPanel);
 };
 </script>

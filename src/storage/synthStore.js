@@ -162,7 +162,8 @@ export const useSynthStore = defineStore('synth', () => {
     const FILTER_SMOOTH_TIME = 0.02;
 
     const setFilterCutoff = val => {
-        const clamped = Math.max(FILTER_MIN_FREQ, val);
+        const maxFreq = ctx?.sampleRate ? ctx.sampleRate / 2 : 20000;
+        const clamped = Math.min(maxFreq, Math.max(FILTER_MIN_FREQ, val));
         filterCutoff.value = clamped;
         audioEngine.ensureVCF();
         const {filterNode} = audioEngine.getNodes();

@@ -8,57 +8,61 @@
             </h3>
         </template>
 
-        <div class="flex flex-col mb-6">
-            <label class="block text-xs font-semibold mb-3"> Frequency </label>
-            <input
-                type="range"
-                min="0.1"
-                max="15"
-                step="0.1"
-                v-model.number="lfoFrequency"
-                @dblclick="synth.resetParam('lfoFrequency')"
-                class="w-full h-[8px] accent-black bg-black/10 rounded-full mb-3"
-            />
-            <p class="text-center text-xs text-gray-700">
-                {{ lfoFrequency.toFixed(1) }} Hz
-            </p>
-        </div>
-
-        <RadioButtonGroup
-            name="lfoWaveForm"
-            v-model="lfoWaveform"
-            :options="[
-                {name: 'Sine', value: 'sine'},
-                {name: 'Square', value: 'square'},
-                {name: 'Saw', value: 'sawtooth'},
-                {name: 'Triangle', value: 'triangle'},
-            ]"
-        />
-
-        <section class="flex flex-row items-center justify-between mt-6">
-            <JackPanel
-                :count="1"
-                type="input"
-                :module-id="id"
-                :connected="connectedInputs"
-                @patch="handlePatch"
-            />
-            <div class="flex flex-col items-center justify-center mt-1.5">
-                <div
-                    class="w-3 h-3 rounded-full border border-stone-600"
-                    :class="lfoHigh ? 'bg-green-500' : 'bg-stone-400'"
+        <section class="flex flex-col grow flex-1 gap-4">
+            <div class="flex flex-col">
+                <label class="block text-xs font-semibold mb-3">
+                    Frequency
+                </label>
+                <input
+                    type="range"
+                    min="0.1"
+                    max="15"
+                    step="0.1"
+                    v-model.number="lfoFrequency"
+                    @dblclick="synth.resetParam('lfoFrequency')"
+                    class="w-full h-[8px] accent-black bg-black/10 rounded-full mb-3"
                 />
-                <span class="block text-[9px] mt-3 uppercase text-center"
-                    >Activity</span
-                >
+                <p class="text-center text-xs text-stone-700">
+                    {{ lfoFrequency.toFixed(1) }} Hz
+                </p>
             </div>
-            <JackPanel
-                :count="1"
-                :type="'output'"
-                :module-id="id"
-                :connected="connectedOutputs"
-                @patch="handlePatch"
+
+            <RadioButtonGroup
+                name="lfoWaveForm"
+                v-model="lfoWaveform"
+                :options="[
+                    {name: 'Sine', value: 'sine'},
+                    {name: 'Square', value: 'square'},
+                    {name: 'Saw', value: 'sawtooth'},
+                    {name: 'Triangle', value: 'triangle'},
+                ]"
             />
+
+            <section class="flex flex-row items-center justify-between">
+                <JackPanel
+                    :count="1"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
+                />
+                <div class="flex flex-col items-center justify-center mt-1.5">
+                    <div
+                        class="w-3 h-3 rounded-full border border-stone-600"
+                        :class="lfoHigh ? 'bg-green-500' : 'bg-stone-400'"
+                    />
+                    <p class="block text-[9px] mt-3 uppercase text-center">
+                        Signal
+                    </p>
+                </div>
+                <JackPanel
+                    :count="1"
+                    :type="'output'"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
+            </section>
         </section>
     </SynthPanel>
 </template>

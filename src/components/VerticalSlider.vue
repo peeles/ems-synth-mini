@@ -1,6 +1,6 @@
 <template>
     <div class="h-52 w-10 flex items-center justify-center relative">
-        <div v-if="showLabels" class="absolute top-0 text-xs text-gray-500">
+        <div v-if="showLabels" class="absolute top-0 text-xs text-stone-500">
             {{ max }}
         </div>
         <input
@@ -14,7 +14,7 @@
             class="absolute origin-center rotate-[-90deg] h-2 rounded accent-black bg-black/10 cursor-pointer"
             :class="!showLabels ? 'w-52' : 'w-40'"
         />
-        <div v-if="showLabels" class="absolute bottom-0 text-xs text-gray-500">
+        <div v-if="showLabels" class="absolute bottom-0 text-xs text-stone-500">
             {{ min }}
         </div>
     </div>

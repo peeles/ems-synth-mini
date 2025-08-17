@@ -25,7 +25,24 @@
                 <div class=""><LFOModule /></div>
                 <div class=""><VCOModule /></div>
                 <div class=""><VCFModule /></div>
-                <div class=""><SynthPanel /></div>
+                <div
+                    class="bg-[#f5c44e] flex flex-col justify-between h-full border border-black rounded-lg shadow-inner p-5 text-black tracking-wide space-y-2"
+                >
+                    <div
+                        class="flex flex-row items-center justify-stretch gap-x-2 -mt-1"
+                    >
+                        <div
+                            class="flex-1 py-0.5 px-2 bg-transparent border-2 border-stone-700 rounded"
+                        >
+                            <span
+                                class="text-base font-bold uppercase leading-0.5"
+                                >Synthi 100</span
+                            >
+                        </div>
+                        <span class="font-semibold text-4xl">EMS</span>
+                    </div>
+                    <PatchPanelButton />
+                </div>
             </div>
             <div class="mx-4 grid grid-cols-2 gap-4 sm:grid-cols-5">
                 <div class=""><MixerModule /></div>
@@ -39,10 +56,8 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-6 py-6"></div>
+        <PianoKeyboard />
         <PatchCables />
-
-        <PatchPanelButton />
     </div>
 </template>
 
@@ -56,11 +71,11 @@ import VCFModule from '@/components/modules/VCFModule.vue';
 import InverterModule from '@/components/modules/InverterModule.vue';
 import VCAModule from '@/components/modules/VCAModule.vue';
 import MixerModule from '@/components/modules/MixerModule.vue';
-import SynthPanel from '@/components/SynthPanel.vue';
-import PatchCables from '@/components/PatchCables.vue';
+import PatchCables from '@/components/patches/PatchCables.vue';
 import MasterOutput from '@/components/modules/MasterOutput.vue';
 import Oscilloscope from '@/components/modules/Oscilloscope.vue';
 import PatchPanelButton from '@/components/patches/PatchPanelButton.vue';
+import PianoKeyboard from '@/components/keyboard/pianoKeyboard.vue';
 
 const audioReady = ref(false);
 const synth = useSynthStore();

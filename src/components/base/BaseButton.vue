@@ -2,7 +2,7 @@
     <button
         :type="type"
         :class="[
-            'flex w-full py-1.5 px-2 bg-transparent border-2 border-stone-700 rounded cursor-pointer transition ease-in-out',
+            'flex w-full py-1.5 px-2 bg-transparent border-2 border-stone-700 text-stone-700 rounded cursor-pointer transition ease-in-out',
             'focus:outline-none focus:ring-2 focus:ring-stone-700 focus:border-transparent focus:bg-stone-50/75',
             'disabled:cursor-not-allowed disabled:bg-stone-200 disabled:border-stone-300 disabled:text-stone-400',
             {

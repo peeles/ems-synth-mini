@@ -8,48 +8,52 @@
             </h3>
         </template>
 
-        <div class="flex flex-col mb-6">
-            <label class="block text-xs font-semibold mb-3"> Frequency </label>
-            <input
-                type="range"
-                min="50"
-                max="2000"
-                step="1"
-                v-model.number="vcoFrequency"
-                @dblclick="synth.resetParam('vcoFrequency')"
-                class="w-full h-[8px] accent-black bg-black/10 rounded-full mb-3"
-            />
-            <p class="text-center text-xs text-gray-700">
-                {{ vcoFrequency }} Hz
-            </p>
-        </div>
+        <section class="flex flex-col grow flex-1 gap-4">
+            <div class="flex flex-col">
+                <label class="block text-xs font-semibold mb-3">
+                    Frequency
+                </label>
+                <input
+                    type="range"
+                    min="50"
+                    max="2000"
+                    step="1"
+                    v-model.number="vcoFrequency"
+                    @dblclick="synth.resetParam('vcoFrequency')"
+                    class="w-full h-[8px] accent-black bg-black/10 rounded-full mb-3"
+                />
+                <p class="text-center text-xs text-stone-700">
+                    {{ vcoFrequency }} Hz
+                </p>
+            </div>
 
-        <RadioButtonGroup
-            name="vcoWaveForm"
-            v-model="vcoWaveform"
-            :options="[
-                {name: 'Sine', value: 'sine'},
-                {name: 'Square', value: 'square'},
-                {name: 'Saw', value: 'sawtooth'},
-                {name: 'Triangle', value: 'triangle'},
-            ]"
-        />
+            <RadioButtonGroup
+                name="vcoWaveForm"
+                v-model="vcoWaveform"
+                :options="[
+                    {name: 'Sine', value: 'sine'},
+                    {name: 'Square', value: 'square'},
+                    {name: 'Saw', value: 'sawtooth'},
+                    {name: 'Triangle', value: 'triangle'},
+                ]"
+            />
 
-        <section class="flex flex-row items-center justify-between mt-6">
-            <JackPanel
-                :count="1"
-                type="input"
-                :module-id="id"
-                :connected="connectedInputs"
-                @patch="handlePatch"
-            />
-            <JackPanel
-                :count="1"
-                type="output"
-                :module-id="id"
-                :connected="connectedOutputs"
-                @patch="handlePatch"
-            />
+            <section class="flex flex-row items-center justify-between">
+                <JackPanel
+                    :count="1"
+                    type="input"
+                    :module-id="id"
+                    :connected="connectedInputs"
+                    @patch="handlePatch"
+                />
+                <JackPanel
+                    :count="1"
+                    type="output"
+                    :module-id="id"
+                    :connected="connectedOutputs"
+                    @patch="handlePatch"
+                />
+            </section>
         </section>
     </SynthPanel>
 </template>

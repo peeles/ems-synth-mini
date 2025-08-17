@@ -191,7 +191,6 @@ export class AudioEngine {
         this.colourWet.gain.setValueAtTime(amount, this.ctx.currentTime);
     }
 
-
     // Lazy Module Loaders
     ensureVCF() {
         if (!this.filterNode || !this.filterInputGain) {
@@ -311,7 +310,11 @@ export class AudioEngine {
         this.vcoOsc = this.lfoOsc = this.noiseSrc = null;
         this.vcoOutGain = this.lfoOutGain = this.noiseOutGain = null;
         this.filterInputGain = this.filterNode = this.mixerNode = null;
-        this.colourNode = this.colourDry = this.colourWet = this.colourMix = null;
+        this.colourNode =
+            this.colourDry =
+            this.colourWet =
+            this.colourMix =
+                null;
         this.vcaGainNode = this.inverterGain = null;
         this._colourConnectedToMixer = false;
         this._colourConnectedToFilter = false;
